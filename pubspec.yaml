@@ -69,6 +69,8 @@ dev_dependencies:
   printing: ^5.11.0
   permission_handler: ^11.3.1
   flutter_pdfview: ^1.4.0
+  floating_navbar: ^3.0.0
+  flutter_svg: ^2.0.15
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -91,6 +93,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/images/icons/
     - assets/
   #   - images/a_dot_ham.jpeg
 

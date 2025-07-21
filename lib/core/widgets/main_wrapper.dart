@@ -40,12 +40,26 @@ class MainWrapper extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       //   extendBody: true,//میگه body بره زیرمجموعه bottomnav
-      bottomNavigationBar: BottomNav(
-        Controller: pageController,
-      ),
-      body: PageView(
-        controller: pageController,
-        children: pageViewWidget,
+      body: Stack(
+        children: [
+          PageView(
+            controller: pageController,
+            children: pageViewWidget,
+          ),
+          Positioned( top: height*0.87,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+              child:MyBottomNavigationBar(onChange: (index){
+                pageController.animateToPage(
+                  index,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },),
+            ),)
+        ],
       ),
     );
   }

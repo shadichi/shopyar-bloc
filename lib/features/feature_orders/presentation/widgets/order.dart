@@ -24,7 +24,7 @@ class Order extends StatelessWidget {
       width: 50,
       margin: EdgeInsets.all(width * 0.01),
       child: Card(
-        color: Colors.white,
+        color: AppColors.secondaryColor,
         elevation: 8,
         child: Container(
           /*color: Colors.red,*/
@@ -61,7 +61,7 @@ class Order extends StatelessWidget {
                                       ? "امروز"
                                       :
                                   "${ordersLoadedStatus.dateCreated!.year}/${ordersLoadedStatus.dateCreated!.month}/${ordersLoadedStatus.dateCreated!.day}",
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.white,fontSize: width*0.03),
                                 ),
                                 IconButton(
                                     onPressed: () {},
@@ -80,7 +80,7 @@ class Order extends StatelessWidget {
                             child: AutoSizeText(
                               "${ordersLoadedStatus.billing!.firstName} ${ordersLoadedStatus.billing!.lastName}",
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: width*0.04, color: Colors.white),
+                              style: TextStyle(fontSize: width*0.03, color: Colors.white),
                               maxLines: 1,
                               minFontSize: 9,
                               overflow: TextOverflow.ellipsis,
@@ -92,12 +92,12 @@ class Order extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Text(
                                 "سفارش ${ordersLoadedStatus.id.toString()}",
-                                style: TextStyle(color: Colors.white))),
+                                style: TextStyle(color: Colors.white, fontSize: width*0.03,))),
                       ],
                     ),
                   )),
               Container(
-                 color: Colors.white10,
+
                 height: height * 0.15,
                 width: width * 0.9,
                 alignment: Alignment.center,
@@ -108,9 +108,9 @@ class Order extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("جمع"),
+                          Text("جمع",style: TextStyle(fontSize: width*0.03,color: Colors.white),),
                           Text(ordersLoadedStatus.total
-                              .toString()),
+                              .toString(),style: TextStyle(fontSize: width*0.03,color: Colors.white)),
                         ],
                       ),
                     ),
@@ -132,9 +132,9 @@ class Order extends StatelessWidget {
                                         alignment: Alignment.center,
                                         child: Text(ordersLoadedStatus.lineItems![index]
                                             .quantity
-                                            .toString())),
+                                            .toString(),style: TextStyle(fontSize: width*0.03,color: Colors.white))),
                                     Container(
-                                        child: Text("×"),
+                                        child: Text("×",style: TextStyle(fontSize: width*0.03,color: Colors.white)),
                                         alignment: Alignment.center,
                                         //  color: Colors.pink,
                                         width: width * 0.04),
@@ -146,17 +146,17 @@ class Order extends StatelessWidget {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             Container(
+                                              width: width*0.6,
+                                              alignment: Alignment.centerRight,
                                               child: AutoSizeText(
                                                 ordersLoadedStatus.lineItems![index].name.toString(),
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: width*0.04),
+                                                style: TextStyle(fontSize: width*0.04,color: Colors.white),
                                                 maxLines: 1,
                                                 minFontSize: 9,
                                                 overflow: TextOverflow.ellipsis,
 
                                               ),
-                                              width: width*0.6,
-                                              alignment: Alignment.centerRight,
                                             ),
                                           ],
                                         ),
@@ -167,15 +167,15 @@ class Order extends StatelessWidget {
                                 );
                               }),
                         ),
-                        Container(
-                          /*color: Colors.grey,*/
+                       /* Container(
+                          *//*color: Colors.grey,*//*
                           width: width * 0.19,
                           height: height * 0.085,
                           padding: EdgeInsets.symmetric(vertical: width * 0.03),
                           child: ElevatedButton(
                             onPressed: () {
-                              /*Navigator.pushNamed(context, OrderDetailScreen.routeName,
-                                arguments: orderData(ordersLoadedStatus: ordersLoadedStatus, item: item),);*/
+                              *//*Navigator.pushNamed(context, OrderDetailScreen.routeName,
+                                arguments: orderData(ordersLoadedStatus: ordersLoadedStatus, item: item),);*//*
                               Navigator.push(context, MaterialPageRoute(builder: (context){
                                 return OrderDetailScreen(ordersLoadedStatus, item);
                               }));
@@ -190,7 +190,7 @@ class Order extends StatelessWidget {
                                   fontSize: width * 0.02),
                             ),
                           ),
-                        ),
+                        ),*/
                       ],
                     )
                   ],

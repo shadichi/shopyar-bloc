@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('HomeScreen');
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final dteNow = Jalali.now();
