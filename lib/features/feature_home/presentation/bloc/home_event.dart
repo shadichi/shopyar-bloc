@@ -3,8 +3,8 @@ part of 'home_bloc.dart';
 @immutable
 abstract class HomeEvent {}
 
-class LoadData extends HomeEvent{}
+class LoadDataEvent extends HomeEvent{}
 
-class LogOut extends HomeEvent{
-  LogOut();
-}
+class LogOutEvent extends HomeEvent{}
+
+class LoadHomeDataEvent extends HomeEvent{}

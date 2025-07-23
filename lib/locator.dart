@@ -23,6 +23,7 @@ import 'features/feature_add_edit_order/domain/use_cases/add_order_get_selected_
 import 'features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
 import 'features/feature_home/data/data_source/remote/home_api_provider.dart';
 import 'features/feature_home/domain/repository/home_repository.dart';
+import 'features/feature_home/domain/use_cases/get_home-data_use_case.dart';
 import 'features/feature_orders/data/data_source/remote/orders_api_provider.dart';
 import 'features/feature_orders/data/repository/orders_repositoryImpl.dart';
 import 'features/feature_orders/domain/repository/orders_repository.dart';
@@ -64,6 +65,7 @@ setup() async {
   locator.registerSingleton<GetMainDataUseCase>(GetMainDataUseCase(locator()));
   locator.registerSingleton<GetOrdersUseCase>(GetOrdersUseCase(locator()));
   locator.registerSingleton<EditOrdersStatusUseCase>(EditOrdersStatusUseCase(locator()));
+  locator.registerSingleton<GetHomeDataUseCase>(GetHomeDataUseCase(locator()));
 
   locator.registerSingleton<GetProductsUseCase>(GetProductsUseCase(locator()));
   locator.registerSingleton<ProductsGetStringDataUseCase>(ProductsGetStringDataUseCase(locator()));
@@ -74,7 +76,7 @@ setup() async {
 
  ///bloc
   locator.registerSingleton<LogInBloc>(LogInBloc(locator(), locator()));
-  locator.registerSingleton<HomeBloc>(HomeBloc(locator()));
+  locator.registerSingleton<HomeBloc>(HomeBloc(locator(),locator()));
   locator.registerSingleton<OrdersBloc>(OrdersBloc(locator(), locator()));
   locator.registerSingleton<ProductsBloc>(ProductsBloc(locator(), locator()));
   locator.registerSingleton<AddOrderBloc>(AddOrderBloc( locator(), locator(), locator()));

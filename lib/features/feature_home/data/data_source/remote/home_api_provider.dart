@@ -28,11 +28,24 @@ print(response.body);
         //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
        "http://shop-yar.ir/wp-json/shop-yar/orders?per_page=10",
         queryParameters: {//یعنی بعد از لینک بالا یه علامت سوال بزن و اینارو ادامش بنویس
-          'Authorization': "shadi",
+          'Authorization': "shadi2",
         }
     );
     print(response.statusCode);
     return response;
 
+  }
+  Future<dynamic> GetHomeData() async {
+    print('GetHomeData');
+   try{
+     final response =await _dio.get('https://shop-yar.ir/wp-json/shop-yar/order-report2',options: Options(headers: {
+       "Authorization":"shadi2"
+     }));
+
+     return response;
+
+   }catch(e){
+     print('error in GetHomeData: $e');
+   }
   }
 }

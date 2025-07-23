@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/core/params/middle_card_data.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_status.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    BlocProvider.of<HomeBloc>(context).add(LoadData());
+    BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
+    BlocProvider.of<HomeBloc>(context).add(LoadHomeDataEvent());
   }
 
   var test = '';
@@ -68,12 +70,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(width*0.03),
+                      padding: EdgeInsets.all(width * 0.03),
                       child: Text(
                         StaticValues.shopName,
                         textDirection: TextDirection.rtl,
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold,fontSize: width*0.04),
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: width * 0.04),
                       ),
                     ),
                     Container(
@@ -84,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         textDirection: TextDirection.rtl,
                         style: TextStyle(
                             color: Colors.grey.shade300,
-                            fontSize: width*0.03,
+                            fontSize: width * 0.03,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -98,11 +102,29 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  HomeScreenPieChart(),
+                  HomeScreenPieChart(
+                    test: [
+                      StaticValues
+                          .staticHomeDataEntity!.statusCounts!.wcCompleted,
+                      StaticValues.staticHomeDataEntity!.statusCounts!.wcOnHold,
+                      StaticValues
+                          .staticHomeDataEntity!.statusCounts!.wcPending,
+                      StaticValues
+                          .staticHomeDataEntity!.statusCounts!.wcProcessing,
+                      StaticValues
+                          .staticHomeDataEntity!.statusCounts!.wcRefunded
+                    ],
+                  ),
                   SizedBox(
                     height: height * 0.02,
                   ),
-                 MiddleCard(),
+                  MiddleCard(
+                    middleCardData: MiddleCardData(
+                        StaticValues.staticHomeDataEntity!.dailySales!.qty.toString(),
+                        StaticValues.staticHomeDataEntity!.monthlySales!.qty.toString(),
+                        StaticValues.staticHomeDataEntity!.dailyCancelled!.qty.toString(),
+                        StaticValues.staticHomeDataEntity!.monthlyCancelled!.qty.toString()),
+                  ),
                   SizedBox(
                     height: height * 0.02,
                   ),
@@ -110,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: width,
                     height: height * 0.4,
                     decoration: BoxDecoration(
-                        color: AppColors.section4,
+                        //color: AppColors.section4,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(width * 0.07),
                             topRight: Radius.circular(width * 0.07))),
@@ -120,6 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       elevation: 8,
                       color: Colors.white,
                     ),*/
+                  ),
+                  SizedBox(
+                    height: height * 0.13,
                   )
                 ],
               ),

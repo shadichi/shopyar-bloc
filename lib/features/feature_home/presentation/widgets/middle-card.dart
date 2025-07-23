@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/colors/test3.dart';
+import '../../../../core/params/middle_card_data.dart';
 
 class MiddleCard extends StatelessWidget {
-  const MiddleCard({super.key});
+  final MiddleCardData middleCardData;
+  const MiddleCard({super.key, required this.middleCardData});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,8 @@ class MiddleCard extends StatelessWidget {
                       child: Divider(),
                     ),
                     Text('1000 فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('5 سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('1 سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${middleCardData.dailySales} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${middleCardData.dailyCancelled} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),
@@ -44,8 +46,8 @@ class MiddleCard extends StatelessWidget {
                       child: Divider(),
                     ),
                     Text('1000 فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('5 سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('1 سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${middleCardData.monthlySales} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${middleCardData.monthlyCancelled} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),

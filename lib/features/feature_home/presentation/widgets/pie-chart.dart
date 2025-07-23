@@ -4,41 +4,54 @@ import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/core/colors/test3.dart';
 
 class HomeScreenPieChart extends StatefulWidget {
-  const HomeScreenPieChart({super.key});
+ final List<int> test;
+   HomeScreenPieChart({super.key,required this.test});
 
   @override
-  State<StatefulWidget> createState() => HomeScreenPieChartState();
+  State<HomeScreenPieChart> createState() => _HomeScreenPieChartState();
 }
 
-class HomeScreenPieChartState extends State {
+class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
   int touchedIndex = 0;
+  List<String> percentages = [];
 
   @override
   Widget build(BuildContext context) {
+
+    int sum = widget.test.reduce((a, b) => a + b);
+    for(var item in widget.test){
+      print("widget.test");
+      print(widget.test);
+      double item2 = ((item*100)/sum);
+      print(item2);
+
+      percentages.add(item2.toStringAsFixed(2));
+    }
+
     return AspectRatio(
       aspectRatio: 1.4,
       child: AspectRatio(
         aspectRatio: 0.5,
         child: Stack(
           children: [
-          Center(
-            child: Container(
-            height: 200,
-            width: 220,
-            decoration: BoxDecoration(
-              color: AppColors.background, // Shadow color
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                  offset: Offset(4, 4), // Adjust shadow position
-                ),
-              ],
-            ),
+            Center(
+              child: Container(
+                height: 200,
+                width: 220,
+                decoration: BoxDecoration(
+                  color: AppColors.background, // Shadow color
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: Offset(4, 4), // Adjust shadow position
                     ),
-          ),
+                  ],
+                ),
+              ),
+            ),
             PieChart(
               PieChartData(
                 pieTouchData: PieTouchData(
@@ -66,11 +79,10 @@ class HomeScreenPieChartState extends State {
       ),
     );
   }
-
   List<PieChartSectionData> showingSections() {
     return List.generate(5, (i) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 20.0 : 16.0;
+      final fontSize = isTouched ? 20.0 :10.0;
       final radius = isTouched ? 110.0 : 100.0;
       final widgetSize = isTouched ? 55.0 : 40.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
@@ -78,9 +90,24 @@ class HomeScreenPieChartState extends State {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: AppColors.piChartSection1,
-            value: 40,
-            title: '40%',
+              color: AppColors.piChartSection1,
+              value: double.parse(percentages[i]),
+              title: '${double.parse(percentages[i])}%',
+              radius: radius,
+              titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xffffffff),
+                shadows: shadows,
+              ),
+              badgeWidget: Text('تکمیل شده',style: TextStyle(color: Colors.white,fontSize: 8),),
+              badgePositionPercentageOffset: 1.2
+          );
+        case 1:
+          return PieChartSectionData(
+            color: AppColors.piChartSection2,
+            value: double.parse(percentages[i]),
+            title: '${double.parse(percentages[i])}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -89,28 +116,13 @@ class HomeScreenPieChartState extends State {
               shadows: shadows,
             ),
             badgeWidget: Text('در صف بررسی',style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset: 1.2
-          );
-        case 1:
-          return PieChartSectionData(
-            color: AppColors.piChartSection2,
-            value: 30,
-            title: '30%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-              shadows: shadows,
-            ),
-            badgeWidget: Text('پرداخت شده',style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset:1.4,
+            badgePositionPercentageOffset:1.2,
           );
         case 2:
           return PieChartSectionData(
             color: AppColors.piChartSection3,
-            value: 16,
-            title: '16%',
+            value: double.parse(percentages[i]),
+            title: '${double.parse(percentages[i])}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -118,14 +130,14 @@ class HomeScreenPieChartState extends State {
               color: const Color(0xffffffff),
               shadows: shadows,
             ),
-            badgeWidget: Text('در حال پردازش',style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset: 1.2,
+            badgeWidget: Text('در حال پرداخت',style: TextStyle(color: Colors.white,fontSize: 8),),
+            badgePositionPercentageOffset: 1.3,
           );
         case 3:
           return PieChartSectionData(
             color: AppColors.piChartSection4,
-            value: 15,
-            title: '15%',
+            value: double.parse(percentages[i]),
+            title: '${double.parse(percentages[i])}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -133,14 +145,14 @@ class HomeScreenPieChartState extends State {
               color: const Color(0xffffffff),
               shadows: shadows,
             ),
-            badgeWidget: Text('در انتظار پرداخت', style: TextStyle(color: Colors.white,fontSize: 8),),
+            badgeWidget: Text('در انتظار پردازش', style: TextStyle(color: Colors.white,fontSize: 8),),
             badgePositionPercentageOffset: 1.5,
           );
         case 4:
           return PieChartSectionData(
             color: AppColors.piChartSection5,
-            value: 15,
-            title: '10%',
+            value: double.parse(percentages[i]),
+            title: '${double.parse(percentages[i])}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -148,7 +160,7 @@ class HomeScreenPieChartState extends State {
               color: const Color(0xffffffff),
               shadows: shadows,
             ),
-            badgeWidget: Text('در انتظار پرداخت', style: TextStyle(color: Colors.white,fontSize: 8),),
+            badgeWidget: Text('برگشت داده شده', style: TextStyle(color: Colors.white,fontSize: 8),),
             badgePositionPercentageOffset: 1.4,
           );
         default:
@@ -157,3 +169,7 @@ class HomeScreenPieChartState extends State {
     });
   }
 }
+
+
+ 
+

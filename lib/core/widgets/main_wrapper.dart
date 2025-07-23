@@ -28,7 +28,7 @@ class MainWrapper extends StatelessWidget {
         child: OrdersScreen(),
       ),
       BlocProvider(
-        create: (context) => HomeBloc(locator()),
+        create: (context) => HomeBloc(locator(),locator()),
         child: HomeScreen(),
       ),
       BlocProvider(
