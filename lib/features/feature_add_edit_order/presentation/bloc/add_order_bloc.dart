@@ -78,7 +78,12 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       final cart = loadedState.cart;
       cart[event.product.id!.toInt()] =
           (cart[event.product.id!.toInt()] ?? 0) + 1;
+
+      print('fsdfsdfsdfsddsfsfsdfsvbsfdgv');
       print(cart[event.product.id!.toInt()]);
+      print('object');
+      print(cart);
+      print('cart');
 
       emit(
           state.copyWith(newCount: cart));

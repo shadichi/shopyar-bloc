@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/widgets/product.dart';
 
-import '../../../../core/colors/test3.dart';
+import '../../../../core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../domain/entities/product_entity.dart';
 
 class EndingProduct extends StatelessWidget {
@@ -24,7 +25,7 @@ class EndingProduct extends StatelessWidget {
               height: height * 0.14,
               width: width * 0.27,
               decoration: BoxDecoration(
-                color: AppColors.section4,
+                color: AppConfig.section4,
                 borderRadius: BorderRadius.circular(width * 0.02),
               ),
               child: Column(

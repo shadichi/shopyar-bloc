@@ -15,6 +15,8 @@ class StaticValues{
   static Map<String, dynamic> status= {};
   static HomeDataEntity? staticHomeDataEntity;
 
+  static bool isDrawerOpen = false;
+
   ///order, product
   static List<OrdersEntity> staticOrders = [];
   static List<ProductEntity> staticProducts = [];

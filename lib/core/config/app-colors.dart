@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
-class AppColors {
+class AppConfig {
   static const Color primary = contentColorCyan;
   static const Color menuBackground = Color(0xFF090912);
   static const Color itemsBackground = Color(0xFF1B2339);
@@ -51,6 +52,28 @@ class AppColors {
   static const Color piChartSection4 = Color(0xFF4679F2);//
   static const Color piChartSection5 = Color(0xFFCA498C);//
 
-  static const Color secondaryColor = Color(0xFF303F59);//
+  static const Color secondaryColor = Color(0xFF485874);//
+
+  static const Color orderCardColor = Color(0xFF303F59);//
+
+  static double calWidth(BuildContext context, double widthPercent) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * (widthPercent / 100);
+  }
+
+  static double calHeight(BuildContext context, double heightPercent) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    return screenHeight * (heightPercent / 100);
+  }
+  static double calFontSize(BuildContext context, double fontPercent) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * (fontPercent / 100);
+  }
+
+  static double calTitleFontSize (BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * (4 / 100);
+  }
+
 
 }

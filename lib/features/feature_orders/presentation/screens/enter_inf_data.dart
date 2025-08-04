@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import '../../../../core/colors/test3.dart';
+import '../../../../core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../data/models/store_info.dart';
 
 class EnterInfData extends StatefulWidget {
@@ -42,15 +43,15 @@ class _EnterInfDataState extends State<EnterInfData> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("📢 اطلاعیه"),
+            title: Text("📢 اطلاعیه",style: TextStyle(fontSize: AppConfig.calTitleFontSize(context)),),
             content: Text(
               "در این بخش، اطلاعات ارسالی شما برای درج در برچسب پستی دریافت و ذخیره می‌شود.\n"
-              "می‌توانید در آینده از طریق صفحه اصلی برنامه آن را ویرایش کنید.",
+              "می‌توانید در آینده از طریق صفحه اصلی برنامه آن را ویرایش کنید.",style: TextStyle(fontSize: AppConfig.calTitleFontSize(context)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("متوجه شدم ✅",style: TextStyle(color: Colors.black87),),
+                child: Text("متوجه شدم ✅",style: TextStyle(color: Colors.black87,fontSize: AppConfig.calTitleFontSize(context)),),
               ),
             ],
           );
@@ -68,14 +69,14 @@ class _EnterInfDataState extends State<EnterInfData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppConfig.background,
       appBar: AppBar(
         title: Text(
           "ثبت اطلاعات برچسب پستی",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white,fontSize: AppConfig.calTitleFontSize(context)),
         ),
         iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: AppColors.background,
+        backgroundColor: AppConfig.background,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -147,7 +148,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                       Navigator.pushNamed(context, '/pdfViewer');
                     }
                   },
-                  child: Text("ذخیره",style: TextStyle(color: Colors.black),),
+                  child: Text("ذخیره",style: TextStyle(color: Colors.black,fontSize: AppConfig.calTitleFontSize(context)),),
                 ),
               ],
             ),
@@ -185,6 +186,7 @@ class CustomTextField extends StatelessWidget {
         validator: validator,
         decoration: InputDecoration(
           hintText: label,
+          hintStyle: TextStyle(fontSize: AppConfig.calTitleFontSize(context) ),
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(

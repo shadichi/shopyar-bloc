@@ -6,10 +6,11 @@ import 'package:shapyar_bloc/features/feature_add_edit_order/data/models/add_ord
 import 'package:shapyar_bloc/features/feature_add_edit_order/data/models/add_order_orders_model.dart';
 import 'package:shapyar_bloc/features/feature_add_edit_order/presentation/bloc/add_order_status.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/bloc/orders_bloc.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/widgets/product.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import '../../../../core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/products_params.dart';
 import '../../../../core/widgets/alert_dialog.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../locator.dart';
@@ -150,8 +151,9 @@ class _AddOrderState extends State<AddOrder> {
                   is AddOrderProductsLoadingStatus) {
                 BlocProvider.of<AddOrderBloc>(context)
                     .add(LoadAddOrderProductsData());
-                bodyContent = Center(child: CircularProgressIndicator());
-              } else if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
+                bodyContent = Center(child: ProgressBar());
+              }
+              else if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
                 AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
                     state.addOrderStatus as AddOrderProductsLoadedStatus;
                 paymentMethod!.forEach((element) {
@@ -172,7 +174,7 @@ class _AddOrderState extends State<AddOrder> {
                     Theme(
                       data: ThemeData(
                           colorScheme: ColorScheme.fromSwatch().copyWith(
-                            primary: AppColors.section4,
+                            primary: AppConfig.section4,
                           ),
                           fontFamily: 'IRANSansWeb'),
                       child: Stepper(
@@ -181,11 +183,11 @@ class _AddOrderState extends State<AddOrder> {
                             children: <Widget>[
                               TextButton(
                                 onPressed: (){details.onStepContinue;},
-                                child: const Text('ادامه',style: TextStyle(color: AppColors.white70),),
+                                child: const Text('ادامه',style: TextStyle(color: AppConfig.white70),),
                               ),
                               TextButton(
                                 onPressed: (){details.onStepCancel;},
-                                child: const Text('لغو',style: TextStyle(color: AppColors.white70),),
+                                child: const Text('لغو',style: TextStyle(color: AppConfig.white70),),
                               ),
                             ],
                           );
@@ -203,12 +205,12 @@ class _AddOrderState extends State<AddOrder> {
                             content: AddOrderBill(paymentMethod, shipmentMethod,
                                 onTextChange, _formKey),
                             isActive: _currentStep == 0,
-                              subtitle: Text('مشخصات صورتحساب برای ایجاد سفارش را وارد کنید.',style: TextStyle(color: AppColors.white70),)
+                              subtitle: Text('مشخصات صورتحساب برای ایجاد سفارش را وارد کنید.',style: TextStyle(color: AppConfig.white70),)
 
 
                           ),
                           Step(
-                            title: Text('محصولات',style: TextStyle(color: AppColors.white),),
+                            title: Text('محصولات',style: TextStyle(color: AppConfig.white),),
                             content: Container(
                               width: width * 0.7,
                               height: height * 0.55,
@@ -221,7 +223,7 @@ class _AddOrderState extends State<AddOrder> {
                                   }),
                             ),
                             isActive: _currentStep == 1,
-                            subtitle: Text('محصولات انتخابی برای ایجاد سفارش را انتخاب کنید.',style: TextStyle(color: AppColors.white70),)
+                            subtitle: Text('محصولات انتخابی برای ایجاد سفارش را انتخاب کنید.',style: TextStyle(color: AppConfig.white70),)
                           ),
                         ],
                       ),
@@ -253,7 +255,7 @@ class _AddOrderState extends State<AddOrder> {
                                 child: Container(
                                     width: width * 0.3,
                                     alignment: Alignment.center,
-                                    child: CircularProgressIndicator())),
+                                    child: ProgressBar())),
                           ),
                         );
                       }
@@ -448,10 +450,10 @@ class _AddOrderState extends State<AddOrder> {
               }
 
               return Scaffold(
-                backgroundColor: AppColors.background,
+                backgroundColor: AppConfig.background,
                 body: bodyContent,
                 appBar: AppBar(
-                  backgroundColor: AppColors.background,
+                  backgroundColor: AppConfig.background,
                   iconTheme: IconThemeData(
                     color: Colors.white, //change your color here
                   ),

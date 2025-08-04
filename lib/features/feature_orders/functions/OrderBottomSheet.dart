@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/core/config/app-colors.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
 
 import '../../../core/params/orders_edit_status.dart';
+import '../../../core/widgets/progress-bar.dart';
 import '../presentation/bloc/orders_bloc.dart';
 import '../presentation/bloc/orders_status.dart';
 
@@ -16,7 +18,7 @@ void showFilterBottomSheet(BuildContext context,
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.white,
+    backgroundColor: AppConfig.background,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -26,17 +28,18 @@ void showFilterBottomSheet(BuildContext context,
 
           if (state.editStatus is EditOrderSuccessStatus) {
 
-          await  alertDialog(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
+            await  alertDialog(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
             Navigator.pop(context);
           }
         },
         builder: (context, state) {
+          print('showFilterBottomSheet');
+          print(state.editStatus);
           if (state.editStatus is EditOrderLoadingStatus) {
             return Container(
               color: Colors.black.withOpacity(0.5),
               child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                child: ProgressBar(
                 ),
               ),
             );
@@ -45,50 +48,74 @@ void showFilterBottomSheet(BuildContext context,
             print('Failed');
 
           }
-          if (state.editStatus is EditOrderInitialStatus || state.editStatus is EditOrderSuccessStatus) {
-            return Padding(
-              padding: EdgeInsets.all(width * 0.02),
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // Adjust height dynamically
-                children: [
-                  Text(
-                    "Filter Orders",
-                    style: TextStyle(
-                        fontSize: width * 0.02, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: width * 0.02),
-                  Container(
-                    height: height * 0.5,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: StaticValues.status.length,
-                      itemBuilder: (context, index) {
-                        final key = StaticValues.status.keys.elementAt(index);
-                        final value = StaticValues.status[key];
-                        return Container(
-                          padding: EdgeInsets.symmetric(vertical: width * 0.02),
-                          alignment: Alignment.center,
-                          child: Container(
-                            color: Colors.blueGrey,
-                            height: height * 0.1,
-                            width: width * 0.7,
-                            alignment: Alignment.center,
-                            child: ListTile(
-                              title:
-                                  Text(value!, textAlign: TextAlign.center),
-                              onTap: () {
-                                print(key.substring(3));
-                                BlocProvider.of<OrdersBloc>(context).add(
-                                    EditStatus(OrdersEditStatus(
-                                        ordersId, key.substring(3))));
-                              },
-                            ),
-                          ),
-                        );
-                      },
+          if ( state.editStatus is OrdersLoadedStatus) {
+            return Padding(padding: EdgeInsets.all(AppConfig.calHeight(context, 0.8)),
+              child: SingleChildScrollView(
+                child: Column(
+
+                  mainAxisSize: MainAxisSize.min, // Adjust height dynamically
+                  children: [
+                    Container(alignment: Alignment.center,
+                      //  padding: EdgeInsets.all(AppConfig.calHeight(context, 1)),
+                      child: Text(
+                        "جهت تغییر وضعیت سفارش انتخاب کنید:",
+                        style: TextStyle(
+                            fontSize: AppConfig.calTitleFontSize(context),color: Colors.white),
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: AppConfig.calHeight(context, 2),),
+                    SizedBox(
+                      height: AppConfig.calHeight(context, 90),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: StaticValues.status.length+1,
+                        itemBuilder: (context, index) {
+                          String trueValue = '';
+                          String trueKey = '';
+                          if(index != StaticValues.status.length){
+                            final key = StaticValues.status.keys.elementAt(index)??'';
+                            final value = StaticValues.status[key]??'';
+                            trueValue = value;
+                            trueKey = key;
+                          }
+                          if(index == StaticValues.status.length){
+                            return Container(height: AppConfig.calHeight(context, 40));
+                          }else{
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 0.08))), color: AppConfig.background,
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: width * 0.02),
+                              alignment: Alignment.center,
+
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 3))),   color:  AppConfig.secondaryColor,
+                                ),
+
+                                height: height * 0.1,
+                                width: width * 0.7,
+                                alignment: Alignment.center,
+                                child: ListTile(
+                                  title:
+                                  Text(trueValue, textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontSize:  AppConfig.calFontSize(context, 4)),),
+                                  onTap: () {
+                                    print(trueKey.substring(3));
+                                    BlocProvider.of<OrdersBloc>(context).add(
+                                        EditStatus(OrdersEditStatus(
+                                            ordersId, trueKey.substring(3))));
+                                  },
+                                ),
+                              ),
+                            );
+                          }
+                        },
+
+                      ),
+                    ),
+                    SizedBox(height: AppConfig.calHeight(context, 2),),
+                  ],
+                ),
               ),
             );
           }

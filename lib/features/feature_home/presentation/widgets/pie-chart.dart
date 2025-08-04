@@ -1,11 +1,13 @@
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import 'package:shapyar_bloc/core/colors/app-colors.dart';
+
+import '../../../../core/config/app-colors.dart';
 
 class HomeScreenPieChart extends StatefulWidget {
- final List<int> test;
-   HomeScreenPieChart({super.key,required this.test});
+ final List<int> items;
+   HomeScreenPieChart({super.key,required this.items});
 
   @override
   State<HomeScreenPieChart> createState() => _HomeScreenPieChartState();
@@ -18,10 +20,10 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
   @override
   Widget build(BuildContext context) {
 
-    int sum = widget.test.reduce((a, b) => a + b);
-    for(var item in widget.test){
+    int sum = widget.items.reduce((a, b) => a + b);
+    for(var item in widget.items){
       print("widget.test");
-      print(widget.test);
+      print(widget.items);
       double item2 = ((item*100)/sum);
       print(item2);
 
@@ -39,13 +41,13 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                 height: 200,
                 width: 220,
                 decoration: BoxDecoration(
-                  color: AppColors.background, // Shadow color
+                  color: AppConfig.background, // Shadow color
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+                      color:AppConfig.section3,
+                      blurRadius: 20,
+                      spreadRadius: 5,
                       offset: Offset(4, 4), // Adjust shadow position
                     ),
                   ],
@@ -90,7 +92,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-              color: AppColors.piChartSection1,
+              color: AppConfig.piChartSection1,
               value: double.parse(percentages[i]),
               title: '${double.parse(percentages[i])}%',
               radius: radius,
@@ -105,7 +107,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           );
         case 1:
           return PieChartSectionData(
-            color: AppColors.piChartSection2,
+            color: AppConfig.piChartSection2,
             value: double.parse(percentages[i]),
             title: '${double.parse(percentages[i])}%',
             radius: radius,
@@ -120,7 +122,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           );
         case 2:
           return PieChartSectionData(
-            color: AppColors.piChartSection3,
+            color: AppConfig.piChartSection3,
             value: double.parse(percentages[i]),
             title: '${double.parse(percentages[i])}%',
             radius: radius,
@@ -135,7 +137,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           );
         case 3:
           return PieChartSectionData(
-            color: AppColors.piChartSection4,
+            color: AppConfig.piChartSection4,
             value: double.parse(percentages[i]),
             title: '${double.parse(percentages[i])}%',
             radius: radius,
@@ -150,7 +152,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           );
         case 4:
           return PieChartSectionData(
-            color: AppColors.piChartSection5,
+            color: AppConfig.piChartSection5,
             value: double.parse(percentages[i]),
             title: '${double.parse(percentages[i])}%',
             radius: radius,

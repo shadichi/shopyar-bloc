@@ -1,66 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/screens/products_screen.dart';
-import 'package:shapyar_bloc/locator.dart';
-
-import '../../features/feature_log_in/presentation/screens/log_in_screen.dart';
-import '../../features/feature_orders/presentation/bloc/orders_bloc.dart';
-import '../../features/feature_products/presentation/bloc/products_bloc.dart';
-import '../colors/test3.dart';
+import '../colors/app-colors.dart';
+import '../config/app-colors.dart';
 import 'bottom_nav.dart';
 
-class MainWrapper extends StatelessWidget {
-  MainWrapper({Key? key}) : super(key: key);
+class MainWrapper extends StatefulWidget {
+  @override
+  State<MainWrapper> createState() => _MainWrapperState();
+}
 
+class _MainWrapperState extends State<MainWrapper> {
   final PageController pageController = PageController(initialPage: 1);
+  final ValueNotifier<bool> isDrawerOpen = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
 
     List<Widget> pageViewWidget = [
-      BlocProvider(
-        create: (context) => OrdersBloc(locator(),locator()),
-        child: OrdersScreen(),
+      OrdersScreen(),
+      HomeScreen(
+        onDrawerStatusChange: (open) {
+          isDrawerOpen.value = open;
+        },
       ),
-      BlocProvider(
-        create: (context) => HomeBloc(locator(),locator()),
-        child: HomeScreen(),
-      ),
-      BlocProvider(
-        create: (context) => ProductsBloc(locator(), locator()),
-        child: ProductsScreen(),
-      ),
+      ProductsScreen(),
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      //   extendBody: true,//میگه body بره زیرمجموعه bottomnav
+      backgroundColor: AppConfig.background,
       body: Stack(
         children: [
           PageView(
             controller: pageController,
+            physics: NeverScrollableScrollPhysics(),
             children: pageViewWidget,
           ),
-          Positioned( top: height*0.87,
+          Positioned(
+            top: height * 0.87,
             left: 0,
             right: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-              child:MyBottomNavigationBar(onChange: (index){
-                pageController.animateToPage(
-                  index,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: isDrawerOpen,
+              builder: (context, drawerOpen, _) {
+                return AnimatedOpacity(
+                  duration: Duration(milliseconds: 400),
+                  opacity: drawerOpen ? 0.0 : 1.0,
+                  child: IgnorePointer(
+                    ignoring: drawerOpen,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                      child: MyBottomNavigationBar(
+                        onChange: (index) {
+                          pageController.animateToPage(
+                            index,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 );
-              },),
-            ),)
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
+

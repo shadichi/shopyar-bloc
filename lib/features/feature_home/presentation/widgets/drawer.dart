@@ -1,56 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
-import '../../../../core/widgets/snackBar.dart';
-import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
-import '../../../feature_orders/presentation/screens/orders_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/home_bloc.dart';
+import '../../../../core/colors/app-colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/config/app-colors.dart';
 
 class HomeDrawer extends StatelessWidget {
+  final List<String> icons = [
+    'assets/images/icons/setting.svg',
+    'assets/images/icons/mail.svg',
+    'assets/images/icons/logout.svg',
+  ];
+  final List<String> title = [
+    'تنظیمات',
+    'برچسب پستی',
+    'خروج از حساب',
+  ];
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    StaticValues.isDrawerOpen = !StaticValues.isDrawerOpen;
+
     return Drawer(
       child: Container(
-        color: AppColors.background,
+        height: height,
+        width: width,
+        color: AppConfig.secondaryColor,
         child: Column(
-       //   mainAxisAlignment: MainAxisAlignment.start,
-          // padding: EdgeInsets.zero,
           children: [
-            SizedBox(height: height*0.03,),
             Container(
-              height: height * 0.2,//color: Colors.yellow,
-              child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              margin: EdgeInsets.only(top: height * 0.13),
+              alignment: Alignment.center,
+              width: width * 0.6,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(
-                   // color: Colors.green,
-                    width: width * 0.7,
-                    child: Text(StaticValues.shopName,style: TextStyle(fontSize: width*0.05,color: AppColors.white),),
+                    child: Image.asset('assets/images/icons/shopyar-icon.png'),
+                    width: width * 0.1,
                   ),
                   Container(
-                 //   color: Colors.green,
-                    width: width * 0.7,
-                    child: Text(StaticValues.userName,style: TextStyle(fontSize: width*0.03,color: AppColors.white)),
-                  ),
-                  SizedBox(
-                    width: width * 0.7,
-                    child: Divider(),
+                    width: width * 0.3,
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Text(
+                            'شاپ یار',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: width * 0.05),
+                          ),
+                          width: width * 0.3,
+                          alignment: Alignment.center,
+                        ),
+                        Container(
+                          child: Text(
+                            'شادی مرادیان',
+                            style: TextStyle(
+                                color: Colors.grey, fontSize: width * 0.04),
+                          ),
+                          width: width * 0.3,
+                          alignment: Alignment.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-         //   _buildDrawerItem(Icons.home, "سفارشات", context, (){}),
-            Container(height: height*0.4,
-              child: Column(
-                children: [
-                  _buildDrawerItem(Icons.settings, "تنظیمات", context,(){}),
-                  _buildDrawerItem(Icons.local_post_office_rounded, "ثبت و تغییر اطلاعات برچسب پستی", context,(){}),
-                  _buildDrawerItem(Icons.exit_to_app, "خروج از حساب کاربری", context,(){}),
-                ],
-              ),
-            )
+            Flexible(
+              child: Container(
+                  padding: EdgeInsets.all(width*0.02),
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(top: height * 0.12),
+                  decoration: BoxDecoration(
+                      color: AppConfig.background,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: Column(
+                    children: List.generate(3, (index) {
+                      return _buildDrawerItem(
+                          icons[index], title[index], context, () {},index==2?false:true, width*0.7);
+                    }),
+                  )),
+            ),
           ],
         ),
       ),
@@ -58,12 +93,26 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
-Widget _buildDrawerItem(IconData icon, String title, BuildContext context, Function onTap) {
-  return ListTile(
-    leading: Icon(icon, color: AppColors.white70),
-    title: Text(title, style: TextStyle(fontSize: 16, color: AppColors.white)),
-    onTap: () {
-      Navigator.pop(context); // بستن دراور
-    },
+Widget _buildDrawerItem(
+    String svgPic, String title, BuildContext context, Function onTap, bool isDivider, double size) {
+  return Container(
+
+    child: Column(
+      children: [
+        ListTile(
+          leading: Container(
+            width: size*0.065,
+              child: CircleAvatar(
+            backgroundColor: AppConfig.background,
+            child: SvgPicture.asset(svgPic),
+          )),
+          title:
+              Text(title, style: TextStyle(fontSize: size*0.045, color: AppConfig.white)),
+          onTap: () {
+            Navigator.pop(context); // بستن دراور
+          },
+        ),isDivider?Container(child: Divider(),width: size,):SizedBox()
+      ],
+    ),
   );
 }

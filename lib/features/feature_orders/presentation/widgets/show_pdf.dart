@@ -10,8 +10,10 @@ import 'package:printing/printing.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/entities/orders_entity.dart';
 import 'package:shapyar_bloc/features/feature_orders/data/models/orders_model.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import 'package:shapyar_bloc/core/colors/app-colors.dart';
 
+import '../../../../core/config/app-colors.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/store_info.dart';
 import 'order_options.dart';
 
@@ -343,19 +345,19 @@ class _ShowPDFState extends State<ShowPDF> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppConfig.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text("فاکتور فروش",style: TextStyle(color: AppColors.white,),),
+        backgroundColor: AppConfig.background,
+        title: Text("فاکتور فروش",style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calTitleFontSize(context)),),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.white,),
+          icon: Icon(Icons.arrow_back, color: AppConfig.white,),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: pdfPath == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: ProgressBar())
           : PDFView(
               filePath: pdfPath!,
               enableSwipe: true,
@@ -365,12 +367,12 @@ class _ShowPDFState extends State<ShowPDF> {
               fitPolicy: FitPolicy.BOTH,
             ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppConfig.background,
         onPressed: _savePdf,
         tooltip: "ذخیره PDF",
         child: Icon(
           Icons.save,
-          color: AppColors.white,
+          color: AppConfig.white,
         ),
       ),
     );

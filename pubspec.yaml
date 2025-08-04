@@ -71,6 +71,9 @@ dev_dependencies:
   flutter_pdfview: ^1.4.0
   floating_navbar: ^3.0.0
   flutter_svg: ^2.0.15
+  flutter_spinkit: ^5.2.1
+  dotted_line: ^3.2.3
+  responsive_sizer: ^3.3.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -4,9 +4,11 @@ import 'package:shapyar_bloc/core/params/products_params.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/widgets/product.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import 'package:shapyar_bloc/core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../../../locator.dart';
 import '../bloc/products_status.dart';
 import '../widgets/ending_product.dart';
@@ -42,10 +44,10 @@ class ProductsScreen extends StatelessWidget {
               .read<ProductsBloc>()
               .add(LoadProductsData(ProductsParams(10, false, '')));
 
-          return Center(child: CircularProgressIndicator());
+          return Center(child: ProgressBar());
         }
         if (state.productsStatus is UserErrorStatus) {
-          return Text("error");
+          return Text("خطا در بارگذاری اطلاعات یوزر!");
         }
         if (state.productsStatus is pUserLoadedStatus) {
           context
@@ -83,19 +85,19 @@ class ProductsScreen extends StatelessWidget {
               state.productsStatus as ProductsLoadedStatus;
 
           return Scaffold(
-              backgroundColor: AppColors.background,
+              backgroundColor: AppConfig.background,
               appBar: AppBar(
                 title: Text(
                   'همه محصولات',
                   style:
-                      TextStyle(fontSize: height * 0.03, color: Colors.white),
+                      TextStyle(fontSize: AppConfig.calTitleFontSize(context), color: Colors.white),
                 ),
-                backgroundColor: AppColors.background,
+                backgroundColor: AppConfig.background,
                 // Match app bar color with background
                 elevation: 0.0,
                 actions: [
                   AnimSearchBar(
-                    color: AppColors.background,
+                    color: AppConfig.background,
                     searchIconColor: Colors.white,
                     width: width * 0.7,
                     helpText: 'جستجو',
@@ -131,20 +133,15 @@ class ProductsScreen extends StatelessWidget {
                     Center(
                       child: Container(
                         // color: Colors.red,
-                        height: height * 0.768,
+                        height: height ,
                         width: width * 0.87,
-                        child: GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3, // Number of columns
-                            crossAxisSpacing: 0, // Horizontal spacing
-                            mainAxisSpacing: 1, // Vertical spacing
-                          ),
+                        child: ListView.builder(
                           // padding: EdgeInsets.all(10),
                           itemCount: StaticValues.staticProducts
-                              .length, // Number of items in the grid
+                              .length + 1, // Number of items in the grid
                           itemBuilder: (context, index) {
-                            return Product(StaticValues.staticProducts[index]);
+                            return index == StaticValues.staticProducts
+                                .length?SizedBox(height: height*0.26,):Product(StaticValues.staticProducts[index]);
                           },
                         ),
                       ),

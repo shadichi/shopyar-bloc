@@ -7,8 +7,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import 'package:shapyar_bloc/core/colors/app-colors.dart';
 
+import '../../../../core/config/app-colors.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/store_info.dart';
 
 class PdfViewerScreen extends StatefulWidget {
@@ -231,18 +233,18 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  AppColors.background,
+      backgroundColor:  AppConfig.background,
       appBar: AppBar(
-        backgroundColor:  AppColors.background,
-        title: Text("برچسب چستی",style: TextStyle( color: AppColors.white,),),leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: AppColors.white,),
+        backgroundColor:  AppConfig.background,
+        title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,),),leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: AppConfig.white,),
           onPressed: () {
 
           Navigator.pop(context);
         },
       ),),
       body: pdfPath == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: ProgressBar())
           : PDFView(
         filePath: pdfPath!,
         enableSwipe: true,
@@ -252,10 +254,10 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
         fitPolicy: FitPolicy.BOTH,
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppConfig.background,
         onPressed: _savePdf,
         tooltip: "ذخیره PDF",
-        child: Icon(Icons.save,color: AppColors.white,),
+        child: Icon(Icons.save,color: AppConfig.white,),
       ),
     );
   }

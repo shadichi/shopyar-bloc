@@ -6,6 +6,7 @@ import 'package:shapyar_bloc/features/feature_log_in/domain/entities/login_entit
 import 'package:shapyar_bloc/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/widgets/main_wrapper.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../bloc/log_in_status.dart';
 import '../widgets/cusrom_clippath_login.dart';
@@ -148,7 +149,7 @@ class LogInScreen extends StatelessWidget {
                                         width: 1, color: Colors.grey[300]!))),
                             onPressed: () {
                             },
-                            child:Container(child: CircularProgressIndicator(),width: width*0.05,height: height*0.02,)
+                            child:SizedBox(width: width*0.05,height: height*0.02,child: ProgressBar(),)
                           );                        }
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(

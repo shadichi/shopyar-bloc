@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/colors/test3.dart';
+import '../../../../core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/middle_card_data.dart';
 
 class MiddleCard extends StatelessWidget {
@@ -13,10 +14,10 @@ class MiddleCard extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     return  Container(
       height: height * 0.17,
-      width: width * 0.9,
+      width: width ,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: AppColors.secondaryColor),
+          color: AppConfig.secondaryColor),
       child: Row(
         children: [
           Expanded(

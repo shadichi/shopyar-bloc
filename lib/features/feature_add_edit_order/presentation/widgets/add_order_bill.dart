@@ -3,7 +3,8 @@ import 'package:dropdown_button2/src/dropdown_button2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/features/feature_add_edit_order/data/models/add_order_data_model.dart';
 import 'package:shapyar_bloc/features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import '../../../../core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 
 
 class AddOrderBill extends StatelessWidget {
@@ -15,13 +16,13 @@ class AddOrderBill extends StatelessWidget {
   AddOrderBill(this.paymentMethod, this.shipmentMethod, this.onTextChange, this.formKey);
 
   //final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController customerFN = TextEditingController();
+/*  TextEditingController customerFN = TextEditingController();
   TextEditingController customerLN = TextEditingController();
   TextEditingController address = TextEditingController();
   TextEditingController city = TextEditingController();
   TextEditingController postalCode = TextEditingController();
   TextEditingController email = TextEditingController();
-  TextEditingController phone = TextEditingController();
+  TextEditingController phone = TextEditingController();*/
   TextEditingController customerFNBill = TextEditingController();
   TextEditingController customerLNBill = TextEditingController();
   TextEditingController addressBill = TextEditingController();
@@ -155,7 +156,7 @@ class AddOrderBill extends StatelessWidget {
                         onTextChange: onTextChange[5],
                       ),
                       Container(
-                        color:AppColors.background,
+                        color:AppConfig.background,
                         alignment: Alignment.center,
                         // height: height*0.06,
                         // width: width*0.5,
@@ -163,7 +164,7 @@ class AddOrderBill extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              color:AppColors.background,
+                              color:AppConfig.background,
                               //padding: EdgeInsets.all(width*0.2),
                               alignment: Alignment.centerRight,
                               width: width * 0.3,
@@ -177,7 +178,7 @@ class AddOrderBill extends StatelessWidget {
                                   textAlign: TextAlign.start),
                             ),
                             Container(
-                              color:AppColors.background,
+                              color:AppConfig.background,
 
                               alignment: Alignment.centerRight,
                               width: width * 0.3,
@@ -315,7 +316,7 @@ class makeColumnForAddOrder extends StatelessWidget {
             width: heightP * 2.7,
             height: height * 0.06,
             child: Material(
-                color:AppColors.background,
+                color:AppConfig.background,
                 child: TextFormField(
               //initialValue: "index == -1?"":initialValue",
                   onChanged: (value) => onTextChange(value!),

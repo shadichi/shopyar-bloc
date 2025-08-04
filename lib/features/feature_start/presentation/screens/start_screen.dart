@@ -5,6 +5,7 @@ import 'package:shapyar_bloc/core/widgets/main_wrapper.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
 import 'package:shapyar_bloc/features/feature_log_in/presentation/screens/log_in_screen.dart';
 import '../../../../core/params/whole_user_data_params.dart';
+import '../../../../core/widgets/progress-bar.dart';
 import '../../data/repository/start_repositoryImpl.dart';
 import '../bloc/start_bloc.dart';
 import '../bloc/start_status.dart';
@@ -28,7 +29,7 @@ class _StartScreenState extends State<StartScreen> {
     return BlocBuilder<StartBloc, StartState>(builder: (context, state) {
       if (state.logInStatus is UserDataLoadingStatus) {
 
-        return Center(child: CircularProgressIndicator());
+        return Center(child: ProgressBar());
       } else if (state.logInStatus is UserDataErrorStatus) {
 
         return LogInScreen();
@@ -37,7 +38,7 @@ class _StartScreenState extends State<StartScreen> {
         return MainWrapper();
       } else if (state.logInStatus is ConnectionAvailableStatus) {
         context.read<StartBloc>().add(LoadUserDataEvent());
-        return Center(child: CircularProgressIndicator());
+        return Center(child: ProgressBar());
       } else if (state.logInStatus is ConnectionUnavailableState) {
         return NoConnectionScreen();
       }

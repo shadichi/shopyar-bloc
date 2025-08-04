@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/bloc/orders_bloc.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/order.dart';
-import 'package:shapyar_bloc/core/colors/test3.dart';
+import 'package:shapyar_bloc/core/colors/app-colors.dart';
+import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/alert_dialog.dart';
+import '../../../../core/widgets/progress-bar.dart';
+import '../../../feature_add_edit_order/presentation/screens/addOrderTest.dart';
 import '../../../feature_add_edit_order/presentation/screens/add_order.dart';
 import '../bloc/orders_status.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
@@ -45,7 +48,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         listener: (context, state) {},
         builder: (context, state) {
           if (state.ordersStatus is OrdersLoadingStatus) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: ProgressBar());
           }
           if (state.ordersStatus is OrdersSearchFailedStatus) {
             StaticValues.staticOrders.clear();
@@ -72,35 +75,37 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
           ),*/
               // appBar: AppBar(title: Text(homeUserDataParams.userName)),
-               backgroundColor: AppColors.background,
+              backgroundColor: AppConfig.background,
               appBar: AppBar(
                 title: Text(
                   'همه سفارشات',
-                  style: TextStyle(fontSize: height * 0.03, color: Colors.white),
+                  style:
+                      TextStyle(fontSize: AppConfig.calTitleFontSize(context), color: Colors.white),
                 ),
-                backgroundColor: AppColors.background,
+                backgroundColor: AppConfig.background,
                 // Match app bar color with background
                 elevation: 0.0,
                 actions: [
-                  AnimSearchBar(color: AppColors.background,searchIconColor: Colors.white,
+                  AnimSearchBar(
+                    color: AppConfig.background,
+                    searchIconColor: Colors.white,
                     width: width * 0.7,
                     helpText: 'جستجو',
-                    style: TextStyle(fontSize: width * 0.04),
+                    style: TextStyle(fontSize: width * 0.035),
+                    // کوچیک‌تر از قبل
+
                     textController: textEditingController,
                     onSuffixTap: () {
                       print('onSuffixTap');
-                      /* setState(() {
-                    textEditingController.clear();
-                  });*/
                     },
                     onSubmitted: (String) {
                       if (String.isEmpty) {
                         searchTemp = false;
                         StaticValues.staticOrders.clear();
                       }
-                      print(String);
                       BlocProvider.of<OrdersBloc>(context).add(
-                          LoadOrdersData(searchTemp, String, false, '', ''));
+                        LoadOrdersData(searchTemp, String, false, '', ''),
+                      );
                     },
                   ),
                   /* IconButton(
@@ -118,9 +123,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.add,color: Colors.white),
+                    icon: Icon(Icons.add, color: Colors.white),
                     onPressed: () {
-                      Navigator.pushNamed(context, AddOrder.routeName);
+                      Navigator.pushNamed(context, AddOrderTest.routeName);
                     },
                   ),
                   /*  IconButton(
@@ -140,11 +145,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         context.read<OrdersBloc>().add(RefreshOrdersData());
                       },
                       child: ListView.builder(
-                          itemCount: StaticValues.staticOrders.length,
+                          itemCount: StaticValues.staticOrders.length+1,
                           itemBuilder: (context, item) {
-                            return Order(
+
+                            return item ==  StaticValues.staticOrders.length?
+                              SizedBox(height: height*0.12,):Order(
                                 ordersLoadedStatus:
-                                    StaticValues.staticOrders[item],
+                                StaticValues.staticOrders[item],
                                 item: item);
                           }),
                     ),
@@ -167,7 +174,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius:
-                                    BorderRadius.circular(width * 0.06),
+                                    BorderRadius.circular(width * 0.03),
                               ),
                               width: width * 0.8,
                               child: Column(
@@ -211,38 +218,37 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
                                       children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            print(selectedCount);
-                                            print(selectedStatus);
-                                            BlocProvider.of<OrdersBloc>(context)
-                                                .add(LoadOrdersData(
-                                                    false, '', false, '', ''));
-                                            BlocProvider.of<OrdersBloc>(context)
-                                                .add(ShowFilterOff(showFilter));
-                                            selectedStatus = '';
-                                            selectedCount = '10';
-                                            StaticValues.staticOrders.clear();
-                                          },
-                                          child: Text("پاک کردن فیلتر"),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          child: Text("پاک کردن فیلتر",style: TextStyle(fontSize: width*0.027),)
                                         ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            print(selectedCount);
-                                            print(selectedStatus.substring(3));
-                                            BlocProvider.of<OrdersBloc>(context)
-                                                .add(LoadOrdersData(
-                                                    false,
-                                                    '',
-                                                    true,
-                                                    selectedCount.toString(),
-                                                    selectedStatus.substring(3).toString()));
-                                            BlocProvider.of<OrdersBloc>(context)
-                                                .add(ShowFilterOff(showFilter));
-                                            selectedStatus = '';
-                                            selectedCount = '10';
-                                          },
-                                          child: Text("اعمال تغییرات"),
+                                        SizedBox(
+                                          width: width*0.3,
+                                          height: height*0.06,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              BlocProvider.of<OrdersBloc>(context)
+                                                  .add(LoadOrdersData(
+                                                      false,
+                                                      '',
+                                                      true,
+                                                      selectedCount.toString(),
+                                                      selectedStatus
+                                                          .substring(3)
+                                                          .toString()));
+                                              BlocProvider.of<OrdersBloc>(context)
+                                                  .add(ShowFilterOff(showFilter));
+                                              selectedStatus = '';
+                                              selectedCount = '10';
+                                            },
+                                            child: Text("اعمال تغییرات",style: TextStyle(fontSize: width*0.027,color: Colors.white),),
+                                            style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            width * 0.03)),backgroundColor: AppConfig.secondaryColor),
+
+                                          ),
                                         ),
                                       ],
                                     ),
