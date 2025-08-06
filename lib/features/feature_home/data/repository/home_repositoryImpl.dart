@@ -80,6 +80,9 @@ class HomeRepositoryImpl extends HomeRepository{
 
           HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
 
+          print('eeeeeee');
+          print(response);
+
           return DataSuccess(homeDataEntity);
 
         } else {

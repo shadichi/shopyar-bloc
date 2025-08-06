@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
 
 import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/middle_card_data.dart';
+import '../../data/models/home_data_model.dart';
 
 class MiddleCard extends StatelessWidget {
-  final MiddleCardData middleCardData;
-  const MiddleCard({super.key, required this.middleCardData});
+  final HomeDataEntity? statusCounts;
+  const MiddleCard({super.key, required this.statusCounts});
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +32,9 @@ class MiddleCard extends StatelessWidget {
                       padding:  EdgeInsets.only(left: width*0.1),
                       child: Divider(),
                     ),
-                    Text('1000 فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${middleCardData.dailySales} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${middleCardData.dailyCancelled} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailyCancelled!.qty.toString()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),
@@ -46,9 +48,9 @@ class MiddleCard extends StatelessWidget {
                       padding:  EdgeInsets.only(left: width*0.1),
                       child: Divider(),
                     ),
-                    Text('1000 فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${middleCardData.monthlySales} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${middleCardData.monthlyCancelled} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlyCancelled!.qty.toString()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),

@@ -126,15 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     MiddleCard(
-                      middleCardData: MiddleCardData(
-                          StaticValues.staticHomeDataEntity!.dailySales!.qty
-                              .toString(),
-                          StaticValues.staticHomeDataEntity!.monthlySales!.qty
-                              .toString(),
-                          StaticValues.staticHomeDataEntity!.dailyCancelled!.qty
-                              .toString(),
-                          StaticValues.staticHomeDataEntity!.monthlyCancelled!.qty
-                              .toString()),
+                      statusCounts: StaticValues.staticHomeDataEntity,
                     ),
 
                     Container(alignment: Alignment.centerRight,
@@ -151,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(width * 0.07),
                               topRight: Radius.circular(width * 0.07))),
-                      child: Chart(),
+                      child: Chart(StaticValues.staticHomeDataEntity),
                       /* child: Card(
                         child: Chart(),
                         elevation: 8,

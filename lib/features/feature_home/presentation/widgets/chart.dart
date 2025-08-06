@@ -1,11 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/colors/app-colors.dart';
+import 'package:shapyar_bloc/core/utils/static_values.dart';
+import 'package:shapyar_bloc/features/feature_home/data/models/home_data_model.dart';
+import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
 import '../../../../core/config/app-colors.dart';
-
+import 'package:shamsi_date/shamsi_date.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 class Chart extends StatefulWidget {
-  Chart({super.key});
+  HomeDataEntity? homeDataModel;
+  Chart(this.homeDataModel);
 
   final Color dark = Color(0xff2EBBE5);
   final Color normal = Color(0xffE9A17B);
@@ -18,6 +22,99 @@ class Chart extends StatefulWidget {
 
 class BarChartSample4State extends State<Chart> {
 
+  List<String> lastWeekOrders = [];
+
+  Map<String, String> persianDatesWithWeekday = {};
+
+  List<double> result = [];
+
+
+
+  List<String> getLastSevenDays() {
+    final today = DateTime.now();
+    return List.generate(7, (i) {
+      final date = today.subtract(Duration(days: 6 - i));
+      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    });
+  }
+
+  List<double> getWeeklyCountsList(Map<String, int> counts) {
+    // ترتیب روزهای هفته از شنبه تا جمعه
+    final weekdays = [
+      'شنبه',
+      'یکشنبه',
+      'دوشنبه',
+      'سه‌شنبه',
+      'چهارشنبه',
+      'پنج‌شنبه',
+      'جمعه'
+    ];
+
+    // مپ خالی برای روزهای هفته
+    Map<String, double> weekdayCounts = {for (var day in weekdays) day: 0.08};
+
+    // پر کردن مپ با داده‌ها
+    counts.forEach((dateString, count) {
+      List<String> parts = dateString.split('-');
+      DateTime gDate = DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
+
+      String weekdayName = _persianWeekdayName(gDate.weekday);
+      weekdayCounts[weekdayName] = count.toDouble();
+    });
+
+    // تبدیل به لیست فقط تعدادها به ترتیب شنبه تا جمعه
+    return weekdays.map((day) => weekdayCounts[day] ?? 0.08).toList();
+  }
+
+  String _persianWeekdayName(int weekday) {
+    switch (weekday) {
+      case DateTime.saturday:
+        return 'شنبه';
+      case DateTime.sunday:
+        return 'یکشنبه';
+      case DateTime.monday:
+        return 'دوشنبه';
+      case DateTime.tuesday:
+        return 'سه‌شنبه';
+      case DateTime.wednesday:
+        return 'چهارشنبه';
+      case DateTime.thursday:
+        return 'پنج‌شنبه';
+      case DateTime.friday:
+        return 'جمعه';
+      default:
+        return '';
+    }
+  }
+
+  void test() {
+    final counts = StaticValues.staticHomeDataEntity!.weeklyCounts;
+
+     result = getWeeklyCountsList(counts!);
+    print(result); // [0, 1, 0, 0, 4, 0, 0]
+  }
+
+
+  List<String> getLastWeekPersianDates(List<DateTime> dateTime) {
+
+    final now = DateTime.now(); // Get current Gregorian date
+   // final jalaliNow = Jalali.fromDateTime(dateTime); // Convert to Jalali
+    final dates = <String>[];
+
+    for (int i = dateTime.length; i >= 0; i--) {
+      // Subtract days from Gregorian date first
+      final gregorianDate = dateTime[i].subtract(Duration(days: i));
+      // Then convert to Jalali
+      final jalaliDate = Jalali.fromDateTime(gregorianDate);
+      dates.add('${jalaliDate.year}/${jalaliDate.month.toString().padLeft(2, '0')}/${jalaliDate.day.toString().padLeft(2, '0')}');
+    }
+
+    return dates;
+  }
 
   Widget bottomTitles(double value, TitleMeta meta) {
     print(value);
@@ -130,7 +227,12 @@ class BarChartSample4State extends State<Chart> {
       ),
     );
   }
-
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    test();
+  }
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -181,7 +283,7 @@ class BarChartSample4State extends State<Chart> {
                 show: false,
               ),
               groupsSpace: barsSpace,
-              barGroups: getData(barsWidth, barsSpace, toY, color),
+              barGroups: getData(barsWidth, barsSpace, result, color),
             ),
           );
         },

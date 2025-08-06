@@ -38,7 +38,7 @@ print(response.body);
   Future<dynamic> GetHomeData() async {
     print('GetHomeData');
    try{
-     final response =await _dio.get('https://shop-yar.ir/wp-json/shop-yar/order-report2',options: Options(headers: {
+     final response =await _dio.get('https://shop-yar.ir/wp-json/shop-yar/get_full_order_report',options: Options(headers: {
        "Authorization":"shadi2"
      }));
 

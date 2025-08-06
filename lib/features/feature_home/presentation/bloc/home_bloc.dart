@@ -45,6 +45,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
           StaticValues.staticHomeDataEntity = dataState.data;
 
+          print('StaticValues.staticHomeDataEntity');
+          print(StaticValues.staticHomeDataEntity);
+
         }
 
           final UserDataParams homeUserDataParams = await getMainDataUseCase();
@@ -66,6 +69,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           StaticValues.paymentMethods =
               homeUserDataParams.response['payment_methods'] ?? [];
           StaticValues.status = homeUserDataParams.response['status'] ?? {};
+
+          print('StaticValues.webService');
+          print(StaticValues.webService);
+          print(StaticValues.passWord);
+          print(StaticValues.shopName);
+          print(StaticValues.shippingMethods);
+          print(StaticValues.shippingMethods);
+          print(StaticValues.paymentMethods);
+          print(StaticValues.status);
+          print(StaticValues.staticHomeDataEntity);
 
           if (StaticValues.webService != '' &&
               StaticValues.passWord != '' &&

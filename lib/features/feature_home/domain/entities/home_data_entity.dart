@@ -9,6 +9,9 @@ class HomeDataEntity extends Equatable {
   final DailyCancelled? dailyCancelled;
   final DailyCancelled? monthlyCancelled;
   final StatusCounts? statusCounts;
+  final int? dailyCounts;
+  final int? monthlyCounts;
+  final Map<String, int>? weeklyCounts;
 
   const HomeDataEntity({
     this.dailySales,
@@ -16,6 +19,9 @@ class HomeDataEntity extends Equatable {
     this.dailyCancelled,
     this.monthlyCancelled,
     this.statusCounts,
+    this.dailyCounts,
+    this.monthlyCounts,
+    this.weeklyCounts,
   });
 
   @override
@@ -26,5 +32,8 @@ class HomeDataEntity extends Equatable {
         dailyCancelled,
         monthlyCancelled,
         statusCounts,
+        dailyCounts,
+        monthlyCounts,
+        weeklyCounts,
       ];
 }
