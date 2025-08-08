@@ -61,44 +61,42 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             iconTheme: IconThemeData(color: Colors.white),
             backgroundColor: AppConfig.background,
-            centerTitle: false,
+            //centerTitle: false,
             titleSpacing: 0.0,
-            title: Transform(
-              // you can forcefully translate values left side using Transform
-              transform: Matrix4.translationValues(-200.0, 0.0, 0.0),
-              child: Container(
-                //  color: Colors.green,
-                //  padding: EdgeInsets.only(left: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(width * 0.03),
-                      child: Text(
-                        StaticValues.shopName,
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: width * 0.04),
-                      ),
+            actions: [Container(alignment: Alignment.center,
+              width: AppConfig.calWidth(context, 40),
+
+               // margin: EdgeInsets.only(top: AppConfig.calWidth(context, 5)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(alignment: Alignment.center,
+                    //  padding: EdgeInsets.all(width * 0.03),
+                    child: Text(
+                      StaticValues.shopName,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppConfig.calWidth(context, 3)),
                     ),
-                    Container(
-                      padding: EdgeInsets.only(top: 2),
-                      //color: Colors.pink,
-                      child: Text(
-                        jd.echo('l، d F'),
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                            color: Colors.grey.shade300,
-                            fontSize: width * 0.03,
-                            fontWeight: FontWeight.bold),
-                      ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                   padding: EdgeInsets.only(top: 2),
+                    child: Text(
+                      jd.echo('l، d F'),
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                          color: Colors.grey.shade300,
+                          fontSize: AppConfig.calWidth(context, 4),
+                          fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
+            ),],
           ),
           onDrawerChanged: (isOpened) {
             widget.onDrawerStatusChange!(isOpened);
@@ -137,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Container(
                       width: width,
-                      height: height * 0.4,
+                      height: height * 0.3,
                       decoration: BoxDecoration(
                           //color: AppColors.section4,
                           borderRadius: BorderRadius.only(

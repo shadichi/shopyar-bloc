@@ -206,7 +206,7 @@ class OrderDetailScreen extends StatelessWidget {
                                               fontSize:  AppConfig.calFontSize(context, 3.2),
                                               color:  AppConfig.white),
                                           maxLines: 1,
-                                          minFontSize: AppConfig.calFontSize(context, 2.5),
+                                          minFontSize: (AppConfig.calFontSize(context, 2.5).round()).toDouble(),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),

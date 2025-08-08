@@ -38,8 +38,8 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           children: [
             Center(
               child: Container(
-                height: 200,
-                width: 220,
+                height: AppConfig.calHeight(context, 31),
+                width: AppConfig.calHeight(context, 31),
                 decoration: BoxDecoration(
                   color: AppConfig.background, // Shadow color
                   shape: BoxShape.circle,
@@ -70,10 +70,9 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                     });
                   },
                 ),
-
                 sectionsSpace: 5,
                 centerSpaceRadius: 0.1,
-                sections: showingSections(),centerSpaceColor: Colors.red,
+                sections: showingSections(),centerSpaceColor: Colors.green,
               ),
             ),
           ],
@@ -84,91 +83,45 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
   List<PieChartSectionData> showingSections() {
     return List.generate(5, (i) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 20.0 :10.0;
-      final radius = isTouched ? 110.0 : 100.0;
+      final fontSize = isTouched ? AppConfig.calWidth(context, 4) :AppConfig.calWidth(context, 2.5);
+      final radius = isTouched ? AppConfig.calWidth(context, 30) : AppConfig.calWidth(context, 28);
       final widgetSize = isTouched ? 55.0 : 40.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
 
       switch (i) {
         case 0:
-          return PieChartSectionData(
-              color: AppConfig.piChartSection1,
-              value: double.parse(percentages[i]),
-              title: '${double.parse(percentages[i])}%',
-              radius: radius,
-              titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff),
-                shadows: shadows,
-              ),
-              badgeWidget: Text('تکمیل شده',style: TextStyle(color: Colors.white,fontSize: 8),),
-              badgePositionPercentageOffset: 1.2
-          );
+          return pieChartItem(radius,fontSize,shadows,pieChartText('در حال پرداخت'),i,AppConfig.piChartSection3);
         case 1:
-          return PieChartSectionData(
-            color: AppConfig.piChartSection2,
-            value: double.parse(percentages[i]),
-            title: '${double.parse(percentages[i])}%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-              shadows: shadows,
-            ),
-            badgeWidget: Text('در صف بررسی',style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset:1.2,
-          );
+          return pieChartItem(radius,fontSize,shadows,pieChartText('در صف بررسی'),i,AppConfig.piChartSection2);
         case 2:
-          return PieChartSectionData(
-            color: AppConfig.piChartSection3,
-            value: double.parse(percentages[i]),
-            title: '${double.parse(percentages[i])}%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-              shadows: shadows,
-            ),
-            badgeWidget: Text('در حال پرداخت',style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset: 1.3,
-          );
+          return pieChartItem(radius,fontSize,shadows,pieChartText('برگشت داده شده'),i,AppConfig.piChartSection5);
         case 3:
-          return PieChartSectionData(
-            color: AppConfig.piChartSection4,
-            value: double.parse(percentages[i]),
-            title: '${double.parse(percentages[i])}%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-              shadows: shadows,
-            ),
-            badgeWidget: Text('در انتظار پردازش', style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset: 1.5,
-          );
+          return pieChartItem(radius,fontSize,shadows,pieChartText('در انتظار پردازش         '),i,AppConfig.piChartSection4);
         case 4:
-          return PieChartSectionData(
-            color: AppConfig.piChartSection5,
-            value: double.parse(percentages[i]),
-            title: '${double.parse(percentages[i])}%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-              shadows: shadows,
-            ),
-            badgeWidget: Text('برگشت داده شده', style: TextStyle(color: Colors.white,fontSize: 8),),
-            badgePositionPercentageOffset: 1.4,
-          );
+          return pieChartItem(radius,fontSize,shadows,pieChartText('تکمیل شده'),i,AppConfig.piChartSection1);
         default:
-          throw Exception('Oh no');
+          throw Exception('Error');
       }
     });
+  }
+  Widget pieChartText(text){
+    return Text(text,style: TextStyle(color: Colors.white,fontSize: AppConfig.calWidth(context,3)),);
+  }
+  PieChartSectionData pieChartItem(radius, fontSize,shadows, badgeWidget,index,color){
+    return PieChartSectionData(
+      color: color,
+      value: double.parse(percentages[index]),
+      title: '${double.parse(percentages[index])}%',
+      radius: radius,
+      titleStyle: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: const Color(0xffffffff),
+        shadows: shadows,
+      ),
+      badgeWidget: badgeWidget,
+      badgePositionPercentageOffset:1.3,
+    );
   }
 }
 
