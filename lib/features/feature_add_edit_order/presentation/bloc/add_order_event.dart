@@ -29,9 +29,9 @@ class DecreaseProductCount extends AddOrderEvent {//new
   final ProductEntity product;
   DecreaseProductCount(this.product);
 }
-class SetOrder extends AddOrderEvent {//new
+class SetOrderEvent extends AddOrderEvent {//new
   final SetOrderParams setOrderParams;
-  SetOrder(this.setOrderParams);
+  SetOrderEvent(this.setOrderParams);
 }
 class LoadSelectedProductCount extends AddOrderEvent {//new
   final int count;

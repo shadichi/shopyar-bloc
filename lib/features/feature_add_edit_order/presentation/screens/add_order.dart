@@ -345,7 +345,7 @@ class _AddOrderState extends State<AddOrder> {
                                 onPressed: () {
                                   _validateForm();
                                   if (lineItem.isEmpty) {
-                                    alertDialog(context,
+                                    alertDialogScreen(context,
                                         'هیچ محصولی انتخاب نشده است!', 1, true);
                                   } else {
                                     double totalPrice = 0;
@@ -409,7 +409,7 @@ class _AddOrderState extends State<AddOrder> {
                                     String priceShip = shipPriceBill.isEmpty
                                         ? ""
                                         : shipPriceBill;
-                                    context.read<AddOrderBloc>().add(SetOrder(
+                                    context.read<AddOrderBloc>().add(SetOrderEvent(
                                         SetOrderParams(order, payType, shipType,
                                             priceShip)));
                                   }

@@ -34,7 +34,7 @@ class ProductsScreen extends StatelessWidget {
           BlocConsumer<ProductsBloc, ProductsState>(
             listener: (context, state){
               if (state.productsStatus is ProductsSearchFailedStatus){
-                alertDialog(context,'هیچ محصولی یافت نشد!',1,false);
+                alertDialogScreen(context,'هیچ محصولی یافت نشد!',1,false);
               }
             },
               builder: (context, state) {

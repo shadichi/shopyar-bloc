@@ -218,6 +218,9 @@ class AddOrderBill extends StatelessWidget {
                                       fontSize: width * 0.02, color: Colors.grey),
                                   // hintText: index == -1?"":initialValue
                                 ),
+                                    validator: (value) =>
+                                    value == null || value.isEmpty ? 'Required' : null,
+
                               /*  validator: (String? value) {
                                                     if ((value == null || value.isEmpty) && isNes) {
                                                       return 'لطفا فیلد بالا را تکمیل نمایید';
@@ -347,6 +350,7 @@ class makeColumnForAddOrder extends StatelessWidget {
                 if ((value == null || value.isEmpty) && isNes) {
                   return 'لطفا فیلد بالا را تکمیل نمایید';
                 }
+                return null;
               },
             )),
           ),
@@ -545,6 +549,7 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
                 });
               }),
             ),
+
           ])
         ,
       );

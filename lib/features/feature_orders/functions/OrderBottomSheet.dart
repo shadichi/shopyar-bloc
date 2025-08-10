@@ -28,7 +28,7 @@ void showFilterBottomSheet(BuildContext context,
 
           if (state.editStatus is EditOrderSuccessStatus) {
 
-            await  alertDialog(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
+            await  alertDialogScreen(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
             Navigator.pop(context);
           }
         },

@@ -34,11 +34,11 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
   AddOrderBloc(this.getProductsUseCase,
       this.addOrderGetSelectedProductsUseCase, this.addOrderSetOrderUseCase)
       : super(
-          AddOrderState(
-              addOrderStatus: AddOrderProductsLoadingStatus(),
-              addOrderCardProductStatus: AddOrderChooseLoadingStatus(),
-              addOrderSetOrderStatus: AddOrderSetOrderInitialStatus(),count: {},isFirstTime: {}),
-        ) {
+    AddOrderState(
+        addOrderStatus: AddOrderProductsLoadingStatus(),
+        addOrderCardProductStatus: AddOrderChooseLoadingStatus(),
+        addOrderSetOrderStatus: AddOrderSetOrderInitialStatus(),count: {},isFirstTime: {}),
+  ) {
     on<AddOrderEvent>((event, emit) {
       // TODO: implement event handler
     });
@@ -73,7 +73,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     on<AddOrderAddProduct>((event, emit) async {
 
       AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-          state.addOrderStatus as AddOrderProductsLoadedStatus;
+      state.addOrderStatus as AddOrderProductsLoadedStatus;
       final loadedState = addOrderProductsLoadedStatus;
       final cart = loadedState.cart;
       cart[event.product.id!.toInt()] =
@@ -99,7 +99,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
 
     on<DecreaseProductCount>((event, emit) async {
       AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-          state.addOrderStatus as AddOrderProductsLoadedStatus;
+      state.addOrderStatus as AddOrderProductsLoadedStatus;
       final loadedState = addOrderProductsLoadedStatus;
       final cart = loadedState.cart;
       print(loadedState);
@@ -108,7 +108,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
           cart[event.product.id!.toInt()]! > 0) {
         cart[event.product.id!.toInt()] = cart[event.product.id!.toInt()]! - 1;
       }
-     /* if(cart[event.product.id!.toInt()]! == 0){
+      /* if(cart[event.product.id!.toInt()]! == 0){
         cart.remove(event.product.id!.toInt());
       }*/
       emit(
@@ -118,25 +118,25 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
           newAddOrderStatus: AddOrderProductsLoadedStatus( cart, {})));
     });
 
-    on<SetOrder>((event, emit) async {
-    /*  AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
+    on<SetOrderEvent>((event, emit) async {
+      /*  AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
       state.addOrderStatus as AddOrderProductsLoadedStatus;
       final loadedState = addOrderProductsLoadedStatus;
       final cart = loadedState.cart;
       print(cart);*/
-      emit(state.copyWith(
-          newAddOrderSetOrderStatus: AddOrderSetOrderLoadingStatus()));
+    /*  emit(state.copyWith(
+          newAddOrderStatus: AddOrderProductsLoadingStatus()));*/
       bool dataState = await addOrderSetOrderUseCase(event.setOrderParams);
       print(dataState);
       print(state);
 
       if (dataState == true || dataState) {
         emit(state.copyWith(
-            newAddOrderSetOrderStatus: AddOrderSetOrderSuccess()));
+            newAddOrderStatus: AddOrderSuccessStatus()));
       }
       if (!dataState) {
         emit(state.copyWith(
-            newAddOrderSetOrderStatus: AddOrderSetOrderFailed()));
+            newAddOrderStatus: AddOrderErrorStatus()));
       }
     });
 
@@ -150,4 +150,24 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
           newCount: cart));
     });
   }
-}
+}/*List<TextEditingController> textEditing = [
+  step1CustomerFNBill,
+  step1CustomerLNBill,
+  step1AddressBill,
+  step1CityBill,
+  step1PostalCodeBill,
+  step1EmailBill,
+  step1PhoneBill,
+  step1ShipPrice,
+]
+;
+
+
+TextEditingController step1CustomerFNBill = TextEditingController();
+TextEditingController step1CustomerLNBill = TextEditingController();
+TextEditingController step1AddressBill = TextEditingController();
+TextEditingController step1CityBill = TextEditingController();
+TextEditingController step1PostalCodeBill = TextEditingController();
+TextEditingController step1EmailBill = TextEditingController();
+TextEditingController step1PhoneBill = TextEditingController();
+TextEditingController step1ShipPrice = TextEditingController();*/

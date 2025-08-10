@@ -24,5 +24,15 @@ class AddOrderProductsErrorStatus extends AddOrderStatus{
   // TODO: implement props
   List<Object?> get props => [];
 }
+class AddOrderSuccessStatus extends AddOrderStatus{
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+class AddOrderErrorStatus extends AddOrderStatus{
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 
 

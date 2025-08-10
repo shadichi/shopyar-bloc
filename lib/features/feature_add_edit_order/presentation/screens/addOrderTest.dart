@@ -56,11 +56,9 @@ class _AddOrderTest extends State<AddOrderTest> {
 
   void _validateForm() {
     if (_formKey.currentState?.validate() ?? false) {
-      // All fields are valid
-      print("Form is valid");
+      print("Form is valid ✅");
     } else {
-      // Some fields are invalid
-      print("Form is invalid");
+      print("Form is invalid ❌");
     }
   }
 
@@ -73,11 +71,33 @@ class _AddOrderTest extends State<AddOrderTest> {
 
   final TextEditingController controller = TextEditingController();
 
+  TextEditingController step1CustomerFNBill = TextEditingController();
+  TextEditingController step1CustomerLNBill = TextEditingController();
+  TextEditingController step1AddressBill = TextEditingController();
+  TextEditingController step1CityBill = TextEditingController();
+  TextEditingController step1PostalCodeBill = TextEditingController();
+  TextEditingController step1EmailBill = TextEditingController();
+  TextEditingController step1PhoneBill = TextEditingController();
+  TextEditingController step1ShipPrice = TextEditingController();
+
+
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    List<TextEditingController> textEditing = [
+      step1CustomerFNBill,
+      step1CustomerLNBill,
+      step1AddressBill,
+      step1CityBill,
+      step1PostalCodeBill,
+      step1EmailBill,
+      step1PhoneBill,
+      step1ShipPrice,
+    ]
+    ;
 
     List<Function(String)> onTextChange = [
       (value) {
@@ -144,7 +164,13 @@ class _AddOrderTest extends State<AddOrderTest> {
         .map((method) => ShippingMethod.fromJson(method))
         .toList();
 
-    return BlocBuilder<AddOrderBloc, AddOrderState>(
+    return BlocConsumer<AddOrderBloc, AddOrderState>(
+      listener: (context, state){
+        if (state.addOrderStatus is AddOrderSuccessStatus) {
+          alertDialogScreen(context,'سفارش با موفقیت ایجاد شد.',2,false,icon: Icons.check_circle);
+
+        }
+      },
       builder: (context, state) {
         Widget bodyContent;
 
@@ -206,7 +232,7 @@ class _AddOrderTest extends State<AddOrderTest> {
                         key: ValueKey<int>(activeStep),
                         width: 350,
                         //  height: 300,
-                        child: _buildSection(onTextChange),
+                        child: _buildSection(onTextChange, textEditing),
                       ),
                     ),
                   ),
@@ -243,10 +269,10 @@ class _AddOrderTest extends State<AddOrderTest> {
     );
   }
 
-  Widget _buildSection(onTextChange) {
+  Widget _buildSection(onTextChange, textEditing) {
     switch (activeStep) {
       case 0:
-        return Addorderbilltest(paymentMethod,shipmentMethod,onTextChange,_formKey,);
+        return Addorderbilltest(paymentMethod,shipmentMethod,onTextChange,_formKey,textEditing);
       case 1:
         return  ListView.builder(
     itemCount: 3,
@@ -263,99 +289,37 @@ class _AddOrderTest extends State<AddOrderTest> {
   Widget nextButton(AddOrderProductsLoadedStatus addOrderProductsLoadedStatus) {
     return Container(
       margin: EdgeInsets.all(10),
-      width: activeStep==1?100:80,
+      width: activeStep == 1 ? 100 : 80,
       child: ElevatedButton(
         onPressed: () {
-          _validateForm();
-
-          if (activeStep == 1) {
-                double totalPrice = 0;
-                for (final entry
-                in addOrderProductsLoadedStatus
-                    .cart.entries) {
-                  final productId = entry.key;
-                  final quantity = entry.value;
-
-                  lineItem.add(LineItem(
-                    id: 0,
-                    productId: productId,
-                    name: "",
-                    quantity: quantity,
-                    total: totalPrice.toString(),
-                  ));
-                }
-                print('lineItemlineItemlineItemlineItem');
-                print(lineItem);
-            if (lineItem.isEmpty) {
-              alertDialog(context,
-                  'هیچ محصولی انتخاب نشده است!', 1, true);
-              return;
-            } AddOrderOrdersEntity order =
-            AddOrderOrdersEntity(
-                id: 0,
-                status: 'در انتظار',
-                billing: Ing(
-                    firstName: customerLNBill,
-                    lastName: customerFNBill,
-                    address1: addressBill,
-                    city: cityBill,
-                    email: emailBill,
-                    state: provinceBill,
-                    postcode: postalCodeBill,
-                    country: "ایران",
-                    phone: phoneBill),
-                shipping: Ing(
-                    firstName: customerLNBill,
-                    lastName: customerFNBill,
-                    address1: addressBill,
-                    city: cityBill,
-                    email: emailBill,
-                    state: provinceBill,
-                    postcode: postalCodeBill,
-                    country: "ایران",
-                    phone: phoneBill),
-                paymentMethod: paymentBill,
-                paymentMethodTitle: paymentBill,
-                lineItems: lineItem,
-                shippingLines: shippingLine);
-            print(addOrderProductsLoadedStatus.cart);
-            var payType = '';
-            if (paymentMethod!.isNotEmpty) {
-              payType = paymentMethod![
-              pay.indexOf(paymentBill)]
-                  .methodId
-                  .toString();
+          if (activeStep == 0) {
+            if (_formKey.currentState?.validate() ?? false) {
+              setState(() {
+                activeStep++;
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('لطفا همه فیلدهای مورد نیاز را پر کنید')),
+              );
             }
-            var shipType = '';
-            if (shipmentMethod!.isNotEmpty) {
-              shipType = shipmentMethod![
-              ship.indexOf(shipmentBill)]
-                  .methodId
-                  .toString();
-            }
-            String priceShip = shipPriceBill.isEmpty
-                ? ""
-                : shipPriceBill;
-            context.read<AddOrderBloc>().add(SetOrder(
-                SetOrderParams(order, payType, shipType,
-                    priceShip)));
-
-
-          }
-          if (activeStep < upperBound) {
+          } else {
             setState(() {
               activeStep++;
             });
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppConfig.secondaryColor,
+            backgroundColor: AppConfig.secondaryColor,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)))),
-        child: Text(activeStep==1?'ثبت سفارش':'بعدی',style: TextStyle(color: Colors.white,fontSize:activeStep==1?9:12),),
+        child: Text(
+          activeStep == 1 ? 'ثبت سفارش' : 'بعدی',
+          style: TextStyle(color: Colors.white, fontSize: activeStep == 1 ? 9 : 12),
+        ),
       ),
     );
   }
+
 
   Widget previousButton() {
     return Container(
@@ -467,58 +431,61 @@ class _AddOrderTest extends State<AddOrderTest> {
       padding: EdgeInsets.all(8),
       // color: Colors.green,
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          spacing: 20,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'نام'),
-                textField(controller, ' نام خانوادگی'),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'استان'),
-                textField(controller, 'شهر محل زندگی')
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'آدرس خریدار', isOnlyChild: true)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'کد پستی خریدار'),
-                textField(controller, 'ایمیل خریدار'),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 20,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'نام'),
+                  textField(controller, ' نام خانوادگی'),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'استان'),
+                  textField(controller, 'شهر محل زندگی')
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'آدرس خریدار', isOnlyChild: true)
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'کد پستی خریدار'),
+                  textField(controller, 'ایمیل خریدار'),
 
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'شماره همراه خریدار', isOnlyChild: true)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'روش پرداخت'),
-                textField(controller, 'روش حمل ونقل')
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                textField(controller, 'هزینه حمل ونقل', isOnlyChild: true)
-              ],
-            ),
-          ],
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'شماره همراه خریدار', isOnlyChild: true)
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'روش پرداخت'),
+                  textField(controller, 'روش حمل ونقل')
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(controller, 'هزینه حمل ونقل', isOnlyChild: true)
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

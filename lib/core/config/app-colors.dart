@@ -75,5 +75,10 @@ class AppConfig {
     return screenWidth * (4 / 100);
   }
 
+  static double calBorderRadiusSize (BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth * (3.2 / 100);
+  }
+
 
 }
