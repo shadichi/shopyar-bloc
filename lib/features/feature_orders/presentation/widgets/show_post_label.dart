@@ -24,7 +24,9 @@ class PdfViewerScreen extends StatefulWidget {
 
 class _PdfViewerScreenState extends State<PdfViewerScreen> {
   String? pdfPath;
-  var args = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
+  //var args = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
+
+  StoreInfo storeInfo =  StoreInfo(storeName: 'بلبل', storeAddress: 'بلبل', phoneNumber: 'بلبل', instagram: 'بلبل', postalCode: 'بلبل', website: 'بلبل', storeIcon: 'بلبل');
 
   @override
   void initState() {
@@ -32,11 +34,11 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     _generatePdf(); // تولید PDF در لحظه ورود
   }
 
-  @override
+/*  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     args = ModalRoute.of(context)!.settings.arguments as StoreInfo;
-  }
+  }*/
 
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
@@ -95,7 +97,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                             pw.Text('instagram')
                           ]))),
               positionedTextWidget(
-                  text: args.storeName,//نام گیرنده
+                  text: storeInfo.storeName,//نام گیرنده
                   heightContainer: height * 0.02,
                   widthContainer: width * 0.28,
                   leftPositioned: width * 0.445,
@@ -106,7 +108,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: args.storeName,
+                  text: storeInfo.storeName,
                   heightContainer: height * 0.027,
                   widthContainer: width * 0.3,
                   leftPositioned: width * 0.45,
@@ -117,7 +119,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.bold,
                   maxLine: 1),
               positionedTextWidget(
-                  text: args.storeAddress,
+                  text: storeInfo.storeAddress,
                   heightContainer: height * 0.059,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.445,
@@ -128,7 +130,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 4),
               positionedTextWidget(
-                  text: args.storeName,//یادداشت
+                  text: storeInfo.storeName,//یادداشت
                   heightContainer: height * 0.023,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.445,
@@ -236,7 +238,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       backgroundColor:  AppConfig.background,
       appBar: AppBar(
         backgroundColor:  AppConfig.background,
-        title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,),),leading: IconButton(
+        title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.8)),),leading: IconButton(
         icon: Icon(Icons.arrow_back, color: AppConfig.white,),
           onPressed: () {
 

@@ -10,7 +10,9 @@ class LoadOrdersData extends OrdersEvent{
   bool isFilter;
   String perPage;
   String status;
-  LoadOrdersData(this.isSearch, this.search,this.isFilter, this.perPage, this.status);
+  bool isLoadMore;
+  LoadOrdersData(this.isSearch, this.search,this.isFilter, this.perPage, this.status,
+      {this.isLoadMore = false});
 }
 class RefreshOrdersData extends OrdersEvent {}
 

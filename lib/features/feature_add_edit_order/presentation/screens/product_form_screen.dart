@@ -1,33 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
-import 'package:shapyar_bloc/features/feature_add_edit_order/domain/entities/add_order_orders_entity.dart';
-import '../../../../core/colors/app-colors.dart';
+import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/order.dart';
+import '../../../../core/widgets/snackBar.dart';
+import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
-import '../../../../locator.dart';
 import '../../data/models/add_order_data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../data/models/add_order_orders_model.dart';
 import '../bloc/add_order_bloc.dart';
-import '../bloc/add_order_set_order_status.dart';
 import '../bloc/add_order_status.dart';
 import '../widgets/AddOrderBillTest.dart';
-import '../widgets/add_order_bill.dart';
 import '../widgets/add_order_product.dart';
 
-class AddOrderTest extends StatefulWidget {
-  static const routeName = '/add_order_test';
+enum ProductFormMode {
+  create,
+  edit(),
+}
 
+class ProductFormScreen extends StatefulWidget {
+  static const createRoute = '/orders-create';
+  static const editRoute   = '/orders-edit';
+
+  final ProductFormMode mode;
+  final OrdersEntity? ordersEntity;
+
+  const ProductFormScreen._({required this.mode, this.ordersEntity}); // 👈 private constructor
+
+  factory ProductFormScreen.create() =>
+      ProductFormScreen._(mode: ProductFormMode.create);
+
+  factory ProductFormScreen.edit({required OrdersEntity ordersEntity}) =>
+      ProductFormScreen._(
+        mode: ProductFormMode.edit,
+        ordersEntity: ordersEntity,
+      );
+//کلمه‌ی factory یعنی «این سازنده لزوماً همیشه یک آبجکت جدید نمی‌سازه، می‌تونه یک نمونه‌ی موجود رو برگردونه یا منطق اضافه اجرا کنه».
   @override
   _AddOrderTest createState() => _AddOrderTest();
 }
 
-class _AddOrderTest extends State<AddOrderTest> {
+class _AddOrderTest extends State<ProductFormScreen> {
   int activeStep = 0;
 
   int upperBound = 1;
@@ -80,8 +95,6 @@ class _AddOrderTest extends State<AddOrderTest> {
   TextEditingController step1PhoneBill = TextEditingController();
   TextEditingController step1ShipPrice = TextEditingController();
 
-
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -96,8 +109,7 @@ class _AddOrderTest extends State<AddOrderTest> {
       step1EmailBill,
       step1PhoneBill,
       step1ShipPrice,
-    ]
-    ;
+    ];
 
     List<Function(String)> onTextChange = [
       (value) {
@@ -165,10 +177,10 @@ class _AddOrderTest extends State<AddOrderTest> {
         .toList();
 
     return BlocConsumer<AddOrderBloc, AddOrderState>(
-      listener: (context, state){
+      listener: (context, state) {
         if (state.addOrderStatus is AddOrderSuccessStatus) {
-          alertDialogScreen(context,'سفارش با موفقیت ایجاد شد.',2,false,icon: Icons.check_circle);
-
+          alertDialogScreen(context, 'سفارش با موفقیت ایجاد شد.', 2, false,
+              icon: Icons.check_circle);
         }
       },
       builder: (context, state) {
@@ -198,53 +210,49 @@ class _AddOrderTest extends State<AddOrderTest> {
 
           bodyContent = Padding(
             padding: const EdgeInsets.all(10),
-            child: Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  stepper(),
-                  Container(
-                    child: ListTile(
-                      title: Text(
-                        activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      subtitle: Text(
-                        activeStep == 0
-                            ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
-                            : 'لطفا محصولات را انتخاب فرمایید.',
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                stepper(),
+                ListTile(
+                  title: Text(
+                    activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                  subtitle: Text(
+                    activeStep == 0
+                        ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
+                        : 'لطفا محصولات را انتخاب فرمایید.',
+                    style: TextStyle(color: Colors.grey, fontSize: 11),
+                  ),
+                ),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: Duration(milliseconds: 400),
+                    transitionBuilder: (child, animation) => SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(1.0, 0.0), // از راست بیاد ←
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                    child: SizedBox(
+                      key: ValueKey<int>(activeStep),
+                      width: 350,
+                      //  height: 300,
+                      child: _buildSection(onTextChange, textEditing, widget.mode, widget.ordersEntity),
                     ),
                   ),
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: Duration(milliseconds: 400),
-                      transitionBuilder: (child, animation) => SlideTransition(
-                        position: Tween<Offset>(
-                          begin: Offset(1.0, 0.0), // از راست بیاد ←
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      ),
-                      child: SizedBox(
-                        key: ValueKey<int>(activeStep),
-                        width: 350,
-                        //  height: 300,
-                        child: _buildSection(onTextChange, textEditing),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      nextButton(addOrderProductsLoadedStatus),
-                      previousButton(),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    nextButton(addOrderProductsLoadedStatus),
+                    previousButton(),
+                  ],
+                ),
+              ],
             ),
           );
         } else {
@@ -260,7 +268,7 @@ class _AddOrderTest extends State<AddOrderTest> {
               color: Colors.white, //change your color here
             ),
             title: Text(
-              'ایجاد سفارش جدید',
+              widget.mode == ProductFormMode.create?'ایجاد سفارش جدید':'ویرایش سفارش ${widget.ordersEntity!.id.toString()} ',
               style: TextStyle(color: Colors.white, fontSize: 13),
             ),
           ),
@@ -269,18 +277,20 @@ class _AddOrderTest extends State<AddOrderTest> {
     );
   }
 
-  Widget _buildSection(onTextChange, textEditing) {
+  Widget _buildSection(onTextChange, textEditing, isEditMode, OrdersEntity? ordersEntity ) {
     switch (activeStep) {
       case 0:
-        return Addorderbilltest(paymentMethod,shipmentMethod,onTextChange,_formKey,textEditing);
+        return Addorderbilltest(
+            paymentMethod, shipmentMethod, onTextChange, _formKey, textEditing, isEditMode,  ordersEntity: ordersEntity);
       case 1:
-        return  ListView.builder(
-    itemCount: 3,
-    itemBuilder: (context, index) {
-    final product =
-    StaticValues.staticProducts[index];
-    return AddOrderProduct(product);
-    });
+        return ListView.builder(
+            itemCount: 13,
+            itemBuilder: (context, index) {
+              final product = StaticValues.staticProducts[index];
+              return AddOrderProduct(
+                product: product,
+              );
+            });
       default:
         return Container();
     }
@@ -298,9 +308,8 @@ class _AddOrderTest extends State<AddOrderTest> {
                 activeStep++;
               });
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('لطفا همه فیلدهای مورد نیاز را پر کنید')),
-              );
+
+              showSnack(context, "لطفا همه فیلدهای مورد نیاز را پر کنید!");
             }
           } else {
             setState(() {
@@ -314,12 +323,12 @@ class _AddOrderTest extends State<AddOrderTest> {
                 borderRadius: BorderRadius.all(Radius.circular(5)))),
         child: Text(
           activeStep == 1 ? 'ثبت سفارش' : 'بعدی',
-          style: TextStyle(color: Colors.white, fontSize: activeStep == 1 ? 9 : 12),
+          style: TextStyle(
+              color: Colors.white, fontSize: activeStep == 1 ? 9 : 12),
         ),
       ),
     );
   }
-
 
   Widget previousButton() {
     return Container(
@@ -333,7 +342,10 @@ class _AddOrderTest extends State<AddOrderTest> {
             });
           }
         },
-        child: Text('قبلی',style: TextStyle(color: Colors.white,fontSize: 12),),
+        child: Text(
+          'قبلی',
+          style: TextStyle(color: Colors.white, fontSize: 12),
+        ),
         style: ElevatedButton.styleFrom(
             backgroundColor: AppConfig.secondaryColor,
             shape: RoundedRectangleBorder(
@@ -389,11 +401,17 @@ class _AddOrderTest extends State<AddOrderTest> {
                 lineThickness: 1.0,
                 dashLength: 4.0,
                 dashColor: Colors.black,
-                dashGradient: [Colors.red, Colors.blue],
+                dashGradient: [
+                  AppConfig.firstLinearColor,
+                  AppConfig.secondLinearColor
+                ],
                 dashRadius: 0.0,
                 dashGapLength: 4.0,
                 dashGapColor: Colors.transparent,
-                dashGapGradient: [Colors.red, Colors.blue],
+                dashGapGradient: [
+                  AppConfig.firstLinearColor,
+                  AppConfig.secondLinearColor
+                ],
                 dashGapRadius: 0.0,
               )),
           Container(
@@ -462,7 +480,6 @@ class _AddOrderTest extends State<AddOrderTest> {
                 children: [
                   textField(controller, 'کد پستی خریدار'),
                   textField(controller, 'ایمیل خریدار'),
-
                 ],
               ),
               Row(
@@ -519,7 +536,7 @@ class _AddOrderTest extends State<AddOrderTest> {
           fillColor: Colors.white,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
-          //  borderSide: BorderSide(color: Colors.grey, width: 1.4),
+            //  borderSide: BorderSide(color: Colors.grey, width: 1.4),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
@@ -530,18 +547,5 @@ class _AddOrderTest extends State<AddOrderTest> {
         ),
       ),
     );
-  }
-
-  String headerText() {
-    switch (activeStep) {
-      case 1:
-        return 'Preface';
-
-      case 2:
-        return 'Table of Contents';
-
-      default:
-        return 'Introduction';
-    }
   }
 }

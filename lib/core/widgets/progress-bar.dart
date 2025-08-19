@@ -1,17 +1,23 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/core/config/app-colors.dart';
 
 class ProgressBar extends StatelessWidget {
-  const ProgressBar({super.key});
-
+  final Color color;
+  final double size;
+   ProgressBar({
+    super.key,
+    this.color = AppConfig.progressBarColor,
+    this.size = 5
+  });
   @override
   Widget build(BuildContext context) {
     return SpinKitThreeBounce(
-      size: 20,
+      size: AppConfig.calWidth(context, size),
       itemBuilder: (BuildContext context, int index) {
         return DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: color,
           ),
         );
       },

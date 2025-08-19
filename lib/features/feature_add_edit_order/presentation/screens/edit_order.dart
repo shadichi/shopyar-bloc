@@ -1,18 +1,18 @@
 /*
 import 'package:flutter/material.dart';
-import 'package:shop_manager_bloc/core/params/home_user_data_params.dart';
-import 'package:shop_manager_bloc/core/params/setOrderPArams.dart';
-import 'package:shop_manager_bloc/core/utils/static_values.dart';
-import 'package:shop_manager_bloc/features/feature_add_edit_order/presentation/bloc/add_order_status.dart';
-import 'package:shop_manager_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shapyar_bloc/core/params/home_user_data_params.dart';
+import 'package:shapyar_bloc/core/params/setOrderPArams.dart';
+import 'package:shapyar_bloc/core/utils/static_values.dart';
+import 'package:shapyar_bloc/features/feature_add_edit_order/presentation/bloc/add_order_status.dart';
+import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/params/products_params.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../locator.dart';
+import '../../data/models/add_order_data_model.dart';
 import '../../data/models/add_order_orders_model.dart';
 import '../../domain/entities/add_order_orders_entity.dart';
 import '../bloc/add_order_bloc.dart';
-import '../bloc/add_order_data_status.dart';
 import '../bloc/add_order_set_order_status.dart';
 import '../widgets/edit_order_bill.dart';
 import '../widgets/edit_order_product.dart';
@@ -31,10 +31,9 @@ class EditOrder extends StatefulWidget {
 class _EditOrderState extends State<EditOrder> {
 
   int _currentStep = 0;
-  */
-/*List<PaymentMethod>? paymentMethod = [];
+List<PaymentMethod>? paymentMethod = [];
   List<ShippingMethod>? shipmentMethod = [];
-  *//*
+
 
 
   List pay = [];
@@ -146,7 +145,7 @@ class _EditOrderState extends State<EditOrder> {
         create: (context) => AddOrderBloc(locator(), locator(), locator(), locator()),
         child: BlocBuilder<AddOrderBloc, AddOrderState>(
           builder: (context, state) {
-            if (state.addOrderDataStatus is AddOrderDataLoadingStatus) {
+            if (state.addOrderStatus is ) {
               print("1");
               BlocProvider.of<AddOrderBloc>(context)
                   .add(LoadAddOrderData(UserDataParams("", "",{})));
@@ -160,11 +159,10 @@ class _EditOrderState extends State<EditOrder> {
 
               AddOrderDataLoadedStatus addOrderDataStatus =
                   state.addOrderDataStatus as AddOrderDataLoadedStatus;
-             */
-/* paymentMethod =
+ paymentMethod =
                   addOrderDataStatus.addOrderDataEntity.paymentMethods;
               shipmentMethod =
-                  addOrderDataStatus.addOrderDataEntity.shippingMethods;*//*
+                  addOrderDataStatus.addOrderDataEntity.shippingMethods;
 
               StaticValues.paymentMethods!.forEach((element) {
                 pay.add(element['method_title']);
@@ -173,9 +171,8 @@ class _EditOrderState extends State<EditOrder> {
                 ship.add(element['method_title']);
               });
             }
-           */
-/* print("pay");
-            print(pay);*//*
+ print("pay");
+            print(pay);
 
             if (state.addOrderDataStatus is AddOrderDataErrorStatus) {
               print("3");
@@ -221,10 +218,9 @@ class _EditOrderState extends State<EditOrder> {
                                   final products = addOrderProductsLoadedStatus
                                       .addOrderProductEntity;
                                   0;
-                                  */
-/*  print(product.name);
+  print(product.name);
                                       print("count");
-                                      print(count);*//*
+                                      print(count);
 
 
                                   return EditOrderProduct(currentProduct, products, index, widget.ordersEntity);
@@ -264,8 +260,7 @@ class _EditOrderState extends State<EditOrder> {
                         borderRadius:
                         BorderRadius.circular(width * 0.02),
                       ))),
-              onPressed: () {*/
-/*
+              onPressed: () {
                 print("customerLNBill");
                 print(shipmentBill);
                 print(paymentBill);
@@ -336,7 +331,7 @@ class _EditOrderState extends State<EditOrder> {
                 print(shipType);
                 String priceShip = shipPriceBill.isEmpty?"":shipPriceBill;
                 context.read<AddOrderBloc>().add(
-                    SetOrder(SetOrderParams(order,"","",payType,shipType,priceShip)));*//*
+                    SetOrder(SetOrderParams(order,"","",payType,shipType,priceShip)));
 
               },
               child: Row(
@@ -360,8 +355,7 @@ class _EditOrderState extends State<EditOrder> {
         ),
       );
     }
-    */
-/*if(state.addOrderSetOrderStatus is AddOrderSetOrderSuccess){
+if(state.addOrderSetOrderStatus is AddOrderSetOrderSuccess){
       return Container(
         width: width,
         height: height,
@@ -388,10 +382,9 @@ class _EditOrderState extends State<EditOrder> {
                   child: Text("ثبت شد",style: TextStyle(color: Colors.white)))),
         ),
       );
-    }*//*
+    }
 
-    */
-/* if(state.addOrderSetOrderStatus is AddOrderSetOrderFailed){
+ if(state.addOrderSetOrderStatus is AddOrderSetOrderFailed){
       return Container(
         width: width,
         height: height,
@@ -418,7 +411,7 @@ class _EditOrderState extends State<EditOrder> {
                   child: Text("ثبت نشد",style: TextStyle(color: Colors.white)))),
         ),
       );
-    }*//*
+    }
 
       if(state.addOrderSetOrderStatus is AddOrderSetOrderInitialStatus ){
     return Container(

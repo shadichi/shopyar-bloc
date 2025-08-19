@@ -1,21 +1,16 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_home/domain/entities/orders_entity.dart';
 import 'package:shapyar_bloc/features/feature_orders/data/models/orders_model.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
-
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
-import '../../data/models/store_info.dart';
 import 'order_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowPDF extends StatefulWidget {
   static String routeName = 'ShowPDF';
@@ -30,10 +25,34 @@ class _ShowPDFState extends State<ShowPDF> {
   String? pdfPath;
   var args = PdfData(ordersEntity: OrdersModel(), item: 0);
 
+  Map<int,dynamic> receivedFactorData = {};
+
+  Map<int,dynamic> factorData = {};
+
   @override
   void initState() {
     super.initState();
-    _generatePdf(); // تولید PDF در لحظه ورود
+    getFactorData();
+    _generatePdf();
+
+  }
+  Future<bool> getFactorData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    for( int i = 0 ; i< 9 ; i++){
+      if(prefs.containsKey('factor-data-$i')){
+        bool? value = prefs.getBool('factor-data-$i');
+        receivedFactorData[i] = value;
+        print('receivedFactorData[i]');
+        print(receivedFactorData[i]);
+      }else{
+        receivedFactorData[i] = false;
+      }
+
+    }
+    print(receivedFactorData);
+    print(receivedFactorData[0].runtimeType);
+
+    return true;
   }
 
   @override
@@ -79,11 +98,15 @@ class _ShowPDFState extends State<ShowPDF> {
                                   mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: pw.CrossAxisAlignment.end,
                                   children: [
-                                    pw.Text(
+                                    if(receivedFactorData[2])
+
+                                      pw.Text(
                                         "کد پستی: ${args.ordersEntity.billing!.postcode}",
                                         textDirection: pw.TextDirection.rtl,
                                         style: pw.TextStyle(
                                             fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+
+                                    if(receivedFactorData[3])
                                     pw.Row(
                                         mainAxisAlignment:
                                             pw.MainAxisAlignment.end,
@@ -127,11 +150,13 @@ class _ShowPDFState extends State<ShowPDF> {
                                         textDirection: pw.TextDirection.rtl,
                                         style: pw.TextStyle(
                                             fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+                                  if(receivedFactorData[0])
                                     pw.Text(
-                                        "تلفن: ${args.ordersEntity.billing!.phone}",
-                                        textDirection: pw.TextDirection.rtl,
-                                        style: pw.TextStyle(
-                                            fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+                                      "تلفن: ${args.ordersEntity.billing!.phone}",
+                                      textDirection: pw.TextDirection.rtl,
+                                      style: pw.TextStyle(
+                                          fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+                                    if(receivedFactorData[1])
                                     pw.Text(
                                         "نشانی: ${args.ordersEntity.billing!.address1}",
                                         textDirection: pw.TextDirection.rtl,
@@ -156,12 +181,15 @@ class _ShowPDFState extends State<ShowPDF> {
                                       crossAxisAlignment:
                                           pw.CrossAxisAlignment.end,
                                       children: [
+                                        if(receivedFactorData[6])
                                         pw.Text(
                                             "کد پستی: ${args.ordersEntity.billing!.postcode}",
                                             textDirection: pw.TextDirection.rtl,
                                             style: pw.TextStyle(
                                                 fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
-                                        pw.Row(
+                                        if(receivedFactorData[7])
+
+                                          pw.Row(
                                             mainAxisAlignment:
                                             pw.MainAxisAlignment.end,
                                             children: [
@@ -199,17 +227,21 @@ class _ShowPDFState extends State<ShowPDF> {
                                             textDirection: pw.TextDirection.rtl,
                                             style: pw.TextStyle(
                                                 fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+                                        if(receivedFactorData[4])
                                         pw.Text(
                                             "شماره تماس: ${args.ordersEntity.billing!.phone}",
                                             textDirection: pw.TextDirection.rtl,
                                             style: pw.TextStyle(
                                                 fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
+                                        if(receivedFactorData[5])
                                         pw.Text(
                                             "آدرس: ${args.ordersEntity.billing!.address1}",
                                             textDirection: pw.TextDirection.rtl,
                                             style: pw.TextStyle(
                                                 fontSize: 10, font: ttf),overflow: pw.TextOverflow.clip,),
-                                        pw.Container(
+                                        if(receivedFactorData[8])
+
+                                          pw.Container(
                                             width: 250,
                                             alignment: pw.Alignment.centerRight,
                                             child: pw.Text("توضیحات:",
@@ -342,6 +374,8 @@ class _ShowPDFState extends State<ShowPDF> {
     print(args.item);
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -358,14 +392,20 @@ class _ShowPDFState extends State<ShowPDF> {
       ),
       body: pdfPath == null
           ? Center(child: ProgressBar())
-          : PDFView(
-              filePath: pdfPath!,
-              enableSwipe: true,
-              swipeHorizontal: false,
-              autoSpacing: true,
-              pageSnap: true,
-              fitPolicy: FitPolicy.BOTH,
-            ),
+          : FutureBuilder(future: getFactorData(), builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
+            if(snapshot.hasData){
+              return PDFView(
+                filePath: pdfPath!,
+                enableSwipe: true,
+                swipeHorizontal: false,
+                autoSpacing: true,
+                pageSnap: true,
+                fitPolicy: FitPolicy.BOTH,
+              );
+            }else{
+              return  ProgressBar();
+            }
+      }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppConfig.background,
         onPressed: _savePdf,

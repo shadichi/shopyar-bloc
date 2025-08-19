@@ -64,7 +64,7 @@ class OrderDetailScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.menu,color: AppConfig.white),
           onPressed: () {
-            OrderOptions(context, ordersData,item);
+            OrderOptions(context, ordersData, item, ordersLoadedStatus);
           },
         ),
         actions: [
@@ -151,10 +151,7 @@ class OrderDetailScreen extends StatelessWidget {
                   height: 1,
                     decoration: BoxDecoration(
                         gradient:LinearGradient(
-                          colors: [
-                            Colors.red,
-                            Colors.blue,
-                          ],)
+                          colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
                     )
                 ),
                     SizedBox(
@@ -268,10 +265,7 @@ class OrderDetailScreen extends StatelessWidget {
                         height: 1,
                         decoration: BoxDecoration(
                             gradient:LinearGradient(
-                              colors: [
-                                Colors.red,
-                                Colors.blue,
-                              ],)
+                              colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
                         )
                     ),
                     SizedBox(

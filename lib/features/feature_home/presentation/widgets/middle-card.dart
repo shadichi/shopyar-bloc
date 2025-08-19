@@ -18,6 +18,7 @@ class MiddleCard extends StatelessWidget {
       height: height * 0.17,
       width: width ,
       decoration: BoxDecoration(
+        border: Border.all(color: AppConfig.borderColor,width: 0.4),
           borderRadius: BorderRadius.circular(10),
           color: AppConfig.secondaryColor),
       child: Row(
@@ -30,7 +31,15 @@ class MiddleCard extends StatelessWidget {
                     Text('امروز',style: TextStyle(color: Colors.white),),
                     Padding(
                       padding:  EdgeInsets.only(left: width*0.1),
-                      child: Divider(),
+                      child: Container(
+                          margin: EdgeInsets.all(AppConfig.calWidth(context, 2)),
+                          width: AppConfig.calWidth(context, 40),
+                          height: 0.5,
+                          decoration: BoxDecoration(
+                              gradient:LinearGradient(
+                                colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
+                          )
+                      ),
                     ),
                     Text('${statusCounts!.dailyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                     Text('${statusCounts!.dailySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
@@ -46,7 +55,15 @@ class MiddleCard extends StatelessWidget {
                     Text('ماهانه',style: TextStyle(color: Colors.white),),
                     Padding(
                       padding:  EdgeInsets.only(left: width*0.1),
-                      child: Divider(),
+                      child:  Container(
+                          margin: EdgeInsets.all(AppConfig.calWidth(context, 2)),
+                          width: AppConfig.calWidth(context, 40),
+                          height: 0.5,
+                          decoration: BoxDecoration(
+                              gradient:LinearGradient(
+                                colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
+                          )
+                      ),
                     ),
                     Text('${statusCounts!.monthlyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                     Text('${statusCounts!.monthlySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),

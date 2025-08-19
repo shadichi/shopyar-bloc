@@ -8,3 +8,5 @@ class LoadDataEvent extends HomeEvent{}
 class LogOutEvent extends HomeEvent{}
 
 class LoadHomeDataEvent extends HomeEvent{}
+
+class AccountExit extends HomeEvent{}

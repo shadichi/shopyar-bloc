@@ -86,9 +86,11 @@ class HomeRepositoryImpl extends HomeRepository{
           return DataSuccess(homeDataEntity);
 
         } else {
+          print('eeeeeesde');
           return DataFailed('error in getHomeUserData');
         }
       } catch (e) {
+        print('eeeeedsddsee');
         print(e.toString());
         return DataFailed('error in getHomeUserData:$e');
       }

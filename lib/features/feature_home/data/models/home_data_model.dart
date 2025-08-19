@@ -45,9 +45,9 @@ class HomeDataModel extends HomeDataEntity {
           : null,
       dailyCounts: json["daily_count"] ?? 0,  // Provide default value
       monthlyCounts: json["monthly_count"] ?? 0,  // Provide default value
-      weeklyCounts: json["count"] != null
+      weeklyCounts: (json["count"] is Map)?json["count"] != null
           ? Map<String, int>.from(json["count"])
-          : {},  // Provide empty map as default
+          : {}:{},  // Provide empty map as default
     );
   }
 }

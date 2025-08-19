@@ -219,7 +219,7 @@ class _AddOrderState extends State<AddOrder> {
                                   itemBuilder: (context, index) {
                                     final product =
                                         StaticValues.staticProducts[index];
-                                    return AddOrderProduct(product);
+                                    return AddOrderProduct( product: product,);
                                   }),
                             ),
                             isActive: _currentStep == 1,

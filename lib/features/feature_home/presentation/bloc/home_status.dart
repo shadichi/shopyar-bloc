@@ -13,18 +13,7 @@ class HomeLoading extends HomeStatus{
   // TODO: implement props
   List<Object?> get props => [];
 }
-/*class UserLoadedStatus extends HomeStatus{
-  final UserDataParams homeUserDataParams;
-  UserLoadedStatus(this.homeUserDataParams);
-  @override
-  // TODO: implement props
-  List<Object?> get props => [homeUserDataParams];
-}
-class UserErrorStatus extends HomeStatus{
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
-}*/
+
 class HomeLoadedStatus extends HomeStatus{
   HomeLoadedStatus();
   @override
@@ -32,6 +21,11 @@ class HomeLoadedStatus extends HomeStatus{
   List<Object?> get props => [];
 }
 class HomeErrorStatus extends HomeStatus{
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+class HomeAccountExitStatus extends HomeStatus{
   @override
   // TODO: implement props
   List<Object?> get props => [];

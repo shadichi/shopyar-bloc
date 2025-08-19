@@ -27,39 +27,49 @@ class LogInBloc extends Bloc<LogInEvent, LogInState> {
     });
 
     on<DataLoginEvent>((event, emit) async {
-      if(event.userDataParams.webService.isEmpty || event.userDataParams.key.isEmpty){
+      if (event.userDataParams.webService.isEmpty ||
+          event.userDataParams.key.isEmpty) {
         emit(state.copyWith(newlogInStatus: EmptyTextFieldsStatus()));
-      }else{
+      } else {
         emit(state.copyWith(newlogInStatus: LoadingLogInStatus()));
-        try{
-          Map<String, dynamic> response = await getLoginDataUseCase(WholeUserDataParams(event.userDataParams.webService.toString(), event.userDataParams.key));
-          StaticValues.shopName = await response['name'];
-          StaticValues.shippingMethods = await response['shipping_methods'];
-          StaticValues.paymentMethods = await response['payment_methods'];
-          StaticValues.status = await response['status'];
-          StaticValues.webService = event.userDataParams.webService.toString();
-          StaticValues.passWord = await event.userDataParams.key.toString();
+        try {
+          Map<String, dynamic> response = await getLoginDataUseCase(
+              WholeUserDataParams(event.userDataParams.webService.toString(),
+                  event.userDataParams.key));
 
+          if (response.isNotEmpty) {
+            StaticValues.shopName = await response['name'];
+            StaticValues.shippingMethods = await response['shipping_methods'];
+            StaticValues.paymentMethods = await response['payment_methods'];
+            StaticValues.status = await response['status'];
+            StaticValues.webService =
+                event.userDataParams.webService.toString();
+            StaticValues.passWord = event.userDataParams.key.toString();
+
+            if (StaticValues.shopName != '' &&
+                StaticValues.status.isNotEmpty &&
+                StaticValues.shopName.isNotEmpty &&
+                StaticValues.shippingMethods.isNotEmpty &&
+                StaticValues.paymentMethods.isNotEmpty) {
+              try {
+                await setStringUseCase(event.userDataParams.key.toString(),
+                    event.userDataParams.webService);
+                emit(state.copyWith(newlogInStatus: UserDataLoadedStatus()));
+              } catch (error) {
+                emit(
+                    state.copyWith(newlogInStatus: SharedPErrorState('error')));
+              }
+            }
+          } else {
+            emit(state.copyWith(
+                newlogInStatus:
+                    LoginErrorState('Invalid username or password')));
+          }
         } catch (error) {
           emit(state.copyWith(
               newlogInStatus: LoginErrorState('Invalid username or password')));
         }
-
-        if(StaticValues.shopName != '' && StaticValues.status.isNotEmpty && StaticValues.shopName.isNotEmpty && StaticValues.shippingMethods.isNotEmpty && StaticValues.paymentMethods.isNotEmpty){
-          try {
-            await setStringUseCase(
-                event.userDataParams.key.toString(),
-                event.userDataParams.webService);
-            emit(state.copyWith(newlogInStatus: UserDataLoadedStatus()));
-          } catch (error) {
-            emit(state.copyWith(
-                newlogInStatus: SharedPErrorState('error')));
-          }
-
-        }
       }
-
     });
-
   }
 }

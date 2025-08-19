@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/core/config/app-colors.dart';
 
 class LogInTextFormWidget extends StatelessWidget {
   TextEditingController textEditingController;
@@ -25,16 +26,16 @@ class LogInTextFormWidget extends StatelessWidget {
           fillColor: Colors.grey[300],
           counterText: "",
           enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                  width: 0, color: Colors.transparent),
+              borderSide:  BorderSide(
+                  width: 2, color: Colors.transparent),
               borderRadius: BorderRadius.circular(10)),
           errorBorder: OutlineInputBorder(
               borderSide: const BorderSide(
-                  width: 0, color: Colors.transparent),
+                  width: 1, color: Colors.transparent),
               borderRadius: BorderRadius.circular(10)),
           focusedBorder: OutlineInputBorder(
               borderSide: const BorderSide(
-                  width: 1, color: Colors.blue),
+                  width: 1, color: AppConfig.progressBarColor),
               borderRadius: BorderRadius.circular(10)),
         ),
         validator: (value) {

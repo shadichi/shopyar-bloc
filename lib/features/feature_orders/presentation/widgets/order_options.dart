@@ -3,15 +3,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:shapyar_bloc/features/feature_orders/data/models/orders_model.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/show_pdf.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../feature_home/domain/entities/orders_entity.dart';
+import '../../../feature_add_edit_order/presentation/screens/product_form_screen.dart';
+import '../../domain/entities/orders_entity.dart';
 import '../../functions/OrderBottomSheet.dart';
 import 'show_post_label.dart';
 import '../../data/models/store_info.dart';
 import '../screens/enter_inf_data.dart';
 
-void OrderOptions(BuildContext context, dynamic ordersData, item) {
+void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? ordersEntity) {
   String selectedStatus = '';
 
   showModalBottomSheet(
@@ -33,8 +33,11 @@ void OrderOptions(BuildContext context, dynamic ordersData, item) {
               _buildListTile(
                 icon: Icons.edit,
                 title: 'ویرایش سفارش',
-                onTap: () => Navigator.pop(context),
-                context: context
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => ProductFormScreen.edit(ordersEntity: ordersEntity!)));
+
+                  }, context: context
               ),
               _buildDivider(context),
               _buildListTile(
@@ -92,10 +95,7 @@ Widget _buildDivider(context) {
       height: AppConfig.calHeight(context, 0.1),
       decoration: BoxDecoration(
           gradient:LinearGradient(
-            colors: [
-              Colors.red,
-              Colors.blue,
-            ],)
+            colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
       )
   );
 }

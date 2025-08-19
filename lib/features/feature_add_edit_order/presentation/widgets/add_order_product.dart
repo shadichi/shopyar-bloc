@@ -1,366 +1,223 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
-import '../../../../core/config/app-colors.dart';
-import '../../../../core/params/add_order_get_selected_products_params.dart';
-import '../../../../core/params/selected_products-params.dart';
-import '../../../feature_products/domain/entities/product_entity.dart';
-import '../../domain/entities/add_order_product_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shapyar_bloc/core/config/app-colors.dart';
 
+import '../../../../core/params/add_order_get_selected_products_params.dart';
+import '../../../feature_products/domain/entities/product_entity.dart';
 import '../bloc/add_order_bloc.dart';
 import '../bloc/add_order_card_product_status.dart';
 
+/// A widget that displays a product card for adding to an order
 class AddOrderProduct extends StatelessWidget {
-  ProductEntity addOrderProductEntity;
+  final ProductEntity product;
+  final ProductEntity? purchasedProducts;
 
-  AddOrderProduct(this.addOrderProductEntity);
+  const AddOrderProduct({required this.product, this.purchasedProducts, super.key});
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+
+
+    final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+
     return Card(
       elevation: 8,
       color: Colors.white,
-      child: Container(
-        padding: EdgeInsets.all(width*0.02),
-        width: width,
-        height: height * 0.23,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(width * 0.03)),
-          color: Colors.white,
-        ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(size.width * 0.03),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(size.width * 0.02),
         child: Column(
           children: [
+            _buildProductInfo(context, size, theme),
+            const Divider(),
             Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: height * 0.01, vertical: height * 0.01),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: width * 0.5,
-                    child: Column(
-                      children: [
-                        Container(
-                            width: width * 0.6,
-                            alignment: Alignment.centerRight,
-                            child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    final width = constraints.maxWidth;
-                                    var fontSize = 11.0;
-                                    if (width <= 480) {
-                                      fontSize = 10.0;
-                                    } else if (width > 480 && width <= 960) {
-                                      fontSize = 12.0;
-                                    } else {
-                                      fontSize = 11;
-                                    }
-                                    return Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            addOrderProductEntity.name
-                                                .toString()+addOrderProductEntity.id
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style:
-                                                TextStyle(fontSize: fontSize),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ))),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: width * 0.14,
-                    height: height * 0.07,
-                    alignment: Alignment.centerLeft,
-                    child: addOrderProductEntity.image.toString().isNotEmpty
-                        ? Image.network(addOrderProductEntity.image.toString())
-                        : Image.asset("assets/images/index.png"),
-                  ),
-                ],
-              ),
-            ),
-            Divider(),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                //  width: width * 0.2,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                      '${addOrderProductEntity.price.toString()} تومان',style: TextStyle(fontWeight: FontWeight.bold),),
-                ),
-                Container(
-
-                  child: Column(
-                    children: [
-                      BlocBuilder<AddOrderBloc, AddOrderState>(
-
-                          builder: (context, state) {
-                        if (state.addOrderCardProductStatus
-                            is AddOrderCardProductNotLoaded) {
-
-                          ListTile(
-                            title: Text(addOrderProductEntity.name.toString()),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Button to decrease the count
-                                IconButton(
-                                  icon: Icon(Icons.remove, color: Colors.red,),
-                                  onPressed: () {
-                                    // Dispatch DecreaseProductCount event
-                                    context.read<AddOrderBloc>().add(
-                                        DecreaseProductCount(addOrderProductEntity));
-                                  },
-                                ),
-                                // Display the count of the product
-                                Text("add"),
-                                // Button to increase the count
-                                IconButton(
-                                  icon: Icon(Icons.add, color: Colors.green,),
-                                  onPressed: () {
-                                    // Dispatch IncreaseProductCount event
-                                    context.read<AddOrderBloc>().add(
-                                        AddOrderAddProduct(addOrderProductEntity));
-
-                                    /*      print("countttt");
-                                                      print(product.name);
-                                                      print(count);
-                                                      print("ff");*/
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        if (state.addOrderCardProductStatus
-                            is AddOrderCardProductLoaded) {
-                          print("11");
-                          AddOrderCardProductLoaded editOrderProductsInitialStatus =
-                              state.addOrderCardProductStatus
-                                  as AddOrderCardProductLoaded;
-
-                          final count = editOrderProductsInitialStatus
-                                  .cart[addOrderProductEntity.id] ??
-                              0;
-
-                          print(editOrderProductsInitialStatus.cart);
-                          print(count);
-
-                          return count == 0
-                              ? Container(
-                                  /*color: Colors.grey,*/
-                                  alignment: Alignment.center,
-                                  width: width * 0.4,
-                                  height: height * 0.09,
-                                  child: Container(
-                                    width: width * 0.3,
-                                    height: height * 0.04,
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:AppConfig.secondaryColor,
-                                            shape:RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(width * 0.02),
-                                            )),
-                                        onPressed: () {
-                                          context.read<AddOrderBloc>().add(
-                                              AddOrderAddProduct(
-                                                  addOrderProductEntity));
-                                        },
-                                        child: Text(
-                                          "انتخاب محصول",
-                                          style: TextStyle(
-                                              fontSize: width * 0.025,
-                                              color: Colors.white),
-                                        )),
-                                  ),
-                                )
-                              : Container(
-                                  /*color: Colors.blueAccent,*/
-                                  width: width * 0.6,
-                                  height: height * 0.085,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          width: width * 0.1,
-                                          height: height * 0.04,
-                                          child: Icon(
-                                            Icons
-                                                .add_circle, // Use the built-in add icon
-                                            size: width * 0.07,
-                                  color: Colors.green,
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          context.read<AddOrderBloc>().add(
-                                              AddOrderAddProduct(
-                                                  addOrderProductEntity));
-                                        },
-                                      ),
-                                      Container(
-                                          alignment: Alignment.center,
-                                          width: width * 0.1,
-                                          height: height * 0.04,
-                                          child: Text(
-                                            count.toString(),
-                                            style: TextStyle(
-                                                fontSize: width * 0.04,
-                                                color: Colors.black),
-                                          )),
-                                      GestureDetector(
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          width: width * 0.1,
-                                          height: height * 0.04,
-                                          child: Icon(
-                                            Icons.remove_circle,
-                                            // Use the built-in add icon
-                                            size: width * 0.07,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          context.read<AddOrderBloc>().add(
-                                              DecreaseProductCount(
-                                                  addOrderProductEntity));
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                        }
-                        print("33");
-
-                        return Container(
-                          /*color: Colors.grey,*/
-
-                          alignment: Alignment.center,
-                          width: width * 0.7,
-                          height: height * 0.09,
-                          child: Container(
-                            width: width * 0.3,
-                            height: height * 0.04,
-                            child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all<Color>(
-                                        Colors.blueAccent),
-                                    shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(width * 0.02),
-                                    ))),
-                                onPressed: () {
-                                  context.read<AddOrderBloc>().add(
-                                      AddOrderAddProduct(addOrderProductEntity));
-                                },
-                                child: Text(
-                                  "انتخاب محصول",
-                                  style: TextStyle(
-                                      fontSize: width * 0.025, color: Colors.white),
-                                )),
-                          ),
-                        );
-                      }),
-                      /* Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    */ /*color: Colors.black12,*/ /*
-                                    child: Text(
-                                      editOrderProductEntity.stockQuantity.toString(),
-                                      style: TextStyle(
-                                          color: int.tryParse(editOrderProductEntity
-                                                      .stockQuantity
-                                                      .toString()) ==
-                                                  null
-                                              ? Colors.green
-                                              : int.tryParse(editOrderProductEntity
-                                                          .stockQuantity
-                                                          .toString())! <
-                                                      30
-                                                  ? Colors.red
-                                                  : Colors.green),
-                                    ) */ /*,color: Colors.grey*/ /*,
-                                    width: width * 0.3,
-                                    height: height * 0.025,
-                                  ),
-                                  Container(
-                                    child: Text(
-                                      "موجودی انبار",
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                    */ /*color: Colors.green,*/ /*
-                                    width: width * 0.3,
-                                    height: height * 0.025,
-                                  ),
-                                ],
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              ),
-                             */ /* color: Colors.blue,*/ /*
-                              height: height * 0.07,
-                            ),
-                            Container(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    child: Text(
-                                        editOrderProductEntity.totalSales.toString()),
-                                  */ /*  color: Colors.grey,*/ /*
-                                    width: width * 0.3,
-                                    height: height * 0.025,
-                                  ),
-                                  Container(
-                                    child: Text(
-                                      "فروش کلی",
-                                      style: TextStyle(color: Colors.grey),
-                                    ) */ /*,color: Colors.green*/ /*,
-                                    width: width * 0.3,
-                                    height: height * 0.025,
-                                  ),
-                                ],
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              ),
-                             */ /* color: Colors.blue,*/ /*
-                              height: height * 0.07,
-                            )
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        ),
-                        */ /*color: Colors.blueGrey,*/ /*
-                      )*/
-                    ],
-                  ),
-                ),
-              ],
-            )
+                height: AppConfig.calHeight(context, 4),
+                child: ListView.builder(
+                  itemBuilder: (context, index) =>
+                      _buildProductControls(context, size, theme),
+                  itemCount: product.childes!.isEmpty?1:product.childes!.length,
+                )),
           ],
         ),
       ),
     );
+  }
+
+  /// Builds the product information section
+  Widget _buildProductInfo(BuildContext context, Size size, ThemeData theme) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: size.height * 0.01,
+        vertical: size.height * 0.01,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildProductName(size, theme),
+          _buildProductImage(size),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the product name display
+  Widget _buildProductName(Size size, ThemeData theme) {
+    return SizedBox(
+      width: size.width * 0.5,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final fontSize = _calculateFontSize(constraints.maxWidth);
+          return Text(
+            '${product.name}${product.id}',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(fontSize: fontSize),
+            overflow: TextOverflow.ellipsis,
+          );
+        },
+      ),
+    );
+  }
+
+  /// Builds the product image display
+  Widget _buildProductImage(Size size) {
+    return SizedBox(
+      width: size.width * 0.14,
+      height: size.height * 0.07,
+      child: product.image!.isNotEmpty
+          ? Image.network(product.image.toString())
+          : Image.asset('assets/images/index.png'),
+    );
+  }
+
+  /// Builds the product controls section (price and quantity controls)
+  Widget _buildProductControls(
+      BuildContext context, Size size, ThemeData theme) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            alignment: Alignment.center,
+            width: AppConfig.calWidth(context, 40),
+            child: Text(
+              '${product.price} تومان',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          _buildQuantityControls(context, size, theme),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the quantity controls (add/remove buttons and count)
+  Widget _buildQuantityControls(
+      BuildContext context, Size size, ThemeData theme) {
+    return BlocBuilder<AddOrderBloc, AddOrderState>(
+      builder: (context, state) {
+        if (state.addOrderCardProductStatus is AddOrderCardProductNotLoaded) {
+          return const SizedBox.shrink();
+        }
+
+        if (state.addOrderCardProductStatus is AddOrderCardProductLoaded) {
+          final status =
+              state.addOrderCardProductStatus as AddOrderCardProductLoaded;
+          final count = status.cart[product.id] ?? 0;
+
+          return count == 0
+              ? _buildAddButton(context, size, theme)
+              : _buildQuantitySelector(context, size, theme, count);
+        }
+
+        return _buildAddButton(context, size, theme);
+      },
+    );
+  }
+
+  /// Builds the "Add Product" button
+  Widget _buildAddButton(BuildContext context, Size size, ThemeData theme) {
+    return SizedBox(
+      width: size.width * 0.3,
+      height: size.height * 0.04,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppConfig.secondaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(size.width * 0.02),
+          ),
+        ),
+        onPressed: () =>
+            context.read<AddOrderBloc>().add(AddOrderAddProduct(product)),
+        child: Text(
+          'انتخاب محصول',
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontSize: size.width * 0.022,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the quantity selector (add/remove buttons with count)
+  Widget _buildQuantitySelector(
+      BuildContext context, Size size, ThemeData theme, int count) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildIconButton(
+          context: context,
+          icon: Icons.add_circle,
+          color: Colors.green,
+          size: size.width * 0.07,
+          onPressed: () =>
+              context.read<AddOrderBloc>().add(AddOrderAddProduct(product)),
+        ),
+        SizedBox(
+          width: size.width * 0.1,
+          child: Text(
+            count.toString(),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: size.width * 0.04,
+            ),
+          ),
+        ),
+        _buildIconButton(
+          context: context,
+          icon: Icons.remove_circle,
+          color: Colors.red,
+          size: size.width * 0.07,
+          onPressed: () =>
+              context.read<AddOrderBloc>().add(DecreaseProductCount(product)),
+        ),
+      ],
+    );
+  }
+
+  /// Builds an icon button for quantity controls
+  Widget _buildIconButton({
+    required BuildContext context,
+    required IconData icon,
+    required Color color,
+    required double size,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Icon(icon, color: color, size: size),
+    );
+  }
+
+  /// Calculates responsive font size based on available width
+  double _calculateFontSize(double width) {
+    if (width <= 480) return 10.0;
+    if (width <= 960) return 12.0;
+    return 11.0;
   }
 }

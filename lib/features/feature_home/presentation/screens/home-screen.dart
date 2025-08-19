@@ -8,6 +8,7 @@ import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders
 import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
+import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
 import '../widgets/chart.dart';
 import '../bloc/home_bloc.dart';
 import '../widgets/drawer.dart';
@@ -45,7 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
     var width = MediaQuery.of(context).size.width;
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
-    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+    return BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state){
+           if(state.homeStatus is HomeAccountExitStatus){
+             Navigator.pushReplacementNamed(context, LogInScreen.routeName);
+           }
+        },
+        builder: (context, state) {
       if (state.homeStatus is HomeLoading) {
         return Center(child: ProgressBar());
       }
@@ -161,7 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
         // context.read<HomeBloc>().add(LoadOrdersData(OrdersParams(10,"http://shop-yar.ir/wp-json/shop-yar","per_page=10","")));
 
         return Center(child: Text('خطا!'));
-      } else if (state.homeStatus is HomeLoadedStatus) {
+      }
+      else if (state.homeStatus is HomeLoadedStatus) {
         /*final UserLoadedStatus userLoadedStatus =
             state.homeStatus as UserLoadedStatus;*/
         /* final UserLoadedStatus userLoadedStatus =
@@ -187,34 +195,32 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           // appBar: AppBar(title: Text(homeUserDataParams.userName)),
           // backgroundColor: Colors.red,
-          body: SafeArea(
-            child: Container(
-              height: height,
-              width: width,
-              //color: Colors.green,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, OrdersScreen.routeName);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(top: height * 0.02),
-                      alignment: Alignment.center,
-                      height: height * 0.13,
-                      width: width * 0.9,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Card(
-                        elevation: 20,
-                      ),
+          body: Container(
+            height: height,
+            width: width,
+            //color: Colors.green,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, OrdersScreen.routeName);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(top: height * 0.02),
+                    alignment: Alignment.center,
+                    height: height * 0.13,
+                    width: width * 0.9,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  )
-                ],
-              ),
+                    child: Card(
+                      elevation: 20,
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
         );
@@ -222,8 +228,9 @@ class _HomeScreenState extends State<HomeScreen> {
       /* final UserDataLoadedStatus userDataLoadedStatus =
           state.logInStatus as UserDataLoadedStatus;
       LoginEntity? loginEntity = userDataLoadedStatus.loginEntity;*/
+
       return Container(
-        color: Colors.red,
+        color: AppConfig.background,child: Text('خطا در بارگیری اطلاعات!'),
       );
     });
   }

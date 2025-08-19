@@ -23,72 +23,65 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final EditOrdersStatusUseCase editOrdersStatusUseCase;
 
   OrdersBloc(this.getOrdersUseCase, this.editOrdersStatusUseCase)
-      : super(OrdersState(ordersStatus: OrdersLoadingStatus(), showFilter: false, editStatus: EditOrderInitialStatus())) {
+      : super(OrdersState(ordersStatus: OrdersLoadingStatus(), showFilter: false, editStatus: EditOrderInitialStatus(), isLoadingMore: false)) {
     on<OrdersEvent>((event, emit) {
       // TODO: implement event handler
     });
     on<LoadOrdersData>((event, emit) async {
+      final isInitial = StaticValues.staticOrders.isEmpty && !event.isLoadMore;
 
+      // برای سرچ/فیلتر: لیست رو خالی و لودینگ صفحه‌ای
+      if (event.isSearch || event.isFilter) {
+        StaticValues.staticOrders.clear();
+        emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
+      }
 
-      if (StaticValues.staticOrders.isEmpty || event.isSearch || event.isFilter) {
-        print('1');
-        if(event.isSearch || event.isFilter){
-          StaticValues.staticOrders.clear();
-          emit(state.copyWith(
-              newOrdersStatus: OrdersLoadingStatus()));
-        }
-        if(event.isSearch && StaticValues.staticOrders.isEmpty){
+      // 👇 شروع لود بیشتر: فقط فلگ دکمه رو روشن کن، نه لودینگ کل صفحه
+      if (event.isLoadMore) {
+        emit(state.copyWith(newIsLoadingMore: true));
+      } else if (isInitial) {
+        emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
+      }
 
-          emit(state.copyWith(
-              newOrdersStatus: OrdersSearchFailedStatus()));
+      try {
+        // perPage محاسبه
+        String perPage = '10';
+        if (event.perPage.isNotEmpty) perPage = event.perPage;
 
-        }
-        if(event.isFilter && StaticValues.staticOrders.isEmpty){
+        // فراخوانی
+        final dataState = await getOrdersUseCase(
+          OrdersParams(10, "", {}, event.search, perPage, event.status),
+        );
 
-          emit(state.copyWith(
-              newOrdersStatus: OrdersSearchFailedStatus()));
+        if (dataState is OrderDataSuccess) {
+          final fetched = dataState.data!.cast<OrdersEntity>();
 
-        }
-        if (StaticValues.webService != '' ||
-            StaticValues.passWord != '' ||
-            StaticValues.shopName.isNotEmpty ||
-            StaticValues.shippingMethods.isNotEmpty ||
-            StaticValues.paymentMethods.isNotEmpty ||
-            StaticValues.status.isNotEmpty) {
-          emit(state.copyWith(
-              newOrdersStatus: OrdersLoadingStatus()));
-          String perPage='10';
-          if(event.perPage.isNotEmpty){
-            perPage=event.perPage;
-          }
-          OrderDataState dataState =
-              await getOrdersUseCase(OrdersParams(10, "", {}, event.search, perPage, event.status));
-          StaticValues.staticOrders = dataState.data!.cast<OrdersEntity>();
-          print('StaticValues.staticOrders');
-          print(StaticValues.staticOrders);
-
-          if (dataState is OrderDataSuccess) {
-            try {
-              print("OrdersLoadedStatus");
-              emit(state.copyWith(
-                  newOrdersStatus: OrdersLoadedStatus()));
-              print(state.ordersStatus);
-            } catch (error) {
-              print("OrdersErrorStatus");
-              emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
-            }
+          // 👇 اگر isLoadMore داری و API صفحه‌بندی‌ات «تجمعی» نیست،
+          // یا append کن یا کل لیست رو با fetched جایگزین کن. پیشنهاد:
+          if (event.isLoadMore && StaticValues.staticOrders.isNotEmpty) {
+            // اگر API فقط همون perPage آخر رو می‌ده، این خط گزینه امن‌تره:
+            StaticValues.staticOrders = fetched;
+            // یا اگر API واقعاً «صفحه بعدی» رو می‌ده، از این استفاده کن:
+            // StaticValues.staticOrders.addAll(fetched);
           } else {
-            emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
+            StaticValues.staticOrders = fetched;
           }
+
+          // حالت صفحه: Loaded باقی بمونه
+          emit(state.copyWith(newOrdersStatus: OrdersLoadedStatus()));
         } else {
-          emit(state.copyWith(newOrdersStatus: UserErrorStatus()));
+          emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
         }
-      } else {
-        print('2');
-        emit(state.copyWith(
-            newOrdersStatus: OrdersLoadedStatus()));
+      } catch (_) {
+        emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
+      } finally {
+        // 👇 حتماً خاموش کن تا دکمه از لودینگ خارج شه
+        if (event.isLoadMore) {
+          emit(state.copyWith(newIsLoadingMore: false));
+        }
       }
     });
+
     on<RefreshOrdersData>((event, emit) async {
       emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
       OrderDataState dataState =

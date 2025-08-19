@@ -21,6 +21,9 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     'assets/images/icons/product-screen.svg',
     'assets/images/icons/home-screen.svg',
     'assets/images/icons/order-screen.svg',
+    'assets/images/icons/product-screen-selected.svg',
+    'assets/images/icons/home-screen-selected.svg',
+    'assets/images/icons/order-screen-selected.svg',
   ];
 
   int selectedIndex = 1;
@@ -50,13 +53,13 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           color: AppConfig.secondaryColor.withOpacity(0.8), // Background color
           borderRadius: BorderRadius.circular(width * 0.02),
           border:
-              Border.all(color: Color(0xff697C9D), width: 1) // Rounded corners
+              Border.all(color: AppConfig.borderColor, width: 0.4) // Rounded corners
           ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.01),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(items.length, (index) {
+            children: List.generate(3, (index) {
               bool isSelected = index == selectedIndex;
               return AnimatedContainer(
                 duration: Duration(milliseconds: 250),
@@ -71,7 +74,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                     widget.onChange?.call(index);
                   },
                   child: SvgPicture.asset(
-                    items[index],
+                    isSelected?items[index+3]:items[index],
                     /*   colorFilter: ColorFilter.mode(
                           activePage == itemIndex
                               ? const Color.fromRGBO(94, 96, 89, 1)

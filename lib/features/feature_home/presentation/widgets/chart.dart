@@ -173,13 +173,13 @@ class BarChartSample4State extends State<Chart> {
 
   List<double> toY = [32, 65, 70, 11, 50, 32, 40];
   List<Color> color = [
-    AppConfig.piChartSection1,
     AppConfig.piChartSection2,
+    AppConfig.piChartSection5,
     AppConfig.piChartSection3,
-    AppConfig.piChartSection1,
     AppConfig.piChartSection2,
+    AppConfig.piChartSection5,
     AppConfig.piChartSection3,
-    AppConfig.piChartSection1
+    AppConfig.piChartSection2
   ];
 
   List<BarChartGroupData> getData(

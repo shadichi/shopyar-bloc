@@ -41,6 +41,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         final DataState dataState = await getHomeDataUseCase();
 
+        print('dataState.data');
+        print(dataState.data);
+
         if (dataState is DataSuccess) {
 
           StaticValues.staticHomeDataEntity = dataState.data;
@@ -107,6 +110,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     on<LoadHomeDataEvent>((event, emit) async {
       final DataState dataState = await getHomeDataUseCase();
+    });
+    on<AccountExit>((event, emit) async {
+      emit(state.copyWith(newHomeStatus:HomeLoading()));
+      final prefs = await SharedPreferences.getInstance();
+      prefs.clear();
+      emit(state.copyWith(newHomeStatus:HomeAccountExitStatus()));
     });
   }
 }

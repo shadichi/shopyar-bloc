@@ -1,20 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/src/dropdown_button2.dart';
 import 'package:shapyar_bloc/core/config/app-colors.dart';
+import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../data/models/add_order_data_model.dart';
+import '../screens/product_form_screen.dart';
 
-class Addorderbilltest extends StatelessWidget {
+class Addorderbilltest extends StatefulWidget {
   List<PaymentMethod>? paymentMethod;
   List<ShippingMethod>? shipmentMethod;
   final List<Function(String)> onTextChange;
   final GlobalKey<FormState> formKey;
   final List<TextEditingController> textEditing;
+  final ProductFormMode isEditMode;
+  final OrdersEntity? ordersEntity;
 
   Addorderbilltest(
-      this.paymentMethod, this.shipmentMethod, this.onTextChange, this.formKey, this.textEditing);
+      this.paymentMethod,
+      this.shipmentMethod,
+      this.onTextChange,
+      this.formKey,
+      this.textEditing,
+      this.isEditMode, {
+        this.ordersEntity, // 👈 اختیاری
+      }) : assert(
+  isEditMode == ProductFormMode.create || ordersEntity != null,
+  'در حالت edit باید ordersEntity مقدار داشته باشد',
+  );
 
 
+  @override
+  State<Addorderbilltest> createState() => _AddorderbilltestState();
+}
 
+class _AddorderbilltestState extends State<Addorderbilltest> {
   List<String> provinceList = <String>[
     'آذربایجان شرقی',
     'آذربایجان غربی',
@@ -49,11 +67,31 @@ class Addorderbilltest extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(widget.isEditMode == ProductFormMode.edit){
+      final e = widget.ordersEntity!;
+      widget.textEditing[0].text = e.billing!.firstName;
+      widget.textEditing[1].text = e.billing!.lastName;
+      widget.textEditing[2].text = e.billing!.address1;
+      widget.textEditing[3].text = e.billing!.city;
+      widget.textEditing[4].text = e.billing!.postcode;
+      widget.textEditing[5].text = e.billing!.email.toString();
+      widget.textEditing[6].text = e.billing!.phone;
+      widget.textEditing[7].text = e.paymentMethod!;
+    //  widget.textEditing[8].text = e.billing!.firstName;
+    //  widget.textEditing[9].text = e.billing!.firstName;
+
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Form(
-      key: formKey,
+      key: widget.formKey,
       child: Container(
         padding: EdgeInsets.all(8),
         // color: Colors.green,
@@ -65,8 +103,9 @@ class Addorderbilltest extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(textEditing[0], 'نام', height, context),
-                  textField(textEditing[1], ' نام خانوادگی', height, context),
+                  textField(widget.textEditing[0], 'نام', height, context),
+                  textField(
+                      widget.textEditing[1], ' نام خانوادگی', height, context),
                 ],
               ),
               Row(
@@ -75,30 +114,35 @@ class Addorderbilltest extends StatelessWidget {
                   ProvinceDropdownMenu(
                     itemList: provinceList,
                     key1: 'استان',
-                    onTextChange: onTextChange[3],
-                    selectedValue: '',
+                    onTextChange: widget.onTextChange[3],
+                    selectedValue: widget.ordersEntity!.billing!.state,
                   ),
-                  textField(textEditing[3], 'شهر محل زندگی', height, context),
+                  textField(
+                      widget.textEditing[3], 'شهر محل زندگی', height, context),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(textEditing[2], 'آدرس خریدار', height, context,
+                  textField(
+                      widget.textEditing[2], 'آدرس خریدار', height, context,
                       isOnlyChild: true)
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(textEditing[4], 'کد پستی خریدار', height, context),
-                  textField(textEditing[5], 'ایمیل خریدار', height, context),
+                  textField(
+                      widget.textEditing[4], 'کد پستی خریدار', height, context),
+                  textField(
+                      widget.textEditing[5], 'ایمیل خریدار', height, context),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(textEditing[6], 'شماره همراه خریدار', height, context,
+                  textField(widget.textEditing[6], 'شماره همراه خریدار', height,
+                      context,
                       isOnlyChild: true)
                 ],
               ),
@@ -106,23 +150,24 @@ class Addorderbilltest extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   PaymentDropdownMenu(
-                    itemList: paymentMethod!.toList(),
+                    itemList: widget.paymentMethod!.toList(),
                     key1: "روش پرداخت",
-                    selectedValue: '',
-                    onTextChange: onTextChange[9],
+                    selectedValue: widget.ordersEntity!.paymentMethodTitle.toString(),
+                    onTextChange: widget.onTextChange[9],
                   ),
                   ShipmentDropdownMenu(
-                    itemList: shipmentMethod!.toList(),
+                    itemList: widget.shipmentMethod!.toList(),
                     key1: "روش حمل و نقل",
-                    selectedValue: '',
-                    onTextChange: onTextChange[8],
+                    selectedValue: widget.ordersEntity!.shippingLines.toString(),
+                    onTextChange: widget.onTextChange[8],
                   )
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(textEditing[7], 'هزینه حمل ونقل', height, context,
+                  textField(
+                      widget.textEditing[7], 'هزینه حمل ونقل', height, context,
                       isOnlyChild: true)
                 ],
               ),
@@ -135,7 +180,7 @@ class Addorderbilltest extends StatelessWidget {
 
   Widget textField(controller, hintText, height, context,
       {bool isOnlyChild = false}) {
-    return Container(
+    return SizedBox(
       width: isOnlyChild ? 310 : 150,
       height: height * 0.05,
       child: TextFormField(
@@ -158,9 +203,11 @@ class Addorderbilltest extends StatelessWidget {
             borderRadius: BorderRadius.circular(5),
             borderSide: BorderSide(color: Colors.grey, width: 1),
           ),
-          errorStyle: TextStyle(  color: Colors.transparent,
+          errorStyle: TextStyle(
+            color: Colors.transparent,
             fontSize: 0,
-            height: 0, ),
+            height: 0,
+          ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
             borderSide: BorderSide(color: Colors.red, width: 1.5),
@@ -197,10 +244,16 @@ class ProvinceDropdownMenu extends StatefulWidget {
 
 class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.itemList![0];
+    String? selectedItem = widget.selectedValue;
     return SizedBox(
       width: width * 0.41,
       child: Column(children: [
@@ -363,7 +416,7 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.itemList![0].methodTitle;
+    String? selectedItem = widget.selectedValue;
     widget.onTextChange(selectedItem!);
     print('selectedItem');
     print(selectedItem);

@@ -28,7 +28,7 @@ class Order extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.all(width * 0.01),
         child: Card(
-          color: AppConfig.orderCardColor,
+          color: AppConfig.secondaryColor,
           elevation: 8,
           child: Container(
             child: Column(
@@ -44,7 +44,7 @@ class Order extends StatelessWidget {
                       ),
                     ),
 
-                    height: height * 0.075,
+                    height: AppConfig.calHeight(context, 8),
                     width: width * 0.97,
                     alignment: Alignment.center,
                     child: Padding(
@@ -125,8 +125,8 @@ class Order extends StatelessWidget {
                             decoration: BoxDecoration(
                               gradient:LinearGradient(
                                 colors: [
-                                  Colors.red,
-                                  Colors.blue,
+                                 AppConfig.firstLinearColor,
+                                  AppConfig.secondLinearColor,
                             ],)
                           )
                         ),

@@ -7,7 +7,7 @@ import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders
 import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:shapyar_bloc/features/feature_start/presentation/bloc/start_bloc.dart';
 import 'package:shapyar_bloc/features/feature_start/presentation/screens/start_screen.dart';
-import 'features/feature_add_edit_order/presentation/screens/addOrderTest.dart';
+import 'features/feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import 'features/feature_orders/presentation/screens/order_detail_screen.dart';
 import 'features/feature_orders/presentation/widgets/show_pdf.dart';
 import 'features/feature_orders/presentation/widgets/show_post_label.dart';
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => locator<StartBloc>()),
       ],
       child: MaterialApp(
-        themeMode: ThemeMode.light,
+        //themeMode: ThemeMode.light,
         theme: ThemeData(fontFamily: 'IRANSansWeb'),
         initialRoute: "/",
         locale: const Locale("fa", ""),
@@ -75,11 +75,21 @@ class MyApp extends StatelessWidget {
           EnterInfData.routeName: (context) => EnterInfData(),
           PdfViewerScreen.routeName: (context) => PdfViewerScreen(),
           ShowPDF.routeName: (context) => ShowPDF(),
-          AddOrderTest.routeName: (context) => AddOrderTest(),
-          // Uncomment and adjust other routes if needed
-          // OrderDetailScreen.routeName: (context) => OrderDetailScreen(),
-          // EditOrder.routeName: (context) => EditOrder(),
-        },
+
+        },onGenerateRoute: (settings){
+        switch (settings.name) {
+          case ProductFormScreen.createRoute:
+            return MaterialPageRoute(
+              builder: (_) => ProductFormScreen.create(),
+            );
+
+          case ProductFormScreen.editRoute:
+            final entity = settings.arguments as OrdersEntity;
+            return MaterialPageRoute(
+              builder: (_) => ProductFormScreen.edit(ordersEntity: entity),
+            );
+        }
+      },
       ),
     );
   }

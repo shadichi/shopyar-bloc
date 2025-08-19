@@ -20,9 +20,11 @@ class ProductsApiProvider{
     //ریترن کرد تموم بقیش هیچی
   }*/
   Future<dynamic> GetProducts(ProductsParams productsParams) async {
+    print(StaticValues.webService);
+    print(StaticValues.passWord);
     try {
       var response = await _dio.get(
-        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}&search=${productsParams.search}',
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=23',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
 

@@ -2,29 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class AppConfig {
-  static const Color primary = contentColorCyan;
-  static const Color menuBackground = Color(0xFF090912);
-  static const Color itemsBackground = Color(0xFF1B2339);
-  static const Color pageBackground = Color(0xFF282E45);
-  static const Color mainTextColor1 = Colors.white;
-  static const Color mainTextColor2 = Colors.white70;
-  static const Color mainTextColor3 = Colors.white38;
-  static const Color mainGridLineColor = Colors.white10;
-  static const Color borderColor = Colors.white54;
-  static const Color gridLinesColor = Color(0x11FFFFFF);
 
-  /*static const Color section1 = Color(0xff4B5563);
-  static const Color section2 = Color(0xff9CA3AF);
-  static const Color section3 = Color(0xffD1D5DB);
-  static const Color section4 = Color(0xffF3F4F6);*/
-
-  static const Color section1 = Color(0xff780000);
-  static const Color section2 = Color(0xffC1121F);
+ // static const Color section1 = Color(0xff780000);
+ // static const Color section2 = Color(0xffC1121F);
   static const Color section3 = Color(0xff669BBC);
   static const Color section4 = Color(0xFF8d99ae);
 
   //static const Color background = Color(0xff5C7787);
 
+ // static const Color background = Color(0xff162521);//
   static const Color background = Color(0xff18203B);//
   static const Color cardBackground = Color(0xffFFFFFF);
   static const Color primaryColor = Color(0xff4F46E5);
@@ -46,15 +32,23 @@ class AppConfig {
   static const Color contentColorRed = Color(0xFFE80054);
   static const Color contentColorCyan = Color(0xFF50E4FF);
 
-  static const Color piChartSection1 = Color(0xFF2EBBE5);//
-  static const Color piChartSection2 = Color(0xFFE9A17B);//
-  static const Color piChartSection3 = Color(0xFF8D89E3);//
-  static const Color piChartSection4 = Color(0xFF4679F2);//
-  static const Color piChartSection5 = Color(0xFFCA498C);//
+  static const Color piChartSection1 = Color(0xFF273F4F);//
+  static const Color piChartSection2 = Color(0xFF447D9B);//
+  static const Color piChartSection3 = Color(0xFFBDBDBD);//
+  static const Color piChartSection4 = Color(0xFFFE7743);//
+  static const Color piChartSection5 = Color(0xFFE9A17B);//
 
-  static const Color secondaryColor = Color(0xFF485874);//
+  static const Color secondaryColor = Color(0xFF303F59);//
 
   static const Color orderCardColor = Color(0xFF303F59);//
+
+  static const Color firstLinearColor = Color(0xFFE9A17B);
+  static const Color secondLinearColor = Color(0xFF447D9B);
+
+  static const Color borderColor = Color(0xFFBDBDBD);
+
+  static const Color progressBarColor = Color(0xFFE9A17B);
+
 
   static double calWidth(BuildContext context, double widthPercent) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -77,7 +71,7 @@ class AppConfig {
 
   static double calBorderRadiusSize (BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth * (3.2 / 100);
+    return screenWidth * (2 / 100);
   }
 
 

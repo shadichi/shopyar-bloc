@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
+import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
+import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/setting.dart';
-import '../../../../core/colors/app-colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../../../core/config/app-colors.dart';
+import '../../../../core/params/whole_user_data_params.dart';
+import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
+import '../../../feature_orders/presentation/widgets/show_post_label.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeDrawer extends StatelessWidget {
   final List<String> icons = [
@@ -25,7 +29,20 @@ class HomeDrawer extends StatelessWidget {
 
     StaticValues.isDrawerOpen = !StaticValues.isDrawerOpen;
 
-    List<void Function()?> onTap = [(){Navigator.push(context, MaterialPageRoute(builder: (context)=>SettingPage()));},(){},(){}];
+    List<void Function()?> onTap = [
+      () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => SettingPage()));
+      },
+          () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => PdfViewerScreen()));
+      },
+      () {
+     // alertDialogScreen(context, 'آیا از حساب کاربری خود خارج میشوید؟', 1, 1);
+        context.read<HomeBloc>().add(AccountExit());
+      }
+    ];
 
     return Drawer(
       child: Container(
@@ -102,7 +119,7 @@ class HomeDrawer extends StatelessWidget {
 }
 
 Widget _buildDrawerItem(String svgPic, String title, BuildContext context,
-    void Function()?  onTap, bool isDivider, double size) {
+    void Function()? onTap, bool isDivider, double size) {
   return Container(
     child: Column(
       children: [
@@ -118,9 +135,17 @@ Widget _buildDrawerItem(String svgPic, String title, BuildContext context,
           onTap: onTap,
         ),
         isDivider
-            ? Container(
-                child: Divider(),
+            ? SizedBox(
                 width: size,
+                child:  Container(
+                    margin: EdgeInsets.all(AppConfig.calWidth(context, 2)),
+                    width: AppConfig.calWidth(context, 40),
+                    height: 0.5,
+                    decoration: BoxDecoration(
+                        gradient:LinearGradient(
+                          colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
+                    )
+                ),
               )
             : SizedBox()
       ],
