@@ -31,15 +31,15 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   Future<OrderDataState<ProductEntity>> getOrderProducts(
       ProductsParams productsParams) async {
     try {
-    //  print("syeeees");
+      //  print("syeeees");
       Response response = await apiProvider.GetOrderProducts(productsParams);
 
       //Response response = await apiProvider.GetOrders(ordersParams);
       if (response.statusCode == 200) {
-      //  print("syeeees");
+        //  print("syeeees");
         List<ProductEntity> editOrderProductEntity =
-        productsFromJson(response.data);
-       // print("yeeees");
+            productsFromJson(response.data);
+        // print("yeeees");
 //
         return OrderDataSuccess(editOrderProductEntity);
       } else {
@@ -75,9 +75,12 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   }*/
 
   @override
-  Future<AddOrderProductsCard<AddOrderOrdersEntity>> getSelectedProducts(AddOrderGetSelectedProductsParams editOrderGetSelectedProductsParams) async {
+  Future<AddOrderProductsCard<AddOrderOrdersEntity>> getSelectedProducts(
+      AddOrderGetSelectedProductsParams
+          editOrderGetSelectedProductsParams) async {
     final selectedProducts = editOrderGetSelectedProductsParams.products
-        .where((product) => product.id == editOrderGetSelectedProductsParams.selected)
+        .where((product) =>
+            product.id == editOrderGetSelectedProductsParams.selected)
         .toList();
 
     LineItem lineItem = LineItem(
@@ -86,19 +89,20 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
         quantity: editOrderGetSelectedProductsParams.selected.productQuantity,
         total: selectedProducts[0].price);
 
-   // print("lineitem");
-   // print(lineItem.name);
+    // print("lineitem");
+    // print(lineItem.name);
 
-    editOrderGetSelectedProductsParams.addOrderOrdersEntity.lineItems!.add(lineItem);
+    editOrderGetSelectedProductsParams.addOrderOrdersEntity.lineItems!
+        .add(lineItem);
 
-    if (editOrderGetSelectedProductsParams.selected.productId != 0 ) {
-      return AddOrderProductsChanged(editOrderGetSelectedProductsParams.addOrderOrdersEntity);
+    if (editOrderGetSelectedProductsParams.selected.productId != 0) {
+      return AddOrderProductsChanged(
+          editOrderGetSelectedProductsParams.addOrderOrdersEntity);
     }
     if (editOrderGetSelectedProductsParams.selected.productId == 0) {
-      return AddOrderProductsRemoved(editOrderGetSelectedProductsParams.addOrderOrdersEntity);
-    }
-
-    else {
+      return AddOrderProductsRemoved(
+          editOrderGetSelectedProductsParams.addOrderOrdersEntity);
+    } else {
       return AddOrderProductsCardFailed("failed");
     }
   }
@@ -106,11 +110,16 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   @override
   Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams) async {
     try {
-      var response = await apiProvider.SetOrder(setOrderParams.order, StaticValues.webService,StaticValues.passWord, setOrderParams.payType, setOrderParams.shipType, setOrderParams.shipPrice);
-      var connection  = false;
+      var response = await apiProvider.SetOrder(
+          setOrderParams.order,
+          StaticValues.webService,
+          StaticValues.passWord,
+          setOrderParams.payType,
+          setOrderParams.shipType,
+          setOrderParams.shipPrice);
+      var connection = false;
 
       if (response) {
-
         connection = true;
 
         return connection;
@@ -123,5 +132,3 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
     }
   }
 }
-
-

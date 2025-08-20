@@ -114,6 +114,7 @@ class LineItem {
     this.variationId,
     required this.quantity,
     this.taxClass,
+    this.price,
     this.subtotal,
     this.subtotalTax,
     required this.total,
@@ -128,6 +129,7 @@ class LineItem {
   int? variationId;
   int quantity;
   String? taxClass;
+  String? price;
   String? subtotal;
   String? subtotalTax;
   String total;
@@ -143,6 +145,7 @@ class LineItem {
         variationId: json["variation_id"],
         quantity: json["quantity"],
         taxClass: json["tax_class"],
+    price: json["price"],
         subtotal: json["subtotal"],
         subtotalTax: json["subtotal_tax"],
         total: json["total"],
@@ -158,6 +161,7 @@ class LineItem {
         "variation_id": variationId,
         "quantity": quantity,
         "tax_class": taxClass,
+        "price": price,
         "subtotal": subtotal,
         "subtotal_tax": subtotalTax,
         "total": total,

@@ -10,6 +10,8 @@ import '../../../../core/params/add_order_data_state.dart';
 import '../../../../core/params/home_user_data_params.dart';
 import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/resources/order_data_state.dart';
+import '../../../feature_orders/data/models/orders_model.dart';
+import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
 import '../../domain/entities/add_order_data_entity.dart';
 import '../../domain/entities/add_order_product_entity.dart';
@@ -69,6 +71,23 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
             newAddOrderSetOrderStatus: AddOrderSetOrderInitialStatus()));
       }
     });
+
+
+    on<HydrateCartFromOrder>((event, emit) {
+      // cart جدید بساز و دقیقاً مقادیر سفارش رو ست کن (بدون +)
+      final Map<int, int> cart = {};
+
+      for (final li in event.order.lineItems ?? <LineItem>[]) {
+        cart[li.productId] = li.quantity;
+            }
+
+      emit(state.copyWith(
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(cart),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(cart, {}),
+        // می‌تونی یه فلگ هم توی state نگه داری که یعنی hydrate شده
+      ));
+    });
+
 
     on<AddOrderAddProduct>((event, emit) async {
 

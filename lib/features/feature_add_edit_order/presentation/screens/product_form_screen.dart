@@ -82,6 +82,10 @@ class _AddOrderTest extends State<ProductFormScreen> {
     super.initState();
 
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
+    if (widget.mode == ProductFormMode.edit ) {
+      context.read<AddOrderBloc>().add(HydrateCartFromOrder (widget.ordersEntity!));
+
+    }
   }
 
   final TextEditingController controller = TextEditingController();
@@ -287,9 +291,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
             itemCount: 13,
             itemBuilder: (context, index) {
               final product = StaticValues.staticProducts[index];
-              return AddOrderProduct(
-                product: product,
-              );
+              return AddOrderProduct(isEditMode,  product,ordersEntity: ordersEntity,);
             });
       default:
         return Container();
@@ -342,14 +344,14 @@ class _AddOrderTest extends State<ProductFormScreen> {
             });
           }
         },
-        child: Text(
-          'قبلی',
-          style: TextStyle(color: Colors.white, fontSize: 12),
-        ),
         style: ElevatedButton.styleFrom(
             backgroundColor: AppConfig.secondaryColor,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)))),
+        child: Text(
+          'قبلی',
+          style: TextStyle(color: Colors.white, fontSize: 12),
+        ),
       ),
     );
   }

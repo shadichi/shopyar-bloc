@@ -5,35 +5,33 @@ abstract class AddOrderEvent {}
 
 
 class LoadAddOrderProductsData extends AddOrderEvent{
-//  final ProductsParams productsParams;
   LoadAddOrderProductsData();
 }
 
-/*
-class LoadAddOrderData extends AddOrderEvent{
-  final UserDataParams userDataParams;
-  LoadAddOrderData(this.userDataParams );
+class HydrateCartFromOrder extends AddOrderEvent {
+  final OrdersEntity order;
+  HydrateCartFromOrder(this.order);
 }
-*/
 
-class AddOrderAddProduct  extends AddOrderEvent{//changed
+
+class AddOrderAddProduct  extends AddOrderEvent{
   final ProductEntity product;
   AddOrderAddProduct(this.product);
 }
-class IncreaseProductCount extends AddOrderEvent {//new
+class IncreaseProductCount extends AddOrderEvent {
   final AddOrderProductEntity product;
   IncreaseProductCount(this.product);
 }
 
-class DecreaseProductCount extends AddOrderEvent {//new
+class DecreaseProductCount extends AddOrderEvent {
   final ProductEntity product;
   DecreaseProductCount(this.product);
 }
-class SetOrderEvent extends AddOrderEvent {//new
+class SetOrderEvent extends AddOrderEvent {
   final SetOrderParams setOrderParams;
   SetOrderEvent(this.setOrderParams);
 }
-class LoadSelectedProductCount extends AddOrderEvent {//new
+class LoadSelectedProductCount extends AddOrderEvent {
   final int count;
   LoadSelectedProductCount(this.count);
 }

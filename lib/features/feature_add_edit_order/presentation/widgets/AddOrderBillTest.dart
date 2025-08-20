@@ -115,10 +115,11 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
                     itemList: provinceList,
                     key1: 'استان',
                     onTextChange: widget.onTextChange[3],
-                    selectedValue: widget.ordersEntity!.billing!.state,
-                  ),
+                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.billing!.state:'',
+                mode:   widget.isEditMode,),
                   textField(
                       widget.textEditing[3], 'شهر محل زندگی', height, context),
+
                 ],
               ),
               Row(
@@ -152,14 +153,14 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
                   PaymentDropdownMenu(
                     itemList: widget.paymentMethod!.toList(),
                     key1: "روش پرداخت",
-                    selectedValue: widget.ordersEntity!.paymentMethodTitle.toString(),
-                    onTextChange: widget.onTextChange[9],
+                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.paymentMethodTitle.toString():'',
+                    onTextChange: widget.onTextChange[9], mode: widget.isEditMode,
                   ),
                   ShipmentDropdownMenu(
                     itemList: widget.shipmentMethod!.toList(),
                     key1: "روش حمل و نقل",
-                    selectedValue: widget.ordersEntity!.shippingLines.toString(),
-                    onTextChange: widget.onTextChange[8],
+                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.shippingLines.toString():'',
+                    onTextChange: widget.onTextChange[8],mode:   widget.isEditMode,
                   )
                 ],
               ),
@@ -231,12 +232,13 @@ class ProvinceDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
+  ProductFormMode mode;
 
   ProvinceDropdownMenu(
       {required this.itemList,
       required this.selectedValue,
       required this.key1,
-      required this.onTextChange});
+      required this.onTextChange,required this.mode});
 
   @override
   State<ProvinceDropdownMenu> createState() => _ProvinceDropdownMenuState();
@@ -253,7 +255,10 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.selectedValue;
+    String? selectedItem = widget.mode == ProductFormMode.edit
+        ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue) // اگر خالی بود => null
+        : widget.itemList!.first; // ✅
+
     return SizedBox(
       width: width * 0.41,
       child: Column(children: [
@@ -317,12 +322,13 @@ class ShipmentDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
+  ProductFormMode mode;
 
   ShipmentDropdownMenu(
       {required this.itemList,
       required this.selectedValue,
       required this.key1,
-      required this.onTextChange});
+      required this.onTextChange, required this.mode});
 
   @override
   State<ShipmentDropdownMenu> createState() => _ShipmentDropdownMenuState();
@@ -333,7 +339,10 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.itemList![0].methodTitle;
+    String? selectedItem = widget.mode == ProductFormMode.edit
+        ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue) // اگر خالی بود => null
+        : widget.itemList!.first.methodTitle; // ✅
+
     widget.onTextChange(selectedItem!);
     print('selectedItem');
     print(selectedItem);
@@ -400,12 +409,14 @@ class PaymentDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
+  final ProductFormMode mode;
 
   PaymentDropdownMenu(
       {required this.itemList,
       required this.selectedValue,
       required this.key1,
-      required this.onTextChange});
+      required this.onTextChange,
+      required this.mode});
 
   @override
   State<PaymentDropdownMenu> createState() => _PaymentDropdownMenuState();
@@ -416,10 +427,12 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.selectedValue;
-    widget.onTextChange(selectedItem!);
-    print('selectedItem');
-    print(selectedItem);
+    String? selectedItem = widget.mode == ProductFormMode.edit
+        ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue)
+        : widget.itemList!.first.methodTitle; // ✅
+
+   /* print('selectedItem');
+    print(selectedItem);*/
     return SizedBox(
       width: width * 0.41,
       child: Column(

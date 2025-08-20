@@ -66,6 +66,7 @@ class _AddOrderState extends State<AddOrder> {
   Widget build(BuildContext context) {
     /* print(StaticValues.paymentMethods);
     print(StaticValues.shippingMethods);*/
+
     List<Function(String)> onTextChange = [
       (value) {
         customerLNBill = value;
@@ -143,6 +144,7 @@ class _AddOrderState extends State<AddOrder> {
         children: [
           BlocBuilder<AddOrderBloc, AddOrderState>(
             builder: (context, state) {
+
               Widget bodyContent;
 
               if (state.addOrderStatus is AddOrderProductsErrorStatus) {
@@ -209,7 +211,7 @@ class _AddOrderState extends State<AddOrder> {
 
 
                           ),
-                          Step(
+                       /*   Step(
                             title: Text('محصولات',style: TextStyle(color: AppConfig.white),),
                             content: Container(
                               width: width * 0.7,
@@ -219,12 +221,12 @@ class _AddOrderState extends State<AddOrder> {
                                   itemBuilder: (context, index) {
                                     final product =
                                         StaticValues.staticProducts[index];
-                                    return AddOrderProduct( product: product,);
+                                    return AddOrderProduct( product: product,ordersEntity: or,);
                                   }),
                             ),
                             isActive: _currentStep == 1,
                             subtitle: Text('محصولات انتخابی برای ایجاد سفارش را انتخاب کنید.',style: TextStyle(color: AppConfig.white70),)
-                          ),
+                          ),*/
                         ],
                       ),
                     ),
