@@ -53,31 +53,36 @@ class HomeDataModel extends HomeDataEntity {
 }
 
 class DailyCancelled {
+  final int qty;
+  final int? price; // چون بعضی پاسخ‌ها price = null
+
   DailyCancelled({
     required this.qty,
-    required this.price,
+    this.price,
   });
 
-  String qty;
-  String price;
-
   factory DailyCancelled.fromJson(Map<String, dynamic> json) => DailyCancelled(
-        qty: json["qty"] ?? '',
-        price: json["price"] ?? '',
-      );
+    qty: _asInt(json['qty']) ?? 0,
+    price: _asInt(json['price']),
+  );
 
   Map<String, dynamic> toJson() => {
-        "qty": qty,
-        "price": price,
-      };
+    'qty': qty,
+    'price': price,
+  };
 }
 
+
 class StatusCounts {
-  int wcCompleted;
-  int wcOnHold;
-  int wcPending;
-  int wcProcessing;
-  int wcRefunded;
+  final int wcCompleted;
+  final int wcOnHold;
+  final int wcPending;
+  final int wcProcessing;
+  final int wcRefunded;
+  final int wcCancelled;
+  final int wcFailed;
+  final int wcCheckoutDraft;
+  final int trash;
 
   StatusCounts({
     required this.wcCompleted,
@@ -85,21 +90,54 @@ class StatusCounts {
     required this.wcPending,
     required this.wcProcessing,
     required this.wcRefunded,
+    required this.wcCancelled,
+    required this.wcFailed,
+    required this.wcCheckoutDraft,
+    required this.trash,
   });
 
   factory StatusCounts.fromJson(Map<String, dynamic> json) => StatusCounts(
-        wcCompleted: json["wc-completed"],
-        wcOnHold: json["wc-on-hold"],
-        wcPending: json["wc-pending"],
-        wcProcessing: json["wc-processing"],
-        wcRefunded: json["wc-refunded"],
-      );
+    wcCompleted:     _asInt(json['wc-completed'])     ?? 0,
+    wcOnHold:        _asInt(json['wc-on-hold'])       ?? 0,
+    wcPending:       _asInt(json['wc-pending'])       ?? 0,
+    wcProcessing:    _asInt(json['wc-processing'])    ?? 0,
+    wcRefunded:      _asInt(json['wc-refunded'])      ?? 0,
+    wcCancelled:     _asInt(json['wc-cancelled'])     ?? 0,
+    wcFailed:        _asInt(json['wc-failed'])        ?? 0,
+    wcCheckoutDraft: _asInt(json['wc-checkout-draft'])?? 0,
+    trash:           _asInt(json['trash'])            ?? 0,
+  );
 
   Map<String, dynamic> toJson() => {
-        "wc-completed": wcCompleted,
-        "wc-on-hold": wcOnHold,
-        "wc-pending": wcPending,
-        "wc-processing": wcProcessing,
-        "wc-refunded": wcRefunded,
-      };
+    'wc-completed': wcCompleted,
+    'wc-on-hold': wcOnHold,
+    'wc-pending': wcPending,
+    'wc-processing': wcProcessing,
+    'wc-refunded': wcRefunded,
+    'wc-cancelled': wcCancelled,
+    'wc-failed': wcFailed,
+    'wc-checkout-draft': wcCheckoutDraft,
+    'trash': trash,
+  };
 }
+
+int? _asInt(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return v;
+  if (v is double) return v.toInt();
+  if (v is String) return int.tryParse(v);
+  return null;
+}
+
+Map<String, int> _asStringIntMap(Map<String, dynamic>? m) {
+  final res = <String, int>{};
+  if (m == null) return res;
+  m.forEach((k, v) => res[k] = _asInt(v) ?? 0);
+  return res;
+}
+
+List<int> _asIntList(dynamic v) {
+  if (v is List) return v.map((e) => _asInt(e) ?? 0).toList();
+  return const [];
+}
+

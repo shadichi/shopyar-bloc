@@ -139,19 +139,22 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
                       await Future.delayed(const Duration(seconds: 2));
                       context.read<OrdersBloc>().add(RefreshOrdersData());
                     },
-                    child: Container(
+                    child: StaticValues.staticOrders.isEmpty?Container(
+                      color: AppConfig.background,
+                      child: Center(child: Text('سفارشی وجود ندارد!',style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),)),
+                    ):Container(
                       color: AppConfig.background,
                       child: ListView.builder(
-                        controller: _scrollController,
+                          controller: _scrollController,
                           itemCount: StaticValues.staticOrders.length + 1,
                           itemBuilder: (context, item) {
                             if (item == StaticValues.staticOrders.length) {
                               return _LoadMoreButton();
                             }
                             return Order(
-                                    ordersLoadedStatus:
-                                        StaticValues.staticOrders[item],
-                                    item: item);
+                                ordersLoadedStatus:
+                                StaticValues.staticOrders[item],
+                                item: item);
                           }),
                     ),
                   ),

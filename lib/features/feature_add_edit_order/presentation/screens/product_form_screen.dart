@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/order.dart';
+import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/config/app-colors.dart';
@@ -10,6 +11,7 @@ import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/add_order_data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/add_order_orders_model.dart';
+import '../../domain/entities/add_order_orders_entity.dart';
 import '../bloc/add_order_bloc.dart';
 import '../bloc/add_order_status.dart';
 import '../widgets/AddOrderBillTest.dart';
@@ -116,57 +118,57 @@ class _AddOrderTest extends State<ProductFormScreen> {
     ];
 
     List<Function(String)> onTextChange = [
-      (value) {
+          (value) {
         customerLNBill = value;
         print("نام خانوادگی خریدار");
         print(customerLNBill);
       },
-      (value) {
+          (value) {
         customerFNBill = value;
         print("نام خریدار");
         print(customerFNBill);
       },
-      (value) {
+          (value) {
         cityBill = value;
         print("شهر محل زندگی");
         print(cityBill);
       },
-      (value) {
+          (value) {
         provinceBill = value;
         print("استان");
         print(provinceBill);
       },
-      (value) {
+          (value) {
         addressBill = value;
         print("آدرس خریدار");
         print(addressBill);
       },
-      (value) {
+          (value) {
         postalCodeBill = value;
         print("کد پستی خریدار");
         print(postalCodeBill);
       },
-      (value) {
+          (value) {
         emailBill = value;
         print("ایمیل");
         print(emailBill);
       },
-      (value) {
+          (value) {
         phoneBill = value;
         print("شماره همراه");
         print(phoneBill);
       },
-      (value) {
+          (value) {
         shipmentBill = value;
         print("روش حمل و نقل");
         print(shipmentBill);
       },
-      (value) {
+          (value) {
         paymentBill = value;
         print("روش پرداخت");
         print(paymentBill);
       },
-      (value) {
+          (value) {
         shipPriceBill = value;
         print("هزینه حمل و نقل");
         print(shipPriceBill);
@@ -186,6 +188,10 @@ class _AddOrderTest extends State<ProductFormScreen> {
           alertDialogScreen(context, 'سفارش با موفقیت ایجاد شد.', 2, false,
               icon: Icons.check_circle);
         }
+        if (state.addOrderStatus is AddOrderErrorStatus) {
+          alertDialogScreen(context, 'خطا در ایجاد سفارش.', 2, false,
+              icon: Icons.check_circle);
+        }
       },
       builder: (context, state) {
         Widget bodyContent;
@@ -198,7 +204,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           bodyContent = Center(child: ProgressBar());
         } else if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
           AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-              state.addOrderStatus as AddOrderProductsLoadedStatus;
+          state.addOrderStatus as AddOrderProductsLoadedStatus;
           paymentMethod!.forEach((element) {
             pay.add(element.methodTitle);
           });
@@ -291,7 +297,26 @@ class _AddOrderTest extends State<ProductFormScreen> {
             itemCount: 13,
             itemBuilder: (context, index) {
               final product = StaticValues.staticProducts[index];
-              return AddOrderProduct(isEditMode,  product,ordersEntity: ordersEntity,);
+              return AddOrderProduct(
+                isEditMode,
+                product,
+                ordersEntity,
+                    (p0) {
+                  // فرض: p0 = Map<int, int>  // productId -> quantity
+                  lineItem
+                    ..clear()
+                    ..addAll(
+                      p0.entries.map((e) => LineItem(
+                        id: 0,
+                        productId: e.key,
+                        name: "",                // اگه اسم داری اینجا بذار
+                        quantity: e.value,
+                        total: '1000', // اگه total واحدی می‌خوای: (unitPrice[e.key] * e.value).toString()
+                      )),
+                    );
+                },
+              );
+
             });
       default:
         return Container();
@@ -304,21 +329,109 @@ class _AddOrderTest extends State<ProductFormScreen> {
       width: activeStep == 1 ? 100 : 80,
       child: ElevatedButton(
         onPressed: () {
+          // هم‌خوانی با استپ‌ها
           if (activeStep == 0) {
             if (_formKey.currentState?.validate() ?? false) {
-              setState(() {
-                activeStep++;
-              });
+              setState(() => activeStep = 1);
             } else {
-
               showSnack(context, "لطفا همه فیلدهای مورد نیاز را پر کنید!");
             }
-          } else {
-            setState(() {
-              activeStep++;
-            });
+            return;
           }
+
+          // مرحله ثبت سفارش روی استپ 1
+          if (activeStep == 1) {
+            _validateForm();
+
+            if (lineItem.isEmpty) {
+              alertDialogScreen(context, 'هیچ محصولی انتخاب نشده است!', 1, true);
+              return;
+            }
+
+            // ایمن‌سازی لیست‌های pay/ship
+            // (پیشنهاد: این دو خط رو همون جایی که pay/ship رو پر می‌کنی بگذار)
+            pay.clear();
+            ship.clear();
+            paymentMethod?.forEach((e) => pay.add(e.methodTitle));
+            shipmentMethod?.forEach((e) => ship.add(e.methodTitle));
+
+            // ایندکس امن برای پرداخت
+            int payIdx = -1;
+            if (paymentBill.isNotEmpty) {
+              payIdx = paymentMethod!.indexWhere((m) => m.methodTitle == paymentBill);
+            }
+            if (payIdx < 0) {
+              showSnack(context, "لطفاً روش پرداخت را انتخاب کنید.");
+              return;
+            }
+
+            // ایندکس امن برای حمل‌ونقل
+            int shipIdx = -1;
+            if (shipmentBill.isNotEmpty) {
+              shipIdx = shipmentMethod!.indexWhere((m) => m.methodTitle == shipmentBill);
+            }
+            if (shipIdx < 0) {
+              showSnack(context, "لطفاً روش حمل‌ونقل را انتخاب کنید.");
+              return;
+            }
+
+            final payType = paymentMethod![payIdx].methodId?.toString() ?? "";
+            final shipType = shipmentMethod![shipIdx].methodId?.toString() ?? "";
+            final priceShip = shipPriceBill.isEmpty ? "" : shipPriceBill;
+
+            // (اختیاری) اگر اینجا هنوز می‌خوای مطمئن شی lineItem خالی نیست:
+            // if (lineItem.isEmpty) { ... return; }
+
+            print('payType');
+            print(payType);
+            print(shipType);
+            print(priceShip);
+            print(customerLNBill);
+            print(customerFNBill);
+            print(addressBill);
+
+            // ساخت سفارش
+            final order = AddOrderOrdersEntity(
+              id: 0,
+              status: 'در انتظار',
+              billing: Ing(
+                firstName: customerLNBill,
+                lastName: customerFNBill,
+                address1: addressBill,
+                city: cityBill,
+                email: emailBill,
+                state: provinceBill,
+                postcode: postalCodeBill,
+                country: "ایران",
+                phone: phoneBill,
+              ),
+              shipping: Ing(
+                firstName: customerLNBill,
+                lastName: customerFNBill,
+                address1: addressBill,
+                city: cityBill,
+                email: emailBill,
+                state: provinceBill,
+                postcode: postalCodeBill,
+                country: "ایران",
+                phone: phoneBill,
+              ),
+              paymentMethod: payType,
+              paymentMethodTitle: paymentBill,
+              lineItems: lineItem,
+              shippingLines: shippingLine,
+            );
+
+            context.read<AddOrderBloc>().add(
+              SetOrderEvent(SetOrderParams(order, payType, shipType, priceShip)),
+            );
+            return;
+          }
+
+          // اگر استپ دیگری داری:
+          setState(() => activeStep++);
         },
+
         style: ElevatedButton.styleFrom(
             backgroundColor: AppConfig.secondaryColor,
             shape: RoundedRectangleBorder(
@@ -530,7 +643,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
         style: TextStyle(fontSize: 10, color: Colors.black87),
         decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+          const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           //prefixIcon: Icon(Icons.add, color: Colors.deepPurple),
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey.shade500),

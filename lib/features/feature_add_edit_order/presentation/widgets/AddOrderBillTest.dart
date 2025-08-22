@@ -100,14 +100,22 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             spacing: 20,
             children: [
+              // نام و نام‌خانوادگی
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(widget.textEditing[0], 'نام', height, context),
                   textField(
-                      widget.textEditing[1], ' نام خانوادگی', height, context),
+                    widget.textEditing[0], 'نام', height, context,
+                    onChanged: widget.onTextChange[1], // FN
+                  ),
+                  textField(
+                    widget.textEditing[1], ' نام خانوادگی', height, context,
+                    onChanged: widget.onTextChange[0], // LN
+                  ),
                 ],
               ),
+
+// استان + شهر
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -115,63 +123,89 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
                     itemList: provinceList,
                     key1: 'استان',
                     onTextChange: widget.onTextChange[3],
-                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.billing!.state:'',
-                mode:   widget.isEditMode,),
-                  textField(
-                      widget.textEditing[3], 'شهر محل زندگی', height, context),
-
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
-                      widget.textEditing[2], 'آدرس خریدار', height, context,
-                      isOnlyChild: true)
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
-                      widget.textEditing[4], 'کد پستی خریدار', height, context),
-                  textField(
-                      widget.textEditing[5], 'ایمیل خریدار', height, context),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(widget.textEditing[6], 'شماره همراه خریدار', height,
-                      context,
-                      isOnlyChild: true)
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  PaymentDropdownMenu(
-                    itemList: widget.paymentMethod!.toList(),
-                    key1: "روش پرداخت",
-                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.paymentMethodTitle.toString():'',
-                    onTextChange: widget.onTextChange[9], mode: widget.isEditMode,
+                    selectedValue: widget.isEditMode == ProductFormMode.edit
+                        ? widget.ordersEntity!.billing!.state
+                        : '',
+                    mode: widget.isEditMode,
                   ),
-                  ShipmentDropdownMenu(
-                    itemList: widget.shipmentMethod!.toList(),
-                    key1: "روش حمل و نقل",
-                    selectedValue: widget.isEditMode == ProductFormMode.edit?widget.ordersEntity!.shippingLines.toString():'',
-                    onTextChange: widget.onTextChange[8],mode:   widget.isEditMode,
-                  )
+                  textField(
+                    widget.textEditing[3], 'شهر محل زندگی', height, context,
+                    onChanged: widget.onTextChange[2], // City
+                  ),
                 ],
               ),
+
+// آدرس
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   textField(
-                      widget.textEditing[7], 'هزینه حمل ونقل', height, context,
-                      isOnlyChild: true)
+                    widget.textEditing[2], 'آدرس خریدار', height, context,
+                    isOnlyChild: true,
+                    onChanged: widget.onTextChange[4], // Address
+                  ),
                 ],
               ),
+
+// کد پستی + ایمیل
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(
+                    widget.textEditing[4], 'کد پستی خریدار', height, context,
+                    onChanged: widget.onTextChange[5], // Postal
+                  ),
+                  textField(
+                    widget.textEditing[5], 'ایمیل خریدار', height, context,
+                    onChanged: widget.onTextChange[6], // Email
+                  ),
+                ],
+              ),
+
+// تلفن
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(
+                    widget.textEditing[6], 'شماره همراه خریدار', height, context,
+                    isOnlyChild: true,
+                    onChanged: widget.onTextChange[7], // Phone
+                  ),
+                ],
+              ),
+
+// پرداخت + حمل‌ونقل (خودت قبلاً onTextChange گذاشتی، اوکیه)
+              PaymentDropdownMenu(
+                itemList: widget.paymentMethod!.toList(),
+                key1: "روش پرداخت",
+                selectedValue: widget.isEditMode == ProductFormMode.edit
+                    ? widget.ordersEntity!.paymentMethodTitle.toString()
+                    : '',
+                onTextChange: widget.onTextChange[9], // Payment
+                mode: widget.isEditMode,
+              ),
+              ShipmentDropdownMenu(
+                itemList: widget.shipmentMethod!.toList(),
+                key1: "روش حمل و نقل",
+                selectedValue: widget.isEditMode == ProductFormMode.edit
+                    ? widget.ordersEntity!.shippingLines![0].methodTitle.toString()
+                    : '',
+                onTextChange: widget.onTextChange[8], // Shipment
+                mode: widget.isEditMode,
+              ),
+
+// هزینه حمل
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  textField(
+                    widget.textEditing[7], 'هزینه حمل ونقل', height, context,
+                    isOnlyChild: true,
+                    onChanged: widget.onTextChange[10], // ShipPrice
+                  ),
+                ],
+              ),
+
             ],
           ),
         ),
@@ -179,52 +213,46 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
     );
   }
 
-  Widget textField(controller, hintText, height, context,
-      {bool isOnlyChild = false}) {
+  Widget textField(
+      TextEditingController controller,
+      String hintText,
+      double height,
+      BuildContext context, {
+        bool isOnlyChild = false,
+        required ValueChanged<String> onChanged, // 👈 اضافه شد
+      }) {
     return SizedBox(
       width: isOnlyChild ? 310 : 150,
       height: height * 0.05,
       child: TextFormField(
         controller: controller,
         style: TextStyle(
-            fontSize: AppConfig.calFontSize(context, 2), color: Colors.black87),
+          fontSize: AppConfig.calFontSize(context, 2),
+          color: Colors.black87,
+        ),
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-          //prefixIcon: Icon(Icons.add, color: Colors.deepPurple),
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey.shade500),
           filled: true,
           fillColor: Colors.white,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
-            //  borderSide: BorderSide(color: Colors.grey, width: 1.4),
-          ),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
             borderSide: BorderSide(color: Colors.grey, width: 1),
           ),
-          errorStyle: TextStyle(
-            color: Colors.transparent,
-            fontSize: 0,
-            height: 0,
-          ),
+          errorStyle: const TextStyle(color: Colors.transparent, fontSize: 0, height: 0),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
-            borderSide: BorderSide(color: Colors.red, width: 1.5),
+            borderSide: const BorderSide(color: Colors.red, width: 1.5),
           ),
-          // Optional:
-          // errorBorder, focusedErrorBorder, suffixIcon
         ),
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return ' ';
-          }
-          return null;
-        },
+        validator: (value) => (value == null || value.trim().isEmpty) ? ' ' : null,
+        onChanged: onChanged, // 👈 اینجا کال‌بک پِرِنت صدا می‌خوره
       ),
     );
   }
+
 }
 
 class ProvinceDropdownMenu extends StatefulWidget {
@@ -260,7 +288,7 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
         : widget.itemList!.first; // ✅
 
     return SizedBox(
-      width: width * 0.41,
+      width: width * 0.33,
       child: Column(children: [
         Container(
           height: height * 0.05,
@@ -347,7 +375,7 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
     print('selectedItem');
     print(selectedItem);
     return SizedBox(
-      width: width * 0.41,
+      width: width * 0.33,
       child: Column(children: [
         Container(
           height: height * 0.05,
@@ -434,7 +462,7 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
    /* print('selectedItem');
     print(selectedItem);*/
     return SizedBox(
-      width: width * 0.41,
+      width: width * 0.33,
       child: Column(
         children: [
           Container(

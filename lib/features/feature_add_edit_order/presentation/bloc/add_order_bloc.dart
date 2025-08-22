@@ -74,7 +74,6 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
 
 
     on<HydrateCartFromOrder>((event, emit) {
-      // cart جدید بساز و دقیقاً مقادیر سفارش رو ست کن (بدون +)
       final Map<int, int> cart = {};
 
       for (final li in event.order.lineItems ?? <LineItem>[]) {
@@ -98,12 +97,6 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       cart[event.product.id!.toInt()] =
           (cart[event.product.id!.toInt()] ?? 0) + 1;
 
-      print('fsdfsdfsdfsddsfsfsdfsvbsfdgv');
-      print(cart[event.product.id!.toInt()]);
-      print('object');
-      print(cart);
-      print('cart');
-
       emit(
           state.copyWith(newCount: cart));
       emit(
@@ -119,17 +112,17 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     on<DecreaseProductCount>((event, emit) async {
       AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
       state.addOrderStatus as AddOrderProductsLoadedStatus;
+
       final loadedState = addOrderProductsLoadedStatus;
       final cart = loadedState.cart;
-      print(loadedState);
 
       if (cart[event.product.id!.toInt()] != null &&
           cart[event.product.id!.toInt()]! > 0) {
         cart[event.product.id!.toInt()] = cart[event.product.id!.toInt()]! - 1;
+        if(cart[event.product.id!.toInt()] == 0){
+          cart.remove(event.product.id!.toInt());
+        }
       }
-      /* if(cart[event.product.id!.toInt()]! == 0){
-        cart.remove(event.product.id!.toInt());
-      }*/
       emit(
           state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
       emit(state.copyWith(

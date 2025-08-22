@@ -1,33 +1,57 @@
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
-
 import '../../../../core/config/app-colors.dart';
 
 class HomeScreenPieChart extends StatefulWidget {
- final List<int> items;
-   HomeScreenPieChart({super.key,required this.items});
+  final List<int> items; // [paying, queue, refunded, pending, completed]
+  const HomeScreenPieChart({super.key, required this.items});
 
   @override
   State<HomeScreenPieChart> createState() => _HomeScreenPieChartState();
 }
 
 class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
-  int touchedIndex = 0;
-  List<String> percentages = [];
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    // تعریف لیبل و رنگ هر وضعیت
+    final labels = <String>[
+      'در حال پرداخت',
+      'در صف بررسی',
+      'برگشت داده شده',
+      'در انتظار پردازش',
+      'تکمیل شده',
+    ];
+    final colors = <Color>[
+      AppConfig.piChartSection3, // match case 0
+      AppConfig.piChartSection2, // case 1
+      AppConfig.piChartSection5, // case 2
+      AppConfig.piChartSection4, // case 3
+      AppConfig.piChartSection1, // case 4
+    ];
 
-    int sum = widget.items.reduce((a, b) => a + b);
-    for(var item in widget.items){
-      print("widget.test");
-      print(widget.items);
-      double item2 = ((item*100)/sum);
-      print(item2);
+    // ساخت لیست اسلایس‌ها (فقط > 0)
+    final slices = <_Slice>[];
+    for (var i = 0; i < widget.items.length && i < labels.length; i++) {
+      final v = widget.items[i];
+      if (v > 0) {
+        slices.add(_Slice(label: labels[i], value: v, color: colors[i]));
+      }
+    }
 
-      percentages.add(item2.toStringAsFixed(2));
+    // جمع کل برای محاسبه درصد
+    final sum = slices.fold<int>(0, (acc, s) => acc + s.value);
+
+    // اگر همه صفر بودن، یک سکشن «بدون داده» نشون بده
+    final hasData = sum > 0 && slices.isNotEmpty;
+    final sections = hasData
+        ? _buildSections(context, slices, sum)
+        : _buildEmptySection(context);
+
+    // اگر طول سکشن‌ها تغییر کرد، لمس‌شده رو ریست کن
+    if (touchedIndex >= sections.length) {
+      touchedIndex = -1;
     }
 
     return AspectRatio(
@@ -41,14 +65,14 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                 height: AppConfig.calHeight(context, 31),
                 width: AppConfig.calHeight(context, 31),
                 decoration: BoxDecoration(
-                  color: AppConfig.background, // Shadow color
+                  color: AppConfig.background,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color:AppConfig.section3,
+                      color: AppConfig.section3,
                       blurRadius: 20,
                       spreadRadius: 5,
-                      offset: Offset(4, 4), // Adjust shadow position
+                      offset: const Offset(4, 4),
                     ),
                   ],
                 ),
@@ -57,7 +81,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
             PieChart(
               PieChartData(
                 pieTouchData: PieTouchData(
-                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  touchCallback: (event, pieTouchResponse) {
                     setState(() {
                       if (!event.isInterestedForInteractions ||
                           pieTouchResponse == null ||
@@ -65,14 +89,15 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                         touchedIndex = -1;
                         return;
                       }
-                      touchedIndex =
-                          pieTouchResponse.touchedSection!.touchedSectionIndex;
+                      touchedIndex = pieTouchResponse
+                          .touchedSection!.touchedSectionIndex;
                     });
                   },
                 ),
                 sectionsSpace: 5,
                 centerSpaceRadius: 0.1,
-                sections: showingSections(),centerSpaceColor: Colors.green,
+                sections: sections,
+                centerSpaceColor: Colors.transparent,
               ),
             ),
           ],
@@ -80,51 +105,85 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
       ),
     );
   }
-  List<PieChartSectionData> showingSections() {
-    return List.generate(5, (i) {
+
+  List<PieChartSectionData> _buildSections(
+      BuildContext context, List<_Slice> slices, int sum) {
+    return List<PieChartSectionData>.generate(slices.length, (i) {
+      final s = slices[i];
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? AppConfig.calWidth(context, 4) :AppConfig.calWidth(context, 2.5);
-      final radius = isTouched ? AppConfig.calWidth(context, 30) : AppConfig.calWidth(context, 28);
-      final widgetSize = isTouched ? 55.0 : 40.0;
+      final fontSize =
+      isTouched ? AppConfig.calWidth(context, 4) : AppConfig.calWidth(context, 2.5);
+      final radius = isTouched
+          ? AppConfig.calWidth(context, 30)
+          : AppConfig.calWidth(context, 28);
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
 
-      switch (i) {
-        case 0:
-          return pieChartItem(radius,fontSize,shadows,pieChartText('در حال پرداخت'),i,AppConfig.piChartSection3);
-        case 1:
-          return pieChartItem(radius,fontSize,shadows,pieChartText('در صف بررسی'),i,AppConfig.piChartSection2);
-        case 2:
-          return pieChartItem(radius,fontSize,shadows,pieChartText('برگشت داده شده'),i,AppConfig.piChartSection5);
-        case 3:
-          return pieChartItem(radius,fontSize,shadows,pieChartText('در انتظار پردازش         '),i,AppConfig.piChartSection4);
-        case 4:
-          return pieChartItem(radius,fontSize,shadows,pieChartText('تکمیل شده'),i,AppConfig.piChartSection1);
-        default:
-          throw Exception('Error');
-      }
+      final percent = (s.value * 100) / sum;
+      final titleText = '${percent.toStringAsFixed(2)}%';
+
+      return PieChartSectionData(
+        color: s.color,
+        value: percent, // fl_chart بر اساس value نسبت‌ها رو می‌کشه
+        title: titleText,
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xffffffff),
+          shadows: shadows,
+        ),
+        badgeWidget: _badge(s.label),
+        badgePositionPercentageOffset: 1.3,
+      );
     });
   }
-  Widget pieChartText(text){
-    return Text(text,style: TextStyle(color: Colors.white,fontSize: AppConfig.calWidth(context,3)),);
-  }
-  PieChartSectionData pieChartItem(radius, fontSize,shadows, badgeWidget,index,color){
-    return PieChartSectionData(
-      color: color,
-      value: double.parse(percentages[index]),
-      title: '${double.parse(percentages[index])}%',
-      radius: radius,
-      titleStyle: TextStyle(
-        fontSize: fontSize,
-        fontWeight: FontWeight.bold,
-        color: const Color(0xffffffff),
-        shadows: shadows,
+
+  List<PieChartSectionData> _buildEmptySection(BuildContext context) {
+    final radius = AppConfig.calWidth(context, 28);
+    const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+    return [
+      PieChartSectionData(
+        color: Colors.grey.shade400,
+        value: 100,
+        title: 'بدون داده',
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: AppConfig.calWidth(context, 3),
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          shadows: shadows,
+        ),
+        badgeWidget: _badge('بدون داده'),
+        badgePositionPercentageOffset: 1.2,
       ),
-      badgeWidget: badgeWidget,
-      badgePositionPercentageOffset:1.3,
+    ];
+  }
+
+  Widget _badge(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConfig.calWidth(context, 2),
+        vertical: AppConfig.calWidth(context, 1),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(AppConfig.calWidth(context, 2)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: AppConfig.calWidth(context, 2.6),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
 
-
- 
-
+class _Slice {
+  final String label;
+  final int value;
+  final Color color;
+  _Slice({required this.label, required this.value, required this.color});
+}

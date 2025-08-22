@@ -14,8 +14,10 @@ class AddOrderProduct extends StatelessWidget {
   final ProductEntity product;
   final ProductFormMode? isEditMode;
   final OrdersEntity? ordersEntity;
+  final Function(Map<int, int>) onCartSelected;
 
-  AddOrderProduct(this.isEditMode, this.product, {this.ordersEntity})
+  AddOrderProduct(
+      this.isEditMode, this.product, this.ordersEntity, this.onCartSelected)
       : assert(
           isEditMode == ProductFormMode.create || ordersEntity != null,
           'در حالت edit باید ordersEntity مقدار داشته باشد',
@@ -103,7 +105,7 @@ class AddOrderProduct extends StatelessWidget {
   /// Builds the product name display
   Widget _buildProductName(Size size, ThemeData theme) {
     return Container(
-      width: size.width * 0.5,
+      width: size.width * 0.45,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fontSize = _calculateFontSize(constraints.maxWidth);
@@ -153,40 +155,48 @@ class AddOrderProduct extends StatelessWidget {
                   width: AppConfig.calWidth(context, 20),
                   child: AutoSizeText(
                     product.childes![index].variable,
-                    style: TextStyle(fontSize: AppConfig.calWidth(context, 3),color: Colors.black
-                    ),
+                    style: TextStyle(
+                        fontSize: AppConfig.calWidth(context, 3),
+                        color: Colors.black),
                     maxLines: 1,
                     minFontSize: 7,
                     overflow: TextOverflow.ellipsis,
-
                   ),
                 ),
               Container(
                 alignment: Alignment.center,
                 height: AppConfig.calHeight(context, 4),
-             width: AppConfig.calWidth(context,20),
+                width: AppConfig.calWidth(context, 20),
                 child: AutoSizeText(
-                  isChild?'${product.childes![index].price} تومان':'${product.price} تومان',
-                  style: TextStyle(fontSize: AppConfig.calWidth(context, 3),color: Colors.black
-                  ),
+                  isChild
+                      ? '${product.childes![index].price} تومان'
+                      : '${product.price} تومان',
+                  style: TextStyle(
+                      fontSize: AppConfig.calWidth(context, 3),
+                      color: Colors.black),
                   maxLines: 1,
                   minFontSize: 7,
                   overflow: TextOverflow.ellipsis,
-
-                ) ,
+                ),
               ),
             ],
           ),
         ),
-        _buildQuantityControls(context, size, theme,index, isChild),
+        _buildQuantityControls(context, size, theme, index, isChild),
       ],
     );
   }
 
   /// Builds the quantity controls (add/remove buttons and count)
   Widget _buildQuantityControls(
-      BuildContext context, Size size, ThemeData theme,int index, isChild) {
-    return BlocBuilder<AddOrderBloc, AddOrderState>(
+      BuildContext context, Size size, ThemeData theme, int index, isChild) {
+    return BlocConsumer<AddOrderBloc, AddOrderState>(
+      listener: (context, state) {
+        final status = state.addOrderCardProductStatus;
+        if (status is AddOrderCardProductLoaded) {
+          onCartSelected(status.cart);
+        }
+      },
       builder: (context, state) {
         print('state.addOrderCardProductStatus');
         print(state.addOrderCardProductStatus);
@@ -201,33 +211,36 @@ class AddOrderProduct extends StatelessWidget {
           print('yes');
           print(product.id);
 
-          if(isChild){
-
+          if (isChild) {
             print(product.childes![index].id);
             print(status.cart[product.childes![index].id]);
             print(status.cart);
 
-
-            if(status.cart[product.childes![index].id] != 0){
-             count = status.cart[product.childes![index].id] ?? 0;
-           }
-          }else{
+            if (status.cart[product.childes![index].id] != 0) {
+              count = status.cart[product.childes![index].id] ?? 0;
+            }
+            ProductEntity productChilde =
+                ProductEntity(id: product.childes![index].id);
+            return count == 0
+                ? _buildAddButton(context, size, theme, isChild, index)
+                : _buildQuantitySelector(
+                    context, size, theme, count, productChilde);
+          } else {
             count = status.cart[product.id] ?? 0;
+            return count == 0
+                ? _buildAddButton(context, size, theme, isChild, index)
+                : _buildQuantitySelector(context, size, theme, count, product);
           }
-
-
-          return count == 0
-              ? _buildAddButton(context, size, theme,  isChild,  index)
-              : _buildQuantitySelector(context, size, theme, count);
         }
 
-        return _buildAddButton(context, size, theme,isChild,  index);
+        return _buildAddButton(context, size, theme, isChild, index);
       },
     );
   }
 
   /// Builds the "Add Product" button
-  Widget _buildAddButton(BuildContext context, Size size, ThemeData theme, bool isChild, int index) {
+  Widget _buildAddButton(BuildContext context, Size size, ThemeData theme,
+      bool isChild, int index) {
     return SizedBox(
       width: size.width * 0.3,
       height: size.height * 0.04,
@@ -239,15 +252,14 @@ class AddOrderProduct extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          if(isChild){
+          if (isChild) {
             ProductEntity productEntity = ProductEntity(
               id: product.childes![index].id,
               name: product.childes![index].name,
               price: product.childes![index].price,
             );
             context.read<AddOrderBloc>().add(AddOrderAddProduct(productEntity));
-          }
-          else{
+          } else {
             context.read<AddOrderBloc>().add(AddOrderAddProduct(product));
           }
         },
@@ -263,8 +275,8 @@ class AddOrderProduct extends StatelessWidget {
   }
 
   /// Builds the quantity selector (add/remove buttons with count)
-  Widget _buildQuantitySelector(
-      BuildContext context, Size size, ThemeData theme, int count) {
+  Widget _buildQuantitySelector(BuildContext context, Size size,
+      ThemeData theme, int count, ProductEntity product) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

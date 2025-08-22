@@ -35,24 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
     BlocProvider.of<HomeBloc>(context).add(LoadHomeDataEvent());
+
   }
 
   var test = '';
 
+
+
+
   @override
   Widget build(BuildContext context) {
-    print('HomeScreen');
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
-    return BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state){
-           if(state.homeStatus is HomeAccountExitStatus){
-             Navigator.pushReplacementNamed(context, LogInScreen.routeName);
-           }
-        },
-        builder: (context, state) {
+    return BlocConsumer<HomeBloc, HomeState>(listener: (context, state) {
+      if (state.homeStatus is HomeAccountExitStatus) {
+        Navigator.pushReplacementNamed(context, LogInScreen.routeName);
+      }
+    }, builder: (context, state) {
       if (state.homeStatus is HomeLoading) {
         return Center(child: ProgressBar());
       }
@@ -70,40 +72,44 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: AppConfig.background,
             //centerTitle: false,
             titleSpacing: 0.0,
-            actions: [Container(alignment: Alignment.center,
-              width: AppConfig.calWidth(context, 40),
+            actions: [
+              Container(
+                alignment: Alignment.center,
+                width: AppConfig.calWidth(context, 40),
 
-               // margin: EdgeInsets.only(top: AppConfig.calWidth(context, 5)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(alignment: Alignment.center,
-                    //  padding: EdgeInsets.all(width * 0.03),
-                    child: Text(
-                      StaticValues.shopName,
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppConfig.calWidth(context, 3)),
+                // margin: EdgeInsets.only(top: AppConfig.calWidth(context, 5)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      //  padding: EdgeInsets.all(width * 0.03),
+                      child: Text(
+                        StaticValues.shopName,
+                        textDirection: TextDirection.rtl,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppConfig.calWidth(context, 3)),
+                      ),
                     ),
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                   padding: EdgeInsets.only(top: 2),
-                    child: Text(
-                      jd.echo('l، d F'),
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(
-                          color: Colors.grey.shade300,
-                          fontSize: AppConfig.calWidth(context, 4),
-                          fontWeight: FontWeight.bold),
+                    Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.only(top: 2),
+                      child: Text(
+                        jd.echo('l، d F'),
+                        textDirection: TextDirection.rtl,
+                        style: TextStyle(
+                            color: Colors.grey.shade300,
+                            fontSize: AppConfig.calWidth(context, 4),
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),],
+            ],
           ),
           onDrawerChanged: (isOpened) {
             widget.onDrawerStatusChange!(isOpened);
@@ -111,33 +117,50 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Center(
             child: SingleChildScrollView(
               child: Padding(
-                padding:  EdgeInsets.all(width*0.03),
+                padding: EdgeInsets.all(width * 0.03),
                 child: Column(
-                  spacing: height*0.03,
+                  spacing: height * 0.03,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    HomeScreenPieChart(
-                      items: [
-                        StaticValues
-                            .staticHomeDataEntity!.statusCounts!.wcCompleted,
-                        StaticValues.staticHomeDataEntity!.statusCounts!.wcOnHold,
-                        StaticValues
-                            .staticHomeDataEntity!.statusCounts!.wcPending,
-                        StaticValues
-                            .staticHomeDataEntity!.statusCounts!.wcProcessing,
-                        StaticValues
-                            .staticHomeDataEntity!.statusCounts!.wcRefunded
-                      ],
-                    ),
+
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcCompleted == 0&&
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcOnHold == 0&&
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcPending == 0&&
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcProcessing == 0&&
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcRefunded == 0
+                ?  Center(
+                child: Container(
+                  height: AppConfig.calHeight(context, 30),alignment: Alignment.center,
+                  child: Text(
+                    'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
+                    style: TextStyle(fontSize: AppConfig.calFontSize(context, 3), fontWeight: FontWeight.bold,color: Colors.white),
+                  ),
+                ),
+              )
+                    :                       HomeScreenPieChart(
+                  items: [
+                    StaticValues
+                        .staticHomeDataEntity!.statusCounts!.wcCompleted,
+                    StaticValues
+                        .staticHomeDataEntity!.statusCounts!.wcOnHold,
+                    StaticValues
+                        .staticHomeDataEntity!.statusCounts!.wcPending,
+                    StaticValues
+                        .staticHomeDataEntity!.statusCounts!.wcProcessing,
+                    StaticValues
+                        .staticHomeDataEntity!.statusCounts!.wcRefunded
+                  ],
+                ),
 
                     MiddleCard(
                       statusCounts: StaticValues.staticHomeDataEntity,
                     ),
-
-                    Container(alignment: Alignment.centerRight,
+                    Container(
+                      alignment: Alignment.centerRight,
                       child: Text(
                         "آمار سفارش هفته اخیر",
-                        style: TextStyle(color: Colors.white,fontSize: width*0.03),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: width * 0.03),
                       ),
                     ),
                     Container(
@@ -167,9 +190,12 @@ class _HomeScreenState extends State<HomeScreen> {
       } else if (state.homeStatus is HomeErrorStatus) {
         // context.read<HomeBloc>().add(LoadOrdersData(OrdersParams(10,"http://shop-yar.ir/wp-json/shop-yar","per_page=10","")));
 
-        return Center(child: Text('خطا!'));
-      }
-      else if (state.homeStatus is HomeLoadedStatus) {
+        return Center(
+            child: Text(
+          'خطا در بارگیری اطلاعات صفحه اصلی!',
+          style: TextStyle(color: Colors.white),
+        ));
+      } else if (state.homeStatus is HomeLoadedStatus) {
         /*final UserLoadedStatus userLoadedStatus =
             state.homeStatus as UserLoadedStatus;*/
         /* final UserLoadedStatus userLoadedStatus =
@@ -230,7 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
       LoginEntity? loginEntity = userDataLoadedStatus.loginEntity;*/
 
       return Container(
-        color: AppConfig.background,child: Text('خطا در بارگیری اطلاعات!'),
+        color: AppConfig.background,
+        child: Text('خطا در بارگیری اطلاعات!'),
       );
     });
   }

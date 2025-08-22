@@ -73,27 +73,23 @@ class HomeRepositoryImpl extends HomeRepository{
   @override
   Future<DataState<HomeDataEntity>> getHomeData() async {
 
-      try {
-        final response = await homeApiProvider.GetHomeData();
-
-        if (response.statusCode == 200) {
-
-          HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
-
-          print('eeeeeee');
-          print(response);
-
-          return DataSuccess(homeDataEntity);
-
-        } else {
-          print('eeeeeesde');
-          return DataFailed('error in getHomeUserData');
-        }
-      } catch (e) {
-        print('eeeeedsddsee');
-        print(e.toString());
-        return DataFailed('error in getHomeUserData:$e');
+    try {
+      final response = await homeApiProvider.GetHomeData();
+      if (response.statusCode == 200) {
+        // قبل از پارس، اینو بزن تا نوع‌ها رو ببینی:
+         print(response.data.runtimeType); // باید Map باشه
+        HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
+        return DataSuccess(homeDataEntity);
+      } else {
+        return DataFailed('error in getHomeUserData');
       }
+    } catch (e, st) {
+      print('eeeeedsddsee');
+      print(e);     // نوع خطا
+      print(st);    // استک ترِیس دقیق
+      return DataFailed('error in getHomeUserData:$e');
+    }
+
 
 
   }
