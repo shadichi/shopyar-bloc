@@ -109,6 +109,13 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
 
   @override
   Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams) async {
+    print('setOrderParams.order');
+    print(setOrderParams.order);
+    print(StaticValues.webService);
+    print(StaticValues.passWord);
+    print(setOrderParams.payType);
+    print(setOrderParams.shipType);
+    print(setOrderParams.shipPrice);
     try {
       var response = await apiProvider.SetOrder(
           setOrderParams.order,
@@ -130,5 +137,6 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
       print(e.toString());
       return false;
     }
+    return false;
   }
 }

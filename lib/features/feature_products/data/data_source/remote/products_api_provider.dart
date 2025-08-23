@@ -24,7 +24,7 @@ class ProductsApiProvider{
     print(StaticValues.passWord);
     try {
       var response = await _dio.get(
-        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=23',
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
 

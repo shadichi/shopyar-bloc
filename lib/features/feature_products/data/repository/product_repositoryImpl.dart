@@ -22,13 +22,13 @@ class ProductRepositoryImpl extends ProductRepository{
       StaticValues.webService = webService.toString();
       StaticValues.passWord = passWord.toString();
       if(webService == null || passWord == null){
-        return ProductsParams(10,false,'');
+        return ProductsParams('10',false,'');
       }
 
-      return ProductsParams(10,false, '');
+      return ProductsParams('10',false, '');
     }
     else{
-      return ProductsParams(10,false, '');
+      return ProductsParams('10',false, '');
     }
 
   }

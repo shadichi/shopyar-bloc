@@ -24,12 +24,13 @@ enum ProductFormMode {
 
 class ProductFormScreen extends StatefulWidget {
   static const createRoute = '/orders-create';
-  static const editRoute   = '/orders-edit';
+  static const editRoute = '/orders-edit';
 
   final ProductFormMode mode;
   final OrdersEntity? ordersEntity;
 
-  const ProductFormScreen._({required this.mode, this.ordersEntity}); // 👈 private constructor
+  const ProductFormScreen._(
+      {required this.mode, this.ordersEntity}); // 👈 private constructor
 
   factory ProductFormScreen.create() =>
       ProductFormScreen._(mode: ProductFormMode.create);
@@ -39,6 +40,7 @@ class ProductFormScreen extends StatefulWidget {
         mode: ProductFormMode.edit,
         ordersEntity: ordersEntity,
       );
+
 //کلمه‌ی factory یعنی «این سازنده لزوماً همیشه یک آبجکت جدید نمی‌سازه، می‌تونه یک نمونه‌ی موجود رو برگردونه یا منطق اضافه اجرا کنه».
   @override
   _AddOrderTest createState() => _AddOrderTest();
@@ -84,10 +86,18 @@ class _AddOrderTest extends State<ProductFormScreen> {
     super.initState();
 
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
-    if (widget.mode == ProductFormMode.edit ) {
-      context.read<AddOrderBloc>().add(HydrateCartFromOrder (widget.ordersEntity!));
-
+    if (widget.mode == ProductFormMode.edit) {
+      context
+          .read<AddOrderBloc>()
+          .add(HydrateCartFromOrder(widget.ordersEntity!));
+    } else {
+      context.read<AddOrderBloc>().add(ClearCart());
     }
+  }
+
+  String get _nextButtonLabel {
+    if (activeStep == 0) return 'بعدی';
+    return widget.mode == ProductFormMode.edit ? 'ویرایش سفارش' : 'ثبت سفارش';
   }
 
   final TextEditingController controller = TextEditingController();
@@ -100,6 +110,8 @@ class _AddOrderTest extends State<ProductFormScreen> {
   TextEditingController step1EmailBill = TextEditingController();
   TextEditingController step1PhoneBill = TextEditingController();
   TextEditingController step1ShipPrice = TextEditingController();
+
+  AddOrderProductsLoadedStatus? _lastLoaded;
 
   @override
   Widget build(BuildContext context) {
@@ -118,57 +130,57 @@ class _AddOrderTest extends State<ProductFormScreen> {
     ];
 
     List<Function(String)> onTextChange = [
-          (value) {
+      (value) {
         customerLNBill = value;
         print("نام خانوادگی خریدار");
         print(customerLNBill);
       },
-          (value) {
+      (value) {
         customerFNBill = value;
         print("نام خریدار");
         print(customerFNBill);
       },
-          (value) {
+      (value) {
         cityBill = value;
         print("شهر محل زندگی");
         print(cityBill);
       },
-          (value) {
+      (value) {
         provinceBill = value;
         print("استان");
         print(provinceBill);
       },
-          (value) {
+      (value) {
         addressBill = value;
         print("آدرس خریدار");
         print(addressBill);
       },
-          (value) {
+      (value) {
         postalCodeBill = value;
         print("کد پستی خریدار");
         print(postalCodeBill);
       },
-          (value) {
+      (value) {
         emailBill = value;
         print("ایمیل");
         print(emailBill);
       },
-          (value) {
+      (value) {
         phoneBill = value;
         print("شماره همراه");
         print(phoneBill);
       },
-          (value) {
+      (value) {
         shipmentBill = value;
-        print("روش حمل و نقل");
+        print("روش حمل و نقل در ویجت اصلی");
         print(shipmentBill);
       },
-          (value) {
+      (value) {
         paymentBill = value;
         print("روش پرداخت");
         print(paymentBill);
       },
-          (value) {
+      (value) {
         shipPriceBill = value;
         print("هزینه حمل و نقل");
         print(shipPriceBill);
@@ -194,31 +206,29 @@ class _AddOrderTest extends State<ProductFormScreen> {
         }
       },
       builder: (context, state) {
-        Widget bodyContent;
+        final isSubmitting = state.addOrderStatus is AddOrderLoadingStatus;
+        final isLoadError = state.addOrderStatus is AddOrderProductsErrorStatus;
+        final isLoadingProducts =
+            state.addOrderStatus is AddOrderProductsLoadingStatus;
 
-        if (state.addOrderStatus is AddOrderProductsErrorStatus) {
-          bodyContent = Center(child: Text('خطا!'));
-        } else if (state.addOrderStatus is AddOrderProductsLoadingStatus) {
-          BlocProvider.of<AddOrderBloc>(context)
-              .add(LoadAddOrderProductsData());
-          bodyContent = Center(child: ProgressBar());
-        } else if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
-          AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-          state.addOrderStatus as AddOrderProductsLoadedStatus;
-          paymentMethod!.forEach((element) {
-            pay.add(element.methodTitle);
-          });
-          shipmentMethod!.forEach((element) {
-            ship.add(element.methodTitle);
-          });
-          pay.forEach((element) {
-            print(element);
-          });
-          ship.forEach((element) {
-            print(element);
-          });
+        if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
+          _lastLoaded = state.addOrderStatus as AddOrderProductsLoadedStatus;
+        }
 
-          bodyContent = Padding(
+        Widget mainContent;
+        if (isLoadingProducts) {
+          mainContent = Center(child: ProgressBar());
+        } else if (isLoadError && _lastLoaded == null) {
+          mainContent = const Center(
+              child: Text(
+            'خطا!',
+            style: TextStyle(color: Colors.white),
+          ));
+        } else if (_lastLoaded != null) {
+          // ⚠️ از _lastLoaded برای پر کردن pay/ship استفاده کن
+          final loaded = _lastLoaded!;
+
+          mainContent = Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -228,37 +238,36 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 ListTile(
                   title: Text(
                     activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                   subtitle: Text(
                     activeStep == 0
                         ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
                         : 'لطفا محصولات را انتخاب فرمایید.',
-                    style: TextStyle(color: Colors.grey, fontSize: 11),
+                    style: const TextStyle(color: Colors.grey, fontSize: 11),
                   ),
                 ),
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 400),
+                    duration: const Duration(milliseconds: 400),
                     transitionBuilder: (child, animation) => SlideTransition(
                       position: Tween<Offset>(
-                        begin: Offset(1.0, 0.0), // از راست بیاد ←
-                        end: Offset.zero,
-                      ).animate(animation),
+                              begin: const Offset(1, 0), end: Offset.zero)
+                          .animate(animation),
                       child: child,
                     ),
                     child: SizedBox(
                       key: ValueKey<int>(activeStep),
                       width: 350,
-                      //  height: 300,
-                      child: _buildSection(onTextChange, textEditing, widget.mode, widget.ordersEntity),
+                      child: _buildSection(onTextChange, textEditing,
+                          widget.mode, widget.ordersEntity),
                     ),
                   ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    nextButton(addOrderProductsLoadedStatus),
+                    nextButton(loaded),
                     previousButton(),
                   ],
                 ),
@@ -266,57 +275,71 @@ class _AddOrderTest extends State<ProductFormScreen> {
             ),
           );
         } else {
-          bodyContent = Center(child: Text("خطا در پردازش داده‌ها"));
+          mainContent = const Center(
+              child: Text("خطا در پردازش داده‌ها",
+                  style: TextStyle(color: Colors.white)));
         }
 
         return Scaffold(
           backgroundColor: AppConfig.background,
-          body: bodyContent,
           appBar: AppBar(
             backgroundColor: AppConfig.background,
-            iconTheme: IconThemeData(
-              color: Colors.white, //change your color here
-            ),
+            iconTheme: const IconThemeData(color: Colors.white),
             title: Text(
-              widget.mode == ProductFormMode.create?'ایجاد سفارش جدید':'ویرایش سفارش ${widget.ordersEntity!.id.toString()} ',
-              style: TextStyle(color: Colors.white, fontSize: 13),
+              widget.mode == ProductFormMode.create
+                  ? 'ایجاد سفارش جدید'
+                  : 'ویرایش سفارش ${widget.ordersEntity?.id ?? ""}',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
             ),
+          ),
+          body: Stack(
+            children: [
+              mainContent,
+              if (isSubmitting) _loadingBarrier('در حال ثبت سفارش...'),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildSection(onTextChange, textEditing, isEditMode, OrdersEntity? ordersEntity ) {
+  Widget _buildSection(
+    onTextChange,
+    textEditing,
+    isEditMode,
+    OrdersEntity? ordersEntity,
+  ) {
     switch (activeStep) {
       case 0:
-        return Addorderbilltest(
-            paymentMethod, shipmentMethod, onTextChange, _formKey, textEditing, isEditMode,  ordersEntity: ordersEntity);
+        return Addorderbilltest(paymentMethod, shipmentMethod, onTextChange,
+            _formKey, textEditing, isEditMode,
+            ordersEntity: ordersEntity);
       case 1:
         return ListView.builder(
-            itemCount: 13,
+            itemCount: StaticValues.staticProducts.length,
             itemBuilder: (context, index) {
               final product = StaticValues.staticProducts[index];
               return AddOrderProduct(
                 isEditMode,
                 product,
                 ordersEntity,
-                    (p0) {
+                (p0) {
                   // فرض: p0 = Map<int, int>  // productId -> quantity
                   lineItem
                     ..clear()
                     ..addAll(
                       p0.entries.map((e) => LineItem(
-                        id: 0,
-                        productId: e.key,
-                        name: "",                // اگه اسم داری اینجا بذار
-                        quantity: e.value,
-                        total: '1000', // اگه total واحدی می‌خوای: (unitPrice[e.key] * e.value).toString()
-                      )),
+                            id: 0,
+                            productId: e.key,
+                            name: "",
+                            // اگه اسم داری اینجا بذار
+                            quantity: e.value,
+                            total:
+                                '1000', // اگه total واحدی می‌خوای: (unitPrice[e.key] * e.value).toString()
+                          )),
                     );
                 },
               );
-
             });
       default:
         return Container();
@@ -326,120 +349,152 @@ class _AddOrderTest extends State<ProductFormScreen> {
   Widget nextButton(AddOrderProductsLoadedStatus addOrderProductsLoadedStatus) {
     return Container(
       margin: EdgeInsets.all(10),
-      width: activeStep == 1 ? 100 : 80,
+      width: AppConfig.calWidth(context, 30),
       child: ElevatedButton(
         onPressed: () {
-          // هم‌خوانی با استپ‌ها
+          // برای دیباگ
+          print(
+              'paymentBill: $paymentBill | shipmentBill: $shipmentBill | provinceBill: $provinceBill');
+
           if (activeStep == 0) {
-            if (_formKey.currentState?.validate() ?? false) {
-              setState(() => activeStep = 1);
+            // پیش‌فرض‌ها اگر کاربر انتخاب نکرده
+            if ((paymentBill).trim().isEmpty &&
+                (paymentMethod?.isNotEmpty ?? false)) {
+              paymentBill = (paymentMethod!.first.methodTitle ?? '').trim();
+            }
+            if ((shipmentBill).trim().isEmpty &&
+                (shipmentMethod?.isNotEmpty ?? false)) {
+              shipmentBill = (shipmentMethod!.first.methodTitle ?? '').trim();
+            }
+            if ((provinceBill).trim().isEmpty) {
+              provinceBill = 'تهران';
+            }
+
+            // اعتبارسنجی فرم + وجود انتخاب‌ها
+            final payIdx = paymentMethod?.indexWhere(
+                  (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
+                ) ??
+                -1;
+            final shipIdx = shipmentMethod?.indexWhere(
+                  (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
+                ) ??
+                -1;
+
+            print('payIdx: $payIdx, shipIdx: $shipIdx');
+
+            if ((_formKey.currentState?.validate() ?? false) &&
+                payIdx >= 0 &&
+                shipIdx >= 0) {
+              setState(() => activeStep = 1); // برو به صفحهٔ محصولات
             } else {
-              showSnack(context, "لطفا همه فیلدهای مورد نیاز را پر کنید!");
+              showSnack(context, "لطفاً همه فیلدهای مورد نیاز را پر کنید!");
             }
             return;
           }
 
-          // مرحله ثبت سفارش روی استپ 1
+          // استپ ۱: محصولات → ثبت/ویرایش سفارش
           if (activeStep == 1) {
             _validateForm();
 
             if (lineItem.isEmpty) {
-              alertDialogScreen(context, 'هیچ محصولی انتخاب نشده است!', 1, true);
+              alertDialogScreen(
+                  context, 'هیچ محصولی انتخاب نشده است!', 1, true);
               return;
             }
 
-            // ایمن‌سازی لیست‌های pay/ship
-            // (پیشنهاد: این دو خط رو همون جایی که pay/ship رو پر می‌کنی بگذار)
-            pay.clear();
-            ship.clear();
-            paymentMethod?.forEach((e) => pay.add(e.methodTitle));
-            shipmentMethod?.forEach((e) => ship.add(e.methodTitle));
+            // Resolve امن و نهایی بر اساس عنوان (در آینده بهتره با ID کار کنی)
+            final selectedPay = (paymentMethod ?? []).firstWhere(
+              (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
+              orElse: () => paymentMethod!.first,
+            );
+            final selectedShip = (shipmentMethod ?? []).firstWhere(
+              (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
+              orElse: () => shipmentMethod!.first,
+            );
 
-            // ایندکس امن برای پرداخت
-            int payIdx = -1;
-            if (paymentBill.isNotEmpty) {
-              payIdx = paymentMethod!.indexWhere((m) => m.methodTitle == paymentBill);
-            }
-            if (payIdx < 0) {
-              showSnack(context, "لطفاً روش پرداخت را انتخاب کنید.");
-              return;
-            }
-
-            // ایندکس امن برای حمل‌ونقل
-            int shipIdx = -1;
-            if (shipmentBill.isNotEmpty) {
-              shipIdx = shipmentMethod!.indexWhere((m) => m.methodTitle == shipmentBill);
-            }
-            if (shipIdx < 0) {
-              showSnack(context, "لطفاً روش حمل‌ونقل را انتخاب کنید.");
-              return;
-            }
-
-            final payType = paymentMethod![payIdx].methodId?.toString() ?? "";
-            final shipType = shipmentMethod![shipIdx].methodId?.toString() ?? "";
+            final payType = selectedPay.methodId?.toString() ?? "";
+            final shipType = selectedShip.methodId?.toString() ?? "";
+            final shipTypeTitle = selectedShip.methodTitle?.toString() ?? "";
             final priceShip = shipPriceBill.isEmpty ? "" : shipPriceBill;
 
-            // (اختیاری) اگر اینجا هنوز می‌خوای مطمئن شی lineItem خالی نیست:
-            // if (lineItem.isEmpty) { ... return; }
+            // اگر خواستی هم‌زمان برای UI خودت نگه داری
+            shippingLine = [
+              ShippingLine(methodId: shipType, methodTitle: shipTypeTitle),
+            ];
 
-            print('payType');
-            print(payType);
-            print(shipType);
-            print(priceShip);
-            print(customerLNBill);
-            print(customerFNBill);
-            print(addressBill);
+            // ساخت آدرس‌ها (بهتره country=IR باشه)
+            final billing = Ing(
+              firstName: customerLNBill,
+              lastName: customerFNBill,
+              address1: addressBill,
+              city: cityBill,
+              email: emailBill,
+              state: provinceBill,
+              postcode: postalCodeBill,
+              country: "IR",
+              phone: phoneBill,
+            );
 
-            // ساخت سفارش
+            final shipping = Ing(
+              firstName: customerLNBill,
+              lastName: customerFNBill,
+              address1: addressBill,
+              city: cityBill,
+              email: emailBill,
+              state: provinceBill,
+              postcode: postalCodeBill,
+              country: "IR",
+              phone: phoneBill,
+            );
+
+            // اگر حالت ویرایشه، id سفارش قبلی رو بذار تا API همون رو آپدیت کنه
+            final int orderIdForEdit = (widget.mode == ProductFormMode.edit)
+                ? (widget.ordersEntity?.id ?? 0)
+                : 0;
+
+            // ساخت سفارش برای ارسال به ایونت
             final order = AddOrderOrdersEntity(
-              id: 0,
-              status: 'در انتظار',
-              billing: Ing(
-                firstName: customerLNBill,
-                lastName: customerFNBill,
-                address1: addressBill,
-                city: cityBill,
-                email: emailBill,
-                state: provinceBill,
-                postcode: postalCodeBill,
-                country: "ایران",
-                phone: phoneBill,
-              ),
-              shipping: Ing(
-                firstName: customerLNBill,
-                lastName: customerFNBill,
-                address1: addressBill,
-                city: cityBill,
-                email: emailBill,
-                state: provinceBill,
-                postcode: postalCodeBill,
-                country: "ایران",
-                phone: phoneBill,
-              ),
+              id: orderIdForEdit,
+              // ۰ = ایجاد جدید، >۰ = ویرایش
+              status: 'pending',
+              // اختیاری؛ API تو لازم نداره
+              billing: billing,
+              shipping: shipping,
               paymentMethod: payType,
+              // برای نمایش داخلی؛ API مقدار واقعی رو از payType می‌خونه
               paymentMethodTitle: paymentBill,
+              // اگر نیاز داری در UI بعداً نشون بدی
               lineItems: lineItem,
-              shippingLines: shippingLine,
+              // از استپ محصولات
+              shippingLines:
+                  shippingLine, // فقط برای UI خودت؛ API از پارام جداگانه استفاده می‌کنه
             );
 
+            // 🔔 ارسال ایونت Bloc
             context.read<AddOrderBloc>().add(
-              SetOrderEvent(SetOrderParams(order, payType, shipType, priceShip)),
-            );
+                  SetOrderEvent(
+                    SetOrderParams(order, payType, shipType, priceShip),
+                  ),
+                );
+
+            // اینجا activeStep رو افزایش نده؛ بگذار تو همین استپ بمونه تا لودینگ نمایش داده بشه
+            // وقتی Success اومد (listenerت)، می‌تونی پیام بدی/برگردی
             return;
           }
-
-          // اگر استپ دیگری داری:
-          setState(() => activeStep++);
         },
-
         style: ElevatedButton.styleFrom(
             backgroundColor: AppConfig.secondaryColor,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)))),
         child: Text(
-          activeStep == 1 ? 'ثبت سفارش' : 'بعدی',
+          activeStep == 1
+              ? widget.mode == ProductFormMode.edit
+                  ? 'ویرایش سفارش'
+                  : 'ثبت سفارش'
+              : 'بعدی',
           style: TextStyle(
-              color: Colors.white, fontSize: activeStep == 1 ? 9 : 12),
+              color: Colors.white,
+              fontSize: AppConfig.calFontSize(context, 2.5)),
         ),
       ),
     );
@@ -447,6 +502,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
 
   Widget previousButton() {
     return Container(
+      width: AppConfig.calWidth(context, 30),
       margin: EdgeInsets.all(10),
       child: ElevatedButton(
         onPressed: () {
@@ -463,7 +519,9 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)))),
         child: Text(
           'قبلی',
-          style: TextStyle(color: Colors.white, fontSize: 12),
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: AppConfig.calFontSize(context, 2.5)),
         ),
       ),
     );
@@ -643,7 +701,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
         style: TextStyle(fontSize: 10, color: Colors.black87),
         decoration: InputDecoration(
           contentPadding:
-          const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+              const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           //prefixIcon: Icon(Icons.add, color: Colors.deepPurple),
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey.shade500),
@@ -661,6 +719,37 @@ class _AddOrderTest extends State<ProductFormScreen> {
           // errorBorder, focusedErrorBorder, suffixIcon
         ),
       ),
+    );
+  }
+
+  Widget _loadingBarrier([String? message]) {
+    return Stack(
+      children: [
+        const ModalBarrier(
+          dismissible: false,
+          color: Colors.black54,
+        ),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ProgressBar(),
+              if (message != null) ...[
+                SizedBox(height: AppConfig.calHeight(context, 8)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: AppConfig.calWidth(context, 3.5),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -19,22 +19,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   final GetProductsUseCase getProductsUseCase;
 
   ProductsBloc(this.productsGetStringDataUseCase,this.getProductsUseCase)
-      : super(ProductsState(productsStatus: ProductsLoadingStatus())) {
+      : super(ProductsState(productsStatus: ProductsLoadingStatus(), isLoadingMore: false)) {
 
-    /*on<LoadData>((event, emit) async {
-      ProductsLoadedStatus productsLoadedStatus;
-      emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
-      final ProductsParams productsParams =
-      await productsGetStringDataUseCase();
-      if (productsParams.webService != '' &&
-          productsParams.consumerKey != '' &&
-          productsParams.productCount != '') {
-        emit(state.copyWith(newProductsStatus: pUserLoadedStatus(productsParams)));
-      } else {
-        //  emit(UserDataErrorState()); // No data found, stay in loading state
-        emit(state.copyWith(newProductsStatus: pUserLoadedStatus(productsParams)));
-      }
-    });*/
     on<LoadProductsData>((event, emit) async {
       if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch) {
         print('1');

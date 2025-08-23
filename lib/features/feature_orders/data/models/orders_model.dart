@@ -12,6 +12,7 @@ class OrdersModel extends OrdersEntity {
     String? status,
     String? total,
     Ing? billing,
+    String? shippingPrice,
     Jalali? dateCreated,
     Ing? shipping,
     String? paymentMethod,
@@ -24,6 +25,7 @@ class OrdersModel extends OrdersEntity {
           status: status,
           total: total,
           billing: billing,
+    shippingPrice: shippingPrice,
           dateCreated: dateCreated,
           shipping: shipping,
           paymentMethod: paymentMethod,
@@ -38,6 +40,7 @@ class OrdersModel extends OrdersEntity {
     status = json['status'];
     total = json["total"];
     billing = Ing.fromJson(json["billing"]);
+    shippingPrice =  json["shipping_total"];
     dateCreated = DateTime.parse(json["date_created"]).toJalali();
     shipping = Ing.fromJson(json["shipping"]);
     paymentMethod = json["payment_method"];
@@ -53,6 +56,7 @@ class OrdersModel extends OrdersEntity {
   String? status;
   String? total;
   Ing? billing;
+  String? shippingPrice;
   Jalali? dateCreated;
   Ing? shipping;
   String? paymentMethod;

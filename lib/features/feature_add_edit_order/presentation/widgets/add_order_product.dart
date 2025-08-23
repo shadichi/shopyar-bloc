@@ -10,7 +10,7 @@ import '../bloc/add_order_card_product_status.dart';
 import '../screens/product_form_screen.dart';
 
 /// A widget that displays a product card for adding to an order
-class AddOrderProduct extends StatelessWidget {
+class AddOrderProduct extends StatefulWidget {
   final ProductEntity product;
   final ProductFormMode? isEditMode;
   final OrdersEntity? ordersEntity;
@@ -23,12 +23,29 @@ class AddOrderProduct extends StatelessWidget {
           'در حالت edit باید ordersEntity مقدار داشته باشد',
         );
 
+  @override
+  State<AddOrderProduct> createState() => _AddOrderProductState();
+}
+
+class _AddOrderProductState extends State<AddOrderProduct> {
+
   bool isPurchasedPCalculated = false;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    print('widget.isEditMode');
+    print(widget.isEditMode);
+
+
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(product.name);
-    print(product.childes);
+    print(widget.product.name);
+    print(widget.product.childes);
 
     final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
@@ -44,14 +61,14 @@ class AddOrderProduct extends StatelessWidget {
         child: Column(
           children: [
             _buildProductInfo(context, size, theme),
-            if (product.childes!.isEmpty) const Divider(),
+            if (widget.product.childes!.isEmpty) const Divider(),
             Container(
                 alignment: Alignment.center,
-                height: product.childes!.isEmpty
+                height: widget.product.childes!.isEmpty
                     ? AppConfig.calHeight(context, 5)
                     : AppConfig.calHeight(context, 5),
                 child: _buildProductControls(context, size, theme)),
-            if (product.childes!.isNotEmpty)
+            if (widget.product.childes!.isNotEmpty)
               Column(
                 children: [
                   const Divider(),
@@ -67,14 +84,14 @@ class AddOrderProduct extends StatelessWidget {
                   ),
                   Container(
                       alignment: Alignment.center,
-                      height: product.childes!.isEmpty
+                      height: widget.product.childes!.isEmpty
                           ? AppConfig.calHeight(context, 5)
                           : AppConfig.calHeight(context, 12),
                       child: ListView.builder(
                         itemBuilder: (context, index) => _buildProductControls(
                             context, size, theme,
                             isChild: true, index: index),
-                        itemCount: product.childes!.length,
+                        itemCount: widget.product.childes!.length,
                       )),
                 ],
               ),
@@ -110,7 +127,7 @@ class AddOrderProduct extends StatelessWidget {
         builder: (context, constraints) {
           final fontSize = _calculateFontSize(constraints.maxWidth);
           return AutoSizeText(
-            '${product.name}${product.id}',
+            '${widget.product.name}${widget.product.id}',
             style: TextStyle(
                 fontSize: AppConfig.calWidth(context, 3), color: Colors.black),
             maxLines: 1,
@@ -128,8 +145,8 @@ class AddOrderProduct extends StatelessWidget {
       margin: EdgeInsets.only(left: AppConfig.calWidth(context, 6)),
       width: size.width * 0.17,
       height: size.height * 0.07,
-      child: product.image!.isNotEmpty
-          ? Image.network(product.image.toString())
+      child: widget.product.image!.isNotEmpty
+          ? Image.network(widget.product.image.toString())
           : Image.asset('assets/images/index.png'),
     );
   }
@@ -154,7 +171,7 @@ class AddOrderProduct extends StatelessWidget {
                   height: AppConfig.calHeight(context, 4),
                   width: AppConfig.calWidth(context, 20),
                   child: AutoSizeText(
-                    product.childes![index].variable,
+                    widget.product.childes![index].variable,
                     style: TextStyle(
                         fontSize: AppConfig.calWidth(context, 3),
                         color: Colors.black),
@@ -169,8 +186,8 @@ class AddOrderProduct extends StatelessWidget {
                 width: AppConfig.calWidth(context, 20),
                 child: AutoSizeText(
                   isChild
-                      ? '${product.childes![index].price} تومان'
-                      : '${product.price} تومان',
+                      ? '${widget.product.childes![index].price} تومان'
+                      : '${widget.product.price} تومان',
                   style: TextStyle(
                       fontSize: AppConfig.calWidth(context, 3),
                       color: Colors.black),
@@ -194,7 +211,7 @@ class AddOrderProduct extends StatelessWidget {
       listener: (context, state) {
         final status = state.addOrderCardProductStatus;
         if (status is AddOrderCardProductLoaded) {
-          onCartSelected(status.cart);
+          widget.onCartSelected(status.cart);
         }
       },
       builder: (context, state) {
@@ -209,27 +226,28 @@ class AddOrderProduct extends StatelessWidget {
               state.addOrderCardProductStatus as AddOrderCardProductLoaded;
           int count = 0;
           print('yes');
-          print(product.id);
+          print(widget.product.id);
 
           if (isChild) {
-            print(product.childes![index].id);
-            print(status.cart[product.childes![index].id]);
+            print('widget.product.childes![index].id');
+            print(widget.product.childes![index].id);
+            print(status.cart[widget.product.childes![index].id]);
             print(status.cart);
 
-            if (status.cart[product.childes![index].id] != 0) {
-              count = status.cart[product.childes![index].id] ?? 0;
+            if (status.cart[widget.product.childes![index].id] != 0) {
+              count = status.cart[widget.product.childes![index].id] ?? 0;
             }
             ProductEntity productChilde =
-                ProductEntity(id: product.childes![index].id);
+                ProductEntity(id: widget.product.childes![index].id);
             return count == 0
                 ? _buildAddButton(context, size, theme, isChild, index)
                 : _buildQuantitySelector(
                     context, size, theme, count, productChilde);
           } else {
-            count = status.cart[product.id] ?? 0;
+            count = status.cart[widget.product.id] ?? 0;
             return count == 0
                 ? _buildAddButton(context, size, theme, isChild, index)
-                : _buildQuantitySelector(context, size, theme, count, product);
+                : _buildQuantitySelector(context, size, theme, count, widget.product);
           }
         }
 
@@ -254,13 +272,13 @@ class AddOrderProduct extends StatelessWidget {
         onPressed: () {
           if (isChild) {
             ProductEntity productEntity = ProductEntity(
-              id: product.childes![index].id,
-              name: product.childes![index].name,
-              price: product.childes![index].price,
+              id: widget.product.childes![index].id,
+              name: widget.product.childes![index].name,
+              price: widget.product.childes![index].price,
             );
             context.read<AddOrderBloc>().add(AddOrderAddProduct(productEntity));
           } else {
-            context.read<AddOrderBloc>().add(AddOrderAddProduct(product));
+            context.read<AddOrderBloc>().add(AddOrderAddProduct(widget.product));
           }
         },
         child: Text(

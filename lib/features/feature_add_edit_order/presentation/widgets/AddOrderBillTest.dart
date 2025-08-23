@@ -79,7 +79,7 @@ class _AddorderbilltestState extends State<Addorderbilltest> {
       widget.textEditing[4].text = e.billing!.postcode;
       widget.textEditing[5].text = e.billing!.email.toString();
       widget.textEditing[6].text = e.billing!.phone;
-      widget.textEditing[7].text = e.paymentMethod!;
+      widget.textEditing[7].text = e.shippingPrice!;
     //  widget.textEditing[8].text = e.billing!.firstName;
     //  widget.textEditing[9].text = e.billing!.firstName;
 
@@ -335,6 +335,8 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
               value: selectedItem,
               onChanged: (value) {
                 setState(() {
+                  print('value');
+                  print(value);
                   selectedItem = value as String;
                   widget.onTextChange(value);
                 });
@@ -363,6 +365,9 @@ class ShipmentDropdownMenu extends StatefulWidget {
 }
 
 class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
+
+
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -371,9 +376,6 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
         ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue) // اگر خالی بود => null
         : widget.itemList!.first.methodTitle; // ✅
 
-    widget.onTextChange(selectedItem!);
-    print('selectedItem');
-    print(selectedItem);
     return SizedBox(
       width: width * 0.33,
       child: Column(children: [
@@ -422,6 +424,8 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
               value: selectedItem,
               onChanged: (value) {
                 setState(() {
+                  print('value');
+                  print(value);
                   selectedItem = value as String;
                   widget.onTextChange(value);
                 });
@@ -510,7 +514,9 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
                 value: selectedItem,
                 onChanged: (value) {
                   setState(() {
-                    selectedItem = value as String;
+                    print('value');
+                    print(value);
+                    selectedItem = value as String ;
                     widget.onTextChange(value);
                   });
                 }),

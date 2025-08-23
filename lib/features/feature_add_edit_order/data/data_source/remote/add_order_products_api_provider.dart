@@ -11,20 +11,20 @@ import '../../../../../core/params/orders_params.dart';
 import '../../../../../core/params/products_params.dart';
 import '../../../domain/entities/add_order_orders_entity.dart';
 
-class AddOrderProductsApiProvider{
+class AddOrderProductsApiProvider {
   final Dio _dio = Dio();
+
   Future<dynamic> GetOrderProducts(ProductsParams productsParams) async {
-    var response =await _dio.get(
+    var response = await _dio.get(
         //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
-       "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=23",
-       options: Options(headers: {'Authorization': StaticValues.passWord})
-    );
-   // print(response.statusCode);
+        "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=23",
+        options: Options(headers: {'Authorization': StaticValues.passWord}));
+    // print(response.statusCode);
     return response;
     //ریترن کرد تموم بقیش هیچی
   }
 
- /* Future<dynamic> GetOrderData(UserDataParams userDataParams) async {
+  /* Future<dynamic> GetOrderData(UserDataParams userDataParams) async {
     var response =await _dio.get(
       //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
         "${StaticValues.webService}/wp-json/shop-yar/login",
@@ -82,41 +82,39 @@ class AddOrderProductsApiProvider{
       return false;
     }
   }*/
-  Future SetOrder(AddOrderOrdersEntity order,webService,consumerKey,payType,shipType,String shipPrice) async {
+  Future SetOrder(AddOrderOrdersEntity order, webService, consumerKey, payType,
+      shipType, String shipPrice) async {
     bool connection = false;
     try {
       var prs = [];
-      for(var p in order.lineItems!){
-        /*print("p in wooconnect:");
-        print("p.productId:${p.productId}");
-        print("p.name:${p.name}");
-        print(p.quantity);
-        print(p.name);*/
-        //print("shipType:$shipType");
-        prs.add({"id":p.productId.toString(),"qty":p.quantity});
+      for (var p in order.lineItems!) {
+        prs.add({"id": p.productId.toString(), "qty": p.quantity});
       }
 
       var maap = {
-        "billing":order.billing,
+        "billing": order.billing,
         // "shipping":order.shipping,//age shipping nabashe billing ja shipping mizare
-        "products":prs,
-        "payment_method_id":payType,
-        "shipping_method_id":shipType,
-        "shipping_method_price":shipPrice,
+        "products": prs,
+        "payment_method_id": payType,
+        "shipping_method_id": shipType,
+        "shipping_method_price": shipPrice,
       };
-      if(order.shipping!.firstName.isNotEmpty && order.shipping!.city.isNotEmpty){
-        maap['shipping']=order.shipping;
+      if (order.shipping!.firstName.isNotEmpty &&
+          order.shipping!.city.isNotEmpty) {
+        maap['shipping'] = order.shipping;
       }
 
-      if(order.id != 0){
-        maap['order_id']=order.id;
+      if (order.id != 0) {
+        maap['order_id'] = order.id;
       }
       var url =
           "${StaticValues.webService}/wp-json/shop-yar/orders"; // final url
-      final response = await http.post(Uri.parse(url), headers: {
-        "Authorization": StaticValues.passWord,
-        "Content-Type": "application/json"
-      },body: json.encode(maap));
+      final response = await http.post(Uri.parse(url),
+          headers: {
+            "Authorization": StaticValues.passWord,
+            "Content-Type": "application/json"
+          },
+          body: json.encode(maap));
       print("statusCode:${response.statusCode}");
       if (response.statusCode == 200) {
         connection = true;
@@ -125,7 +123,6 @@ class AddOrderProductsApiProvider{
         print(json);
         return connection;
         // print(ordersFromJson(json));
-
       }
       return false;
     } catch (e) {
@@ -133,5 +130,4 @@ class AddOrderProductsApiProvider{
       return false;
     }
   }
-
 }

@@ -6,6 +6,7 @@ import 'package:shapyar_bloc/core/params/products_params.dart';
 import 'package:shapyar_bloc/core/params/selected_products-params.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_add_edit_order/domain/entities/add_order_orders_entity.dart';
+import 'package:shapyar_bloc/features/feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import '../../../../core/params/add_order_data_state.dart';
 import '../../../../core/params/home_user_data_params.dart';
 import '../../../../core/params/setOrderPArams.dart';
@@ -48,7 +49,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     on<LoadAddOrderProductsData>((event, emit) async {
       if(StaticValues.staticProducts.isEmpty){
         OrderDataState dataState = await getProductsUseCase(
-            ProductsParams(10,false,''));
+            ProductsParams('10',false,''));
 
         if (dataState is OrderDataSuccess) {
 
@@ -74,18 +75,36 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
 
 
     on<HydrateCartFromOrder>((event, emit) {
-      final Map<int, int> cart = {};
+      final cart = <int,int>{};
+      for (final li in event.order.lineItems ?? const <LineItem>[]) {
+        final id = (li.variationId == null || li.variationId == 0)
+            ? li.productId
+            : li.variationId!;
+        if (id != null && li.quantity != null) {
+          cart[id] = li.quantity!;
+        }
+      }
 
-      for (final li in event.order.lineItems ?? <LineItem>[]) {
-        cart[li.productId] = li.quantity;
-            }
+      // رفرنس‌های جدید بساز
+      final newCart = Map<int,int>.from(cart);
 
       emit(state.copyWith(
-        newAddOrderCardProductStatus: AddOrderCardProductLoaded(cart),
-        newAddOrderStatus: AddOrderProductsLoadedStatus(cart, {}),
-        // می‌تونی یه فلگ هم توی state نگه داری که یعنی hydrate شده
+        newCount: Map.unmodifiable(newCart),
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(Map.unmodifiable(newCart)),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(Map.unmodifiable(newCart), const {}),
       ));
     });
+
+    on<ClearCart>((event, emit) {
+      const empty = <int,int>{};
+
+      emit(state.copyWith(
+        newCount: const {},
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(const {}),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(const {}, const {}),
+      ));
+    });
+
 
 
     on<AddOrderAddProduct>((event, emit) async {
@@ -131,13 +150,8 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     });
 
     on<SetOrderEvent>((event, emit) async {
-      /*  AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-      state.addOrderStatus as AddOrderProductsLoadedStatus;
-      final loadedState = addOrderProductsLoadedStatus;
-      final cart = loadedState.cart;
-      print(cart);*/
-    /*  emit(state.copyWith(
-          newAddOrderStatus: AddOrderProductsLoadingStatus()));*/
+      emit(state.copyWith(
+          newAddOrderStatus: AddOrderLoadingStatus()));
       bool dataState = await addOrderSetOrderUseCase(event.setOrderParams);
       print(dataState);
       print(state);
@@ -161,7 +175,47 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       emit(state.copyWith(
           newCount: cart));
     });
+
+    Map<int, int> cartFromLineItems(List<LineItem> items) {
+      final cart = <int, int>{};
+      for (final li in items) {
+        final key = (li.variationId != null && li.variationId! > 0)
+            ? li.variationId!
+            : (li.productId ?? 0);
+        if (key == 0) continue;
+
+        final qty = li.quantity ?? 0;
+        if (qty <= 0) continue;
+
+        cart.update(key, (old) => old + qty, ifAbsent: () => qty);
+      }
+      return cart;
+    }
+
+
+  /*  on<addLineItemProducts>((event, emit) async {
+
+      if(event.productFormMode == ProductFormMode.create){
+        emit(state.copyWith(
+            newCount: {}));
+        return;
+      }else{
+        Map<int, int> makeCart = {};
+
+        for(final m in event.lineItem){
+          makeCart[m.id!.toInt()] = m.quantity;
+        }
+
+        emit(state.copyWith(
+            newCount: makeCart));
+        print('makeCart');
+        print(makeCart);
+      }
+
+    });*/
+
   }
+
 }/*List<TextEditingController> textEditing = [
   step1CustomerFNBill,
   step1CustomerLNBill,

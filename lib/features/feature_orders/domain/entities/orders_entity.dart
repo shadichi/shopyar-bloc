@@ -8,6 +8,7 @@ class OrdersEntity extends Equatable {
   final String? status;
   final String? total;
   final Ing? billing;
+  final String? shippingPrice;
   final Jalali? dateCreated;
   final Ing? shipping;
   final String? paymentMethod;
@@ -22,6 +23,7 @@ class OrdersEntity extends Equatable {
       this.total,
         this.dateCreated,
       this.billing,
+        this.shippingPrice,
       this.shipping,
       this.paymentMethod,
       this.paymentMethodTitle,
@@ -36,6 +38,7 @@ class OrdersEntity extends Equatable {
         status,
         total,
         billing,
+    shippingPrice,
         paymentMethod,
     dateCreated,
         shipping,

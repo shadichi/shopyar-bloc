@@ -37,4 +37,5 @@ class AddOrderState extends Equatable {
   @override
   // TODO: implement props
   List<Object?> get props => [addOrderStatus,addOrderCardProductStatus ,addOrderSetOrderStatus, count, isFirstTime];
+
 }

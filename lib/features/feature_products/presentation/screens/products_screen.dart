@@ -31,18 +31,19 @@ class ProductsScreen extends StatelessWidget {
     return BlocProvider<ProductsBloc>(
       create: (context) => ProductsBloc(locator(), locator()),
       child:
-          BlocConsumer<ProductsBloc, ProductsState>(
-            listener: (context, state){
-              if (state.productsStatus is ProductsSearchFailedStatus){
-                alertDialogScreen(context,'هیچ محصولی یافت نشد!',1,false);
-              }
-            },
-              builder: (context, state) {
+          BlocConsumer<ProductsBloc, ProductsState>(listener: (context, state) {
+            print('context.watch<ProductsBloc>().state');
+            print(context.watch<ProductsBloc>().state);
+        if (state.productsStatus is ProductsSearchFailedStatus) {
+          alertDialogScreen(context, 'هیچ محصولی یافت نشد!', 1, false);
+        }
+
+      }, builder: (context, state) {
         if (state.productsStatus is ProductsLoadingStatus) {
           print("OrdersLoadingStatus");
           context
               .read<ProductsBloc>()
-              .add(LoadProductsData(ProductsParams(10, false, '')));
+              .add(LoadProductsData(ProductsParams('10', false, '')));
 
           return Center(child: ProgressBar());
         }
@@ -52,34 +53,12 @@ class ProductsScreen extends StatelessWidget {
         if (state.productsStatus is pUserLoadedStatus) {
           context
               .read<ProductsBloc>()
-              .add(LoadProductsData(ProductsParams(10, false, '')));
+              .add(LoadProductsData(ProductsParams('10', false, '')));
         }
         if (state.productsStatus is ProductsErrorStatus) {
           return Text("خطا هنگام بارگذاری محصولات!");
         }
-    /*    if (state.productsStatus is ProductsSearchFailedStatus) {
-          return Container(
-              height: height,
-              width: width,alignment: Alignment.center,
-              child: Center(
-                  child: Container(//color: Colors.red,
-                    height: height*0.14,
-                    child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                    Text(
-                      "محصول مورد نظر پیدا نشد!",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    ElevatedButton(onPressed: (){
-                      StaticValues.staticProducts.clear();
-                      BlocProvider.of<ProductsBloc>(context).add(
-                          LoadProductsData(
-                              ProductsParams(10, false, '')));
-                    }, child: Text('بازگشت'))
-                                    ],
-                                  ),
-                  )));
-        }*/
+
         if (state.productsStatus is ProductsLoadedStatus) {
           final ProductsLoadedStatus productsLoadedStatus =
               state.productsStatus as ProductsLoadedStatus;
@@ -89,8 +68,9 @@ class ProductsScreen extends StatelessWidget {
               appBar: AppBar(
                 title: Text(
                   'همه محصولات',
-                  style:
-                      TextStyle(fontSize: AppConfig.calTitleFontSize(context), color: Colors.white),
+                  style: TextStyle(
+                      fontSize: AppConfig.calTitleFontSize(context),
+                      color: Colors.white),
                 ),
                 backgroundColor: AppConfig.background,
                 // Match app bar color with background
@@ -117,7 +97,7 @@ class ProductsScreen extends StatelessWidget {
                       print(String);
                       BlocProvider.of<ProductsBloc>(context).add(
                           LoadProductsData(
-                              ProductsParams(10, true, searchProduct.text)));
+                              ProductsParams('10', true, searchProduct.text)));
                       searchProduct.clear();
                     },
                   ),
@@ -133,15 +113,17 @@ class ProductsScreen extends StatelessWidget {
                     Center(
                       child: Container(
                         // color: Colors.red,
-                        height: height ,
+                        height: height,
                         width: width * 0.87,
                         child: ListView.builder(
                           // padding: EdgeInsets.all(10),
-                          itemCount: StaticValues.staticProducts
-                              .length + 1, // Number of items in the grid
+                          itemCount: StaticValues.staticProducts.length + 1,
+                          // Number of items in the grid
                           itemBuilder: (context, index) {
-                            return index == StaticValues.staticProducts
-                                .length?SizedBox(height: height*0.26,):Product(StaticValues.staticProducts[index]);
+                            if (index == StaticValues.staticProducts.length) {
+                              return Container(child: _LoadMoreButton(),);
+                            }
+                            return Product(StaticValues.staticProducts[index]);
                           },
                         ),
                       ),
@@ -152,6 +134,54 @@ class ProductsScreen extends StatelessWidget {
         }
         return Container();
       }),
+    );
+  }
+}
+
+class _LoadMoreButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<ProductsBloc>().state;
+    final isLoadingMore = state.isLoadingMore == true;
+
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: AppConfig.calWidth(context, 30),
+        right: AppConfig.calWidth(context, 8),
+        left: AppConfig.calWidth(context, 8),
+      ),
+      height: AppConfig.calHeight(context, 23),
+      child: ElevatedButton(
+        onPressed: isLoadingMore
+            ? (){print('fgggggggggggggggggggg');}
+            : () {
+          print('fgggggg');
+                final currentCount = StaticValues.staticProducts.length;
+                context.read<ProductsBloc>().add(
+                      LoadProductsData(ProductsParams(
+                          (currentCount + 10).toString(), false, '')),
+                    );
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppConfig.secondaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(width: 0.3, color: Colors.grey[300]!),
+          ),
+        ),
+        child: isLoadingMore
+            ? SizedBox(
+                child: ProgressBar(
+                size: 3,
+              ))
+            : Text(
+                "بارگیری بیشتر",
+                style: TextStyle(
+                  fontSize: AppConfig.calFontSize(context, 3.2),
+                  color: Colors.white,
+                ),
+              ),
+      ),
     );
   }
 }

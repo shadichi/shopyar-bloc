@@ -13,6 +13,15 @@ class HydrateCartFromOrder extends AddOrderEvent {
   HydrateCartFromOrder(this.order);
 }
 
+class ClearCart extends AddOrderEvent {}
+
+class ResetAddOrderScreen extends AddOrderEvent {
+  final bool isEdit;
+  final OrdersEntity? order;
+  ResetAddOrderScreen.create() : isEdit = false, order = null;
+  ResetAddOrderScreen.edit(this.order) : isEdit = true;
+}
+
 
 class AddOrderAddProduct  extends AddOrderEvent{
   final ProductEntity product;
@@ -38,7 +47,11 @@ class LoadSelectedProductCount extends AddOrderEvent {
 class addCurrentProducts extends AddOrderEvent {
   final ProductEntity product;
   final int count;
-  addCurrentProducts(this.product, this.count);
+  addCurrentProducts(this.product, this.count,);
+}
+class addLineItemProducts extends AddOrderEvent {
+  final List<LineItem> lineItem;
+  addLineItemProducts(this.lineItem);
 }
 
 
