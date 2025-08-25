@@ -22,13 +22,13 @@ class ProductRepositoryImpl extends ProductRepository{
       StaticValues.webService = webService.toString();
       StaticValues.passWord = passWord.toString();
       if(webService == null || passWord == null){
-        return ProductsParams('10',false,'');
+        return ProductsParams('10',false,'',false);
       }
 
-      return ProductsParams('10',false, '');
+      return ProductsParams('10',false, '',false);
     }
     else{
-      return ProductsParams('10',false, '');
+      return ProductsParams('10',false, '',false);
     }
 
   }
@@ -40,7 +40,12 @@ class ProductRepositoryImpl extends ProductRepository{
       Response response = await apiProvider.GetProducts(productsParams);
 
       //Response response = await apiProvider.GetOrders(ordersParams);
+
+
+
       if (response.statusCode == 200) {
+        print('response.statusCode');
+        print(response.statusCode);
         List<ProductEntity> productEntity = productsFromJson(response.data);
 
         return OrderDataSuccess(productEntity);

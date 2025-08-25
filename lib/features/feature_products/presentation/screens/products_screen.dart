@@ -15,127 +15,152 @@ import '../widgets/ending_product.dart';
 import '../widgets/variation_product.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   static const routeName = "/products_screen";
 
   ProductsScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProductsScreen> createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen>
+    with AutomaticKeepAliveClientMixin {
   TextEditingController searchProduct = TextEditingController();
+
   bool searchTemp = true;
+
+  bool _suppressNextSubmit = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    BlocProvider.of<ProductsBloc>(context)
+        .add(LoadProductsData(ProductsParams('10', false, '', false)));
+  }
 
   @override
   Widget build(BuildContext context) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    return BlocProvider<ProductsBloc>(
-      create: (context) => ProductsBloc(locator(), locator()),
-      child:
-          BlocConsumer<ProductsBloc, ProductsState>(listener: (context, state) {
-            print('context.watch<ProductsBloc>().state');
-            print(context.watch<ProductsBloc>().state);
-        if (state.productsStatus is ProductsSearchFailedStatus) {
-          alertDialogScreen(context, 'هیچ محصولی یافت نشد!', 1, false);
-        }
+    return BlocConsumer<ProductsBloc, ProductsState>(
+        listener: (context, state) {
+      if (state.productsStatus is ProductsSearchFailedStatus) {
+        alertDialogScreen(context, 'هیچ محصولی یافت نشد!', 1, false);
+      }
+    }, builder: (context, state) {
+      if (state.productsStatus is ProductsLoadingStatus) {
+        print("OrdersLoadingStatus");
+        /* context
+            .read<ProductsBloc>()
+            .add(LoadProductsData(ProductsParams('10', false, '')));
+*/
+        return Center(child: ProgressBar());
+      }
+      if (state.productsStatus is UserErrorStatus) {
+        return Text("خطا در بارگذاری اطلاعات یوزر!");
+      }
 
-      }, builder: (context, state) {
-        if (state.productsStatus is ProductsLoadingStatus) {
-          print("OrdersLoadingStatus");
-          context
-              .read<ProductsBloc>()
-              .add(LoadProductsData(ProductsParams('10', false, '')));
+      if (state.productsStatus is ProductsErrorStatus) {
+        return Text("خطا هنگام بارگذاری محصولات!");
+      }
 
-          return Center(child: ProgressBar());
-        }
-        if (state.productsStatus is UserErrorStatus) {
-          return Text("خطا در بارگذاری اطلاعات یوزر!");
-        }
-        if (state.productsStatus is pUserLoadedStatus) {
-          context
-              .read<ProductsBloc>()
-              .add(LoadProductsData(ProductsParams('10', false, '')));
-        }
-        if (state.productsStatus is ProductsErrorStatus) {
-          return Text("خطا هنگام بارگذاری محصولات!");
-        }
+      if (state.productsStatus is ProductsLoadedStatus) {
+        final ProductsLoadedStatus productsLoadedStatus =
+            state.productsStatus as ProductsLoadedStatus;
 
-        if (state.productsStatus is ProductsLoadedStatus) {
-          final ProductsLoadedStatus productsLoadedStatus =
-              state.productsStatus as ProductsLoadedStatus;
-
-          return Scaffold(
-              backgroundColor: AppConfig.background,
-              appBar: AppBar(
-                title: Text(
-                  'همه محصولات',
-                  style: TextStyle(
-                      fontSize: AppConfig.calTitleFontSize(context),
-                      color: Colors.white),
-                ),
-                backgroundColor: AppConfig.background,
-                // Match app bar color with background
-                elevation: 0.0,
-                actions: [
-                  AnimSearchBar(
-                    color: AppConfig.background,
-                    searchIconColor: Colors.white,
-                    width: width * 0.7,
-                    helpText: 'جستجو',
-                    style: TextStyle(fontSize: width * 0.04),
-                    textController: searchProduct,
-                    onSuffixTap: () {
-                      print('onSuffixTap');
-                      /* setState(() {
-                    textEditingController.clear();
-                  });*/
-                    },
-                    onSubmitted: (String) {
-                      if (String.isEmpty) {
-                        searchTemp = false;
-                        StaticValues.staticOrders.clear();
+        return Scaffold(
+            appBar: AppBar(
+              centerTitle: false,
+              automaticallyImplyLeading: false,
+              titleSpacing: 0,
+              title: Align(
+                alignment: Alignment.centerRight,
+                child:  Container(
+                  width: AppConfig.calWidth(context, 94),
+                  height:  AppConfig.calWidth(context, 9),
+                  padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
+                  child: SearchBar(
+                    backgroundColor:
+                    WidgetStateProperty.all(AppConfig.secondaryColor),
+                    leading: Icon(
+                      Icons.search,
+                      size: AppConfig.calWidth(context, 5),
+                    ),
+                    hintText: 'جستجو',textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white,fontSize: AppConfig.calFontSize(context, 3))),
+                    hintStyle: WidgetStateProperty.all(
+                        TextStyle(fontSize:  AppConfig.calFontSize(context, 3), color: Colors.white60)),
+                    onSubmitted: (query) {
+                      if (_suppressNextSubmit) {
+                        _suppressNextSubmit = false;
+                        return;
                       }
-                      print(String);
-                      BlocProvider.of<ProductsBloc>(context).add(
-                          LoadProductsData(
-                              ProductsParams('10', true, searchProduct.text)));
+                      if (query.trim().isEmpty) return;
+
+                      context.read<ProductsBloc>().add(
+                        LoadProductsData(
+                            ProductsParams('10', true, query, false)),
+                      );
+
+                      _suppressNextSubmit = true;
                       searchProduct.clear();
                     },
+
                   ),
-                ], // Remove shadow for a seamless look
-              ),
-              body: Container(
-                  child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: height * 0.01,
-                    ),
-                    Center(
-                      child: Container(
-                        // color: Colors.red,
-                        height: height,
-                        width: width * 0.87,
-                        child: ListView.builder(
-                          // padding: EdgeInsets.all(10),
-                          itemCount: StaticValues.staticProducts.length + 1,
-                          // Number of items in the grid
-                          itemBuilder: (context, index) {
-                            if (index == StaticValues.staticProducts.length) {
-                              return Container(child: _LoadMoreButton(),);
-                            }
-                            return Product(StaticValues.staticProducts[index]);
-                          },
-                        ),
-                      ),
-                    )
-                  ],
                 ),
-              )));
-        }
-        return Container();
-      }),
-    );
+              ),
+            ),
+            body: Center(
+              child: StaticValues.staticProducts.isEmpty
+                  ? Container(
+                      color: AppConfig.background,
+                      child: Center(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
+                              context, 4),
+                            children: [
+                              Text('محصولی یافت نشد!',
+                                                      style: TextStyle(
+                                color: Colors.white,
+                                fontSize: AppConfig.calFontSize(context, 3)),
+                                                    ),
+                              IconButton(onPressed: (){
+                                BlocProvider.of<ProductsBloc>(context)
+                                    .add(LoadProductsData(ProductsParams('10', false, '', false)));
+                              }, icon:   Icon(Icons.refresh,color: Colors.white,size: AppConfig.calWidth(context, 6),))
+
+                            ],
+                          )),
+                    )
+                  : SizedBox(
+                      // color: Colors.red,
+                      height: height,
+                      //  width: width * 0.87,
+                      child: ListView.builder(
+                        // padding: EdgeInsets.all(10),
+                        itemCount: StaticValues.staticProducts.length + 1,
+                        // Number of items in the grid
+                        itemBuilder: (context, index) {
+                          if (index == StaticValues.staticProducts.length) {
+                            //,child: _LoadMoreButton()
+                            return Container(
+                                height: AppConfig.calHeight(context, 21),
+                                child: _LoadMoreButton());
+                          }
+                          return Product(StaticValues.staticProducts[index]);
+                        },
+                      ),
+                    ),
+            ));
+      }
+      return Container();
+    });
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class _LoadMoreButton extends StatelessWidget {
@@ -146,20 +171,26 @@ class _LoadMoreButton extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        bottom: AppConfig.calWidth(context, 30),
-        right: AppConfig.calWidth(context, 8),
-        left: AppConfig.calWidth(context, 8),
+        bottom: AppConfig.calWidth(context, 24),
+        right: AppConfig.calWidth(context, 3),
+        left: AppConfig.calWidth(context, 3),
       ),
-      height: AppConfig.calHeight(context, 23),
+      margin: EdgeInsets.only(
+        top: AppConfig.calWidth(context, 1.2),
+      ),
+      height: AppConfig.calHeight(context, 10),
       child: ElevatedButton(
         onPressed: isLoadingMore
-            ? (){print('fgggggggggggggggggggg');}
+            ? () {
+                print('fgggggggggggggggggggg');
+              }
             : () {
-          print('fgggggg');
+                print('fgggggg');
                 final currentCount = StaticValues.staticProducts.length;
+                print(currentCount);
                 context.read<ProductsBloc>().add(
                       LoadProductsData(ProductsParams(
-                          (currentCount + 10).toString(), false, '')),
+                          (currentCount + 10).toString(), false, '', true)),
                     );
               },
         style: ElevatedButton.styleFrom(

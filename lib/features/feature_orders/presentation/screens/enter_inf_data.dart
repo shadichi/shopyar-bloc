@@ -69,14 +69,11 @@ class _EnterInfDataState extends State<EnterInfData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.background,
       appBar: AppBar(
         title: Text(
           "ثبت اطلاعات برچسب پستی",
           style: TextStyle(color: Colors.white,fontSize: AppConfig.calTitleFontSize(context)),
         ),
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: AppConfig.background,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

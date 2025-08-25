@@ -63,7 +63,6 @@ class _LogInScreenState extends State<LogInScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        backgroundColor: AppConfig.background,
         body: BlocListener<LogInBloc, LogInState>(
           listener: (context, state) {
             final status = state.logInStatus;

@@ -22,13 +22,51 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       : super(ProductsState(productsStatus: ProductsLoadingStatus(), isLoadingMore: false)) {
 
     on<LoadProductsData>((event, emit) async {
-      if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch) {
+      final isInitial = StaticValues.staticOrders.isEmpty && !event.productsParams.isLoadMore;
+
+      if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch || event.productsParams.isLoadMore) {
         print('1');
 
         if (event.productsParams.isSearch) {
           StaticValues.staticProducts.clear();
           emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
         }
+
+        if (event.productsParams.isLoadMore) {
+          emit(state.copyWith(newIsLoadingMore: true));
+        } else if (isInitial) {
+          emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
+        }
+
+        try{
+          String perPage = '10';
+          if (event.productsParams.productCount.isNotEmpty) perPage = event.productsParams.productCount;
+          final dataState = await getProductsUseCase(event.productsParams);
+          if (dataState is OrderDataSuccess) {
+            final fetched = dataState.data!.cast<ProductEntity>();
+
+            if (event.productsParams.isLoadMore && StaticValues.staticProducts.isNotEmpty){
+              StaticValues.staticProducts = fetched;
+            }else{
+              StaticValues.staticProducts = fetched;
+            }
+            emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
+
+
+
+          }else{
+            emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
+          }
+
+        }catch(e){
+          emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
+        } finally {
+          // 👇 حتماً خاموش کن تا دکمه از لودینگ خارج شه
+          if (event.productsParams.isLoadMore) {
+            emit(state.copyWith(newIsLoadingMore: false));
+          }
+        }
+/*
 
         if (StaticValues.webService == '' || StaticValues.passWord == '') {
           final prefs = await SharedPreferences.getInstance();
@@ -59,8 +97,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         }
       } else {
         emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
-      }
-    });
+      */
+    }});
 
 
 

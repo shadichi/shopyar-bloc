@@ -1,3 +1,6 @@
+
+import 'dart:math' as math;
+import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -28,6 +31,19 @@ class BarChartSample4State extends State<Chart> {
 
   List<double> result = [];
 
+  final double kZeroBarHeight = 0.08;
+
+  double _niceStep(double maxY) {
+    if (maxY <= 5) return 1;
+    final exp = (math.log(maxY) / math.ln10).floor();
+    for (final base in [1, 2, 5]) {
+      final step = base * math.pow(10, exp - 1);
+      if (maxY / step <= 8) return step.toDouble();
+    }
+    return math.pow(10, exp - 1).toDouble();
+  }
+
+  final _faFmt = NumberFormat.decimalPattern('fa');
 
 
   List<String> getLastSevenDays() {
@@ -50,10 +66,8 @@ class BarChartSample4State extends State<Chart> {
       'جمعه'
     ];
 
-    // مپ خالی برای روزهای هفته
     Map<String, double> weekdayCounts = {for (var day in weekdays) day: 0.08};
 
-    // پر کردن مپ با داده‌ها
     counts.forEach((dateString, count) {
       List<String> parts = dateString.split('-');
       DateTime gDate = DateTime(
@@ -66,7 +80,6 @@ class BarChartSample4State extends State<Chart> {
       weekdayCounts[weekdayName] = count.toDouble();
     });
 
-    // تبدیل به لیست فقط تعدادها به ترتیب شنبه تا جمعه
     return weekdays.map((day) => weekdayCounts[day] ?? 0.08).toList();
   }
 
@@ -95,20 +108,17 @@ class BarChartSample4State extends State<Chart> {
     final counts = StaticValues.staticHomeDataEntity!.weeklyCounts;
 
      result = getWeeklyCountsList(counts!);
-    print(result); // [0, 1, 0, 0, 4, 0, 0]
+    print(result);
   }
 
 
   List<String> getLastWeekPersianDates(List<DateTime> dateTime) {
 
-    final now = DateTime.now(); // Get current Gregorian date
-   // final jalaliNow = Jalali.fromDateTime(dateTime); // Convert to Jalali
+    final now = DateTime.now();
     final dates = <String>[];
 
     for (int i = dateTime.length; i >= 0; i--) {
-      // Subtract days from Gregorian date first
       final gregorianDate = dateTime[i].subtract(Duration(days: i));
-      // Then convert to Jalali
       final jalaliDate = Jalali.fromDateTime(gregorianDate);
       dates.add('${jalaliDate.year}/${jalaliDate.month.toString().padLeft(2, '0')}/${jalaliDate.day.toString().padLeft(2, '0')}');
     }
@@ -235,6 +245,23 @@ class BarChartSample4State extends State<Chart> {
   }
   @override
   Widget build(BuildContext context) {
+    // result = لیست واقعی شمارش‌ها (صفرها واقعا 0.0 باشن)
+    final rawMax = result.isEmpty ? 0.0 : result.reduce(math.max);
+    final allZero = rawMax == 0.0;
+
+    // اگه همه صفرن: یه ماکس رندوم ثابت روزانه بساز (برای ثبات در رندرها)
+    final int daySeed = DateTime.now().difference(DateTime(1970,1,1)).inDays;
+    final double fallbackMaxY = 5 + math.Random(daySeed).nextInt(8).toDouble(); // 5..12
+
+    // محور Y و فاصله تیک‌ها
+    final double axisMaxY = allZero
+        ? fallbackMaxY
+        : (rawMax * 1.2).ceilToDouble(); // کمی حاشیه بالای بیشینه واقعی
+
+    final double interval = allZero
+        ? (fallbackMaxY / 5).ceilToDouble().clamp(1, double.infinity)
+        : _niceStep(rawMax);
+
     return AspectRatio(
       aspectRatio: 1.66,
       child: LayoutBuilder(
@@ -260,7 +287,12 @@ class BarChartSample4State extends State<Chart> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 40,
-                    getTitlesWidget: leftTitles,
+                    interval: interval,
+                    getTitlesWidget: (v, m) {
+                      // اگر همه صفرن، فقط 0 و چند تیک تمیز نشون بده
+                      if (allZero && v < 0) return const SizedBox.shrink();
+                      return leftTitles(v, m);
+                    },
                   ),
                 ),
                 topTitles: const AxisTitles(
@@ -272,10 +304,10 @@ class BarChartSample4State extends State<Chart> {
               ),
               gridData: FlGridData(
                 show: true,
-                checkToShowHorizontalLine: (value) => value % 10 == 0,
-                getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.white,
-                  strokeWidth: 0.25,
+                checkToShowHorizontalLine: (v) => v % interval == 0,
+                getDrawingHorizontalLine: (v) => FlLine(
+                  color: allZero ? Colors.white12 : Colors.white24,
+                  strokeWidth: 0.5,
                 ),
                 drawVerticalLine: false,
               ),
@@ -283,7 +315,31 @@ class BarChartSample4State extends State<Chart> {
                 show: false,
               ),
               groupsSpace: barsSpace,
-              barGroups: getData(barsWidth, barsSpace, result, color),
+              barGroups: List.generate(7, (i) {
+                final yRaw = (i < result.length) ? result[i] : 0.0;
+                final yVisual = (yRaw == 0.0) ? kZeroBarHeight : yRaw;
+
+                return BarChartGroupData(
+                  x: i,
+                  barsSpace: barsSpace,
+                  barRods: [
+                    BarChartRodData(
+                      toY: yVisual,
+                      width: barsWidth,
+                      color: yRaw == 0.0
+                          ? AppConfig.piChartSection3.withOpacity(0.55) // رنگ نرم‌تر برای صفرها
+                          : color[i],
+                      borderRadius: BorderRadius.zero,
+                      // اختیاری: بک‌گراند برای زیبایی
+                      backDrawRodData: BackgroundBarChartRodData(
+                        show: !allZero, // وقتی همه صفرن، شاید نخواهی پس‌زمینه باشه
+                        toY: axisMaxY,
+                        color: Colors.white10,
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
           );
         },

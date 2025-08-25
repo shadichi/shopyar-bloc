@@ -59,18 +59,9 @@ class _HomeScreenState extends State<HomeScreen> {
         return Center(child: ProgressBar());
       }
       if (state.homeStatus is HomeLoadedStatus) {
-        /*  final UserLoadedStatus userLoadedStatus =
-            state.homeStatus as UserLoadedStatus;
-        final UserDataParams homeUserDataParams =
-            userLoadedStatus.homeUserDataParams;*/
-        // context.read<HomeBloc>().add(LoadOrdersData(OrdersParams(10,"shop-yar.ir/wp-json/shop-yar","10",""), ));
         return Scaffold(
-          backgroundColor: AppConfig.background,
           drawer: HomeDrawer(),
           appBar: AppBar(
-            iconTheme: IconThemeData(color: Colors.white),
-            backgroundColor: AppConfig.background,
-            //centerTitle: false,
             titleSpacing: 0.0,
             actions: [
               Container(
@@ -127,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 StaticValues.staticHomeDataEntity!.statusCounts!.wcOnHold == 0&&
                 StaticValues.staticHomeDataEntity!.statusCounts!.wcPending == 0&&
                 StaticValues.staticHomeDataEntity!.statusCounts!.wcProcessing == 0&&
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcRefunded == 0
+                StaticValues.staticHomeDataEntity!.statusCounts!.wcCancelled == 0
                 ?  Center(
                 child: Container(
                   height: AppConfig.calHeight(context, 30),alignment: Alignment.center,
@@ -148,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     StaticValues
                         .staticHomeDataEntity!.statusCounts!.wcProcessing,
                     StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcRefunded
+                        .staticHomeDataEntity!.statusCounts!.wcCancelled
                   ],
                 ),
 
@@ -172,11 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               topLeft: Radius.circular(width * 0.07),
                               topRight: Radius.circular(width * 0.07))),
                       child: Chart(StaticValues.staticHomeDataEntity),
-                      /* child: Card(
-                        child: Chart(),
-                        elevation: 8,
-                        color: Colors.white,
-                      ),*/
+
                     ),
                     SizedBox(
                       height: height * 0.08,
@@ -208,19 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
 */
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
-
-        /*     final OrdersLoadedStatus ordersLoadedStatus = state.homeStatus as OrdersLoadedStatus;
-       final List<OrdersEntity>? ordersEntity =
-            ordersLoadedStatus.orderDataState;
-        ordersLoadedStatus.OrdersEntity..
-
-        print("test");
-        print(loginEntity![0]);*/
-        /*final HomeUserDataParams homeUserDataParams =
-            userLoadedStatus.homeUserDataParams;*/
         return Scaffold(
-          // appBar: AppBar(title: Text(homeUserDataParams.userName)),
-          // backgroundColor: Colors.red,
+
           body: Container(
             height: height,
             width: width,

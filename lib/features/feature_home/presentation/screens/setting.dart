@@ -76,12 +76,7 @@ class _SettingPageState extends State<SettingPage> {
                 fontSize: AppConfig.calFontSize(context, 4),
                 color: Colors.white),
           ),
-          backgroundColor: AppConfig.background,
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
         ),
-        backgroundColor: AppConfig.background,
         body: FutureBuilder(future: getFactorData(), builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
           if(snapshot.hasData){
             return Stack(

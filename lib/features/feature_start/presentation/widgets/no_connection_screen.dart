@@ -7,12 +7,13 @@ class NoConnectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    return Container(child: Container(
+    return Container(width: width,height: height,color: Colors.blueGrey,child: Container(
+      width: width*0.7,height: height*0.5,
       child: Column(
         children: [
           Text("لطفا اتصال اینترنت خود را بررسی کنید"),
         ],
-      ),width: width*0.7,height: height*0.5,
-    ),width: width,height: height,color: Colors.blueGrey,);
+      ),
+    ),);
   }
 }

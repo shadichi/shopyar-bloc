@@ -51,7 +51,7 @@ class _MainWrapperState extends State<MainWrapper> {
                   child: IgnorePointer(
                     ignoring: drawerOpen,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                      padding:  EdgeInsets.symmetric(horizontal: AppConfig.calWidth(context, 10), vertical:  AppConfig.calWidth(context, 2)),
                       child: MyBottomNavigationBar(
                         onChange: (index) {
                           pageController.animateToPage(

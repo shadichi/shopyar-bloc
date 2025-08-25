@@ -14,7 +14,7 @@ import '../../data/models/add_order_orders_model.dart';
 import '../../domain/entities/add_order_orders_entity.dart';
 import '../bloc/add_order_bloc.dart';
 import '../bloc/add_order_status.dart';
-import '../widgets/AddOrderBillTest.dart';
+import '../widgets/add_order_bill.dart';
 import '../widgets/add_order_product.dart';
 
 enum ProductFormMode {
@@ -281,10 +281,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
         }
 
         return Scaffold(
-          backgroundColor: AppConfig.background,
           appBar: AppBar(
-            backgroundColor: AppConfig.background,
-            iconTheme: const IconThemeData(color: Colors.white),
             title: Text(
               widget.mode == ProductFormMode.create
                   ? 'ایجاد سفارش جدید'
@@ -311,7 +308,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
   ) {
     switch (activeStep) {
       case 0:
-        return Addorderbilltest(paymentMethod, shipmentMethod, onTextChange,
+        return AddOrderBill(paymentMethod, shipmentMethod, onTextChange,
             _formKey, textEditing, isEditMode,
             ordersEntity: ordersEntity);
       case 1:

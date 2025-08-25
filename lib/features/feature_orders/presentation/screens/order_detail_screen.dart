@@ -37,30 +37,11 @@ class OrderDetailScreen extends StatelessWidget {
         "";
 
     return Scaffold(
-      backgroundColor: AppConfig.white,
-     /* floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          //  Navigator.pushNamed(context,AddOrder.routeName);
-        },
-        backgroundColor: Color(0xff0A369D),
-        child: IconButton(
-          icon: Icon(
-            Icons.picture_as_pdf,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            //  Navigator.pushNamed(context,HomeScreen.routeName);
-          }, //productsLoadedStatus.productsDataState![0].name.toString()
-        ),
-      ),*/
       appBar: AppBar(
         title: Text(
           'سفارش ${ordersData.id}',
           style: TextStyle(fontSize: AppConfig.calTitleFontSize(context),color: AppConfig.white),
         ),
-        backgroundColor: AppConfig.background,
-        // Match app bar color with background
-        elevation: 0.0,
         leading: IconButton(
           icon: const Icon(Icons.menu,color: AppConfig.white),
           onPressed: () {
@@ -338,7 +319,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),
                               Text(
-                                ordersData.shippingLines![0].methodTitle
+                                ordersData.shippingLines!.isEmpty?'':  ordersData.shippingLines![0].methodTitle
                                     .toString(),
                                 style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),

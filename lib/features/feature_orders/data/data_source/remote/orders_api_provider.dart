@@ -22,12 +22,7 @@ class OrdersApiProvider{
   }
   Future<dynamic> GetOrders(OrdersParams ordersParams) async {
 
-    print('ordersParams.status');
-    print(ordersParams.status);
-    print(ordersParams.perPage);
-
     var response =await _dio.get(
-        //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
        "${StaticValues.webService}/wp-json/shop-yar/orders?per_page=${ordersParams.perPage}&status=${ordersParams.status}&search=${ordersParams.search}",
         options: Options(headers: {
           "Authorization":StaticValues.passWord

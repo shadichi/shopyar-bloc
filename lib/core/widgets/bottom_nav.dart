@@ -18,12 +18,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   late int activePage;
 
   final List<String> items = [
-    'assets/images/icons/product-screen.svg',
-    'assets/images/icons/home-screen.svg',
     'assets/images/icons/order-screen.svg',
-    'assets/images/icons/product-screen-selected.svg',
-    'assets/images/icons/home-screen-selected.svg',
+    'assets/images/icons/home-screen.svg',
+    'assets/images/icons/product-screen.svg',
     'assets/images/icons/order-screen-selected.svg',
+    'assets/images/icons/home-screen-selected.svg',
+    'assets/images/icons/product-screen-selected.svg',
   ];
 
   int selectedIndex = 1;
@@ -38,6 +38,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   void didUpdateWidget(MyBottomNavigationBar oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
+
+  final labels = ['سفارشات', 'داشبورد', 'محصولات'];
 
   @override
   Widget build(BuildContext context) {
@@ -55,39 +57,65 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
           border:
               Border.all(color: AppConfig.borderColor, width: 0.4) // Rounded corners
           ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(3, (index) {
-              bool isSelected = index == selectedIndex;
-              return AnimatedContainer(
-                duration: Duration(milliseconds: 250),
-                curve: Curves.easeIn,
-                height: isSelected ? width * 0.065 : width * 0.055,
-                width: width * 0.2,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedIndex = index;
-                    });
-                    widget.onChange?.call(index);
-                  },
-                  child: SvgPicture.asset(
-                    isSelected?items[index+3]:items[index],
-                    /*   colorFilter: ColorFilter.mode(
-                          activePage == itemIndex
-                              ? const Color.fromRGBO(94, 96, 89, 1)
-                              : AppColors.cardBackground,
-                          // Color based on active state
-                          BlendMode.srcIn,
-                        ),*/
-                    // Icon width
+      child:
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(3, (index) {
+          final isSelected = index == selectedIndex;
+
+          return InkWell(
+            borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)),
+            onTap: () {
+              setState(() => selectedIndex = index);
+              widget.onChange?.call(index);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // ICON: fixed slot width + centered
+                Container(
+                  width: AppConfig.calWidth(context, 20), //
+                  height: AppConfig.calHeight(context, 3),
+                  child: Center(
+                    child: AnimatedScale(
+                      scale: isSelected ? 1.15 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: SvgPicture.asset(
+                        isSelected ? items[index + 3] : items[index],
+                        width: AppConfig.calWidth(context, 20),
+                        height: AppConfig.calWidth(context, 20),
+                        alignment: Alignment.center, // extra safety
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
                   ),
                 ),
-              );
-            })),
-      ),
+
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  transitionBuilder: (child, anim) =>
+                      SizeTransition(sizeFactor: anim, axisAlignment: -1, child: child),
+                  child: isSelected
+                      ? Container(
+                    padding: EdgeInsets.only(top: AppConfig.calWidth(context, 2)),
+                        width: AppConfig.calWidth(context, 20), //
+                        child: Text(
+                          labels[index],
+                          key: ValueKey(index),
+                          textAlign: TextAlign.center,
+                          style:  TextStyle(fontSize: AppConfig.calFontSize(context, 2.4), fontWeight: FontWeight.w600, color: isSelected?AppConfig.firstLinearColor:Colors.white),
+                        ),
+                      )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          );
+        }),
+      )
+
+
     );
   }
 }

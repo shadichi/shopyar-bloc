@@ -25,10 +25,10 @@ class MiddleCard extends StatelessWidget {
         children: [
           Expanded(
               child: Container(
-                padding: EdgeInsets.all(width*0.03),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                padding: EdgeInsets.all(width*0.02),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start,spacing: AppConfig.calWidth(context, 0.5),
                   children: [
-                    Text('امروز',style: TextStyle(color: Colors.white),),
+                    Text('امروز',style: TextStyle(color: Colors.white, fontSize: width*0.04),),
                     Padding(
                       padding:  EdgeInsets.only(left: width*0.1),
                       child: Container(
@@ -49,10 +49,10 @@ class MiddleCard extends StatelessWidget {
               )),
           Expanded(
               child: Container(
-                padding: EdgeInsets.all(width*0.03),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                padding: EdgeInsets.all(width*0.02),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start,spacing: AppConfig.calWidth(context, 0.5),
                   children: [
-                    Text('ماهانه',style: TextStyle(color: Colors.white),),
+                    Text('ماهانه',style: TextStyle(color: Colors.white, fontSize: width*0.04),),
                     Padding(
                       padding:  EdgeInsets.only(left: width*0.1),
                       child:  Container(

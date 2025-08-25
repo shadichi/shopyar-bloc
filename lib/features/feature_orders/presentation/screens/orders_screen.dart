@@ -3,12 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/bloc/orders_bloc.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/order.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../../feature_add_edit_order/presentation/screens/product_form_screen.dart';
-import '../../../feature_add_edit_order/presentation/screens/add_order.dart';
 import '../bloc/orders_status.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 
@@ -21,9 +18,13 @@ class OrdersScreen extends StatefulWidget {
   State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveClientMixin{
+class _OrdersScreenState extends State<OrdersScreen>
+    with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
-  @override bool get wantKeepAlive => true;
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -49,8 +50,6 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
-
-
     return BlocConsumer<OrdersBloc, OrdersState>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -67,70 +66,62 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
           }
           if (state.ordersStatus is OrdersErrorStatus) {
             return Text("خطا در هنگام بارگیری سفارشات!");
-          }if (state.ordersStatus is OrdersLoadingStatus && StaticValues.staticOrders.isEmpty) {
+          }
+          if (state.ordersStatus is OrdersLoadingStatus &&
+              StaticValues.staticOrders.isEmpty) {
             return Center(child: ProgressBar());
           }
 
-
           if (state.ordersStatus is OrdersLoadedStatus) {
-
-            final isInitialLoading = state.ordersStatus is OrdersLoadingStatus
-                && StaticValues.staticOrders.isEmpty;
+            final isInitialLoading =
+                state.ordersStatus is OrdersLoadingStatus &&
+                    StaticValues.staticOrders.isEmpty;
 
             isLoadBtn = true;
-            print("this is");
             return Scaffold(
-              backgroundColor: AppConfig.background,
               appBar: AppBar(
-                title: Text(
-                  'همه سفارشات',
-                  style: TextStyle(
-                      fontSize: AppConfig.calTitleFontSize(context),
-                      color: Colors.white),
+                centerTitle: false,
+                automaticallyImplyLeading: false,
+                titleSpacing: 0,
+
+                title: Align(
+                  alignment: Alignment.centerRight, // stick to right
+                  child: Container(
+                    padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
+                    width: AppConfig.calWidth(context, 62),
+                    height: AppConfig.calWidth(context, 9),
+                    child: SearchBar(
+                      backgroundColor: MaterialStateProperty.all(AppConfig.secondaryColor),
+                      leading: Icon(Icons.search, size: AppConfig.calWidth(context, 5)),
+                      hintText: 'جستجو',
+                      textStyle: MaterialStateProperty.all(
+                        TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+                      ),
+                      hintStyle: MaterialStateProperty.all(
+                        TextStyle(fontSize: AppConfig.calFontSize(context, 3), color: Colors.white60),
+                      ),
+                      onSubmitted: (query) {
+                        if (query.isEmpty) {
+                          searchTemp = false;
+                          StaticValues.staticOrders.clear();
+                        }
+                        context.read<OrdersBloc>().add(LoadOrdersData(searchTemp, query, false, '', ''));
+                      },
+                    ),
+                  ),
                 ),
-                backgroundColor: AppConfig.background,
-                // Match app bar color with background
-                elevation: 0.0,
+
                 actions: [
-                  AnimSearchBar(
-                    color: AppConfig.background,
-                    searchIconColor: Colors.white,
-                    width: width * 0.7,
-                    helpText: 'جستجو',
-                    style: TextStyle(fontSize: width * 0.035),
-                    // کوچیک‌تر از قبل
-
-                    textController: textEditingController,
-                    onSuffixTap: () {
-                      print('onSuffixTap');
-                    },
-                    onSubmitted: (String) {
-                      if (String.isEmpty) {
-                        searchTemp = false;
-                        StaticValues.staticOrders.clear();
-                      }
-                      BlocProvider.of<OrdersBloc>(context).add(
-                        LoadOrdersData(searchTemp, String, false, '', ''),
-                      );
-                    },
-                  ),
-
                   IconButton(
-                    icon: Icon(Icons.filter_alt_outlined, color: Colors.white),
-                    onPressed: () {
-                      print(StaticValues.status);
-                      BlocProvider.of<OrdersBloc>(context)
-                          .add(ShowFilter(showFilter));
-                    },
+                    icon: const Icon(Icons.filter_alt_outlined, color: Colors.white),
+                    onPressed: () => context.read<OrdersBloc>().add(ShowFilter(showFilter)),
                   ),
                   IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductFormScreen.create()));
-                    },
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductFormScreen.create())),
                   ),
-
-                ], // Remove shadow for a seamless look
+                 // const SizedBox(width: 8),
+                ],
               ),
               body: Stack(
                 children: [
@@ -139,24 +130,42 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
                       await Future.delayed(const Duration(seconds: 2));
                       context.read<OrdersBloc>().add(RefreshOrdersData());
                     },
-                    child: StaticValues.staticOrders.isEmpty?Container(
+                    child: StaticValues.staticOrders.isEmpty
+                        ? Container(
                       color: AppConfig.background,
-                      child: Center(child: Text('سفارشی وجود ندارد!',style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),)),
-                    ):Container(
-                      color: AppConfig.background,
-                      child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: StaticValues.staticOrders.length + 1,
-                          itemBuilder: (context, item) {
-                            if (item == StaticValues.staticOrders.length) {
-                              return _LoadMoreButton();
-                            }
-                            return Order(
-                                ordersLoadedStatus:
-                                StaticValues.staticOrders[item],
-                                item: item);
-                          }),
-                    ),
+                      child: Center(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
+                              context, 4),
+                            children: [
+                              Text('سفارشی یافت نشد!',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: AppConfig.calFontSize(context, 3)),
+                              ),
+                              IconButton(onPressed: (){
+                                BlocProvider.of<OrdersBloc>(context)
+                                    .add(LoadOrdersData(false, '', false, '', ''));
+                              }, icon:   Icon(Icons.refresh,color: Colors.white,size: AppConfig.calWidth(context, 6),))
+
+                            ],
+                          )),
+                    )
+                        : Container(
+                            color: AppConfig.background,
+                            child: ListView.builder(
+                                controller: _scrollController,
+                                itemCount: StaticValues.staticOrders.length + 1,
+                                itemBuilder: (context, item) {
+                                  if (item ==
+                                      StaticValues.staticOrders.length) {
+                                    return _LoadMoreButton();
+                                  }
+                                  return Order(
+                                      ordersLoadedStatus:
+                                          StaticValues.staticOrders[item],
+                                      item: item);
+                                }),
+                          ),
                   ),
                   if (state.showFilter)
                     GestureDetector(
@@ -174,7 +183,7 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
                             child: Container(
                               padding: EdgeInsets.all(width * 0.06),
                               decoration: BoxDecoration(
-                                color: AppConfig.piChartSection3,
+                                color: Colors.white,
                                 borderRadius:
                                     BorderRadius.circular(width * 0.03),
                               ),
@@ -184,49 +193,69 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
                                 children: [
                                   Text("اعمال فیلتر",
                                       style: TextStyle(
-                                          fontSize: width * 0.05,
+                                          fontSize: AppConfig.calFontSize(context, 4),
                                           fontWeight: FontWeight.bold)),
                                   SizedBox(height: height * 0.06),
-                                  DropdownButtonFormField(
+                                  DropdownButtonFormField(dropdownColor: Colors.white,
                                     items: StaticValues.status.entries
                                         .map((entry) {
                                       return DropdownMenuItem(
                                           value: entry.key,
-                                          child: Text(entry.value));
+                                          child: Text(entry.value,style: TextStyle(fontSize: AppConfig.calFontSize(context, 3))));
                                     }).toList(),
                                     onChanged: (value) {
                                       selectedStatus = value!;
                                     },
                                     decoration: InputDecoration(
-                                        labelText: "وضعیت سفارش"),
+                                        labelText: "وضعیت سفارش",labelStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2))),
                                   ),
                                   SizedBox(height: height * 0.06),
-                                  DropdownButtonFormField(
+                                  DropdownButtonFormField(dropdownColor: Colors.white,
                                     items:
                                         ["5", "10", "20", "50"].map((status) {
                                       return DropdownMenuItem(
-                                          value: status, child: Text(status));
+                                          value: status, child: Text(status,style: TextStyle(fontSize: AppConfig.calFontSize(context, 3)),));
                                     }).toList(),
                                     onChanged: (value) {
                                       selectedCount = value!;
                                     },
                                     decoration: InputDecoration(
-                                        labelText: "تعداد سفارش"),
+                                        labelText: "تعداد سفارش",labelStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2))),
                                   ),
                                   SizedBox(height: height * 0.06),
-                                  Container(
+                                  SizedBox(
                                     width: width * 0.87,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
                                       children: [
-                                        Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              "پاک کردن فیلتر",
-                                              style: TextStyle(
-                                                  fontSize: width * 0.027),
-                                            )),
+                                        GestureDetector(
+                                          onTap: (){
+                                            BlocProvider.of<OrdersBloc>(
+                                                context)
+                                                .add(LoadOrdersData(
+                                                false,
+                                                '',
+                                                true,
+                                                '',
+                                              ''
+                                            ));
+                                            BlocProvider.of<OrdersBloc>(
+                                                context)
+                                                .add(ShowFilterOff(
+                                                showFilter));
+                                            selectedStatus = '';
+                                            selectedCount = '10';
+                                          },
+                                          child: Container(
+                                              alignment: Alignment.center,
+                                              height: AppConfig.calHeight(context, 05),
+                                              child: Text(
+                                                "پاک کردن فیلتر",
+                                                style: TextStyle(
+                                                    fontSize: AppConfig.calFontSize(context, 2.8)),
+                                              )),
+                                        ),
                                         SizedBox(
                                           width: width * 0.3,
                                           height: height * 0.06,
@@ -259,7 +288,7 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
                                             child: Text(
                                               "اعمال تغییرات",
                                               style: TextStyle(
-                                                  fontSize: width * 0.027,
+                                                  fontSize: AppConfig.calFontSize(context,2.8),
                                                   color: Colors.white),
                                             ),
                                           ),
@@ -282,6 +311,7 @@ class _OrdersScreenState extends State<OrdersScreen>  with AutomaticKeepAliveCli
         });
   }
 }
+
 class _LoadMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -299,36 +329,32 @@ class _LoadMoreButton extends StatelessWidget {
         onPressed: isLoadingMore
             ? null
             : () {
-          final currentCount = StaticValues.staticOrders.length;
-          context.read<OrdersBloc>().add(
-            LoadOrdersData(
-              false,
-              '',
-              false,
-              (currentCount + 10).toString(),
-              '',
-              isLoadMore: true,
-            ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppConfig.secondaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: BorderSide(width: 0.3, color: Colors.grey[300]!),
-          ),
-        ),
+                final currentCount = StaticValues.staticOrders.length;
+                context.read<OrdersBloc>().add(
+                      LoadOrdersData(
+                        false,
+                        '',
+                        false,
+                        (currentCount + 10).toString(),
+                        '',
+                        isLoadMore: true,
+                      ),
+                    );
+              },
+
         child: isLoadingMore
-            ? SizedBox(child: ProgressBar(size: 3,))
+            ? SizedBox(
+                child: ProgressBar(
+                size: 3,
+              ))
             : Text(
-          "بارگیری بیشتر",
-          style: TextStyle(
-            fontSize: AppConfig.calFontSize(context, 3.2),
-            color: Colors.white,
-          ),
-        ),
+                "بارگیری بیشتر",
+                style: TextStyle(
+                  fontSize: AppConfig.calFontSize(context, 3.2),
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
 }
-

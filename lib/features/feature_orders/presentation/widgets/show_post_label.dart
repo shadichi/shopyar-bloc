@@ -235,9 +235,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  AppConfig.background,
       appBar: AppBar(
-        backgroundColor:  AppConfig.background,
         title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.8)),),leading: IconButton(
         icon: Icon(Icons.arrow_back, color: AppConfig.white,),
           onPressed: () {

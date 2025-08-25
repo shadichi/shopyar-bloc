@@ -20,11 +20,11 @@ class ProductsApiProvider{
     //ریترن کرد تموم بقیش هیچی
   }*/
   Future<dynamic> GetProducts(ProductsParams productsParams) async {
-    print(StaticValues.webService);
-    print(StaticValues.passWord);
+    print('productsParams.search');
+    print(productsParams.search);
     try {
       var response = await _dio.get(
-        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}',
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}&search=${productsParams.search}',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
 
@@ -38,7 +38,7 @@ class ProductsApiProvider{
         print("محصولی یافت نشد");
         return Response(
             requestOptions: RequestOptions(path: ''),
-            statusCode: 404,
+            statusCode: 200,
             data: [] // لیست خالی، چون محصولی وجود ندارد
         );
       }

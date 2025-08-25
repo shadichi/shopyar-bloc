@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shapyar_bloc/core/config/app-colors.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
 import 'package:shapyar_bloc/features/feature_log_in/presentation/screens/log_in_screen.dart';
 import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
@@ -12,7 +13,6 @@ import 'features/feature_orders/presentation/screens/order_detail_screen.dart';
 import 'features/feature_orders/presentation/widgets/show_pdf.dart';
 import 'features/feature_orders/presentation/widgets/show_post_label.dart';
 import 'features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
-import 'features/feature_add_edit_order/presentation/screens/add_order.dart';
 import 'features/feature_home/presentation/bloc/home_bloc.dart';
 import 'features/feature_log_in/presentation/bloc/log_in_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,7 +24,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'locator.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
@@ -52,7 +52,28 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         //themeMode: ThemeMode.light,
-        theme: ThemeData(fontFamily: 'IRANSansWeb'),
+        theme: ThemeData(
+          useMaterial3: true,
+          fontFamily: 'IRANSansWeb',
+          appBarTheme: AppBarTheme(actionsPadding: EdgeInsets.only( left: AppConfig.calWidth(context, 2)),
+              color: AppConfig.background,
+              iconTheme: IconThemeData(
+                color: Colors.white,
+              )),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppConfig.firstLinearColor,
+            brightness: Brightness.light, // یا dark
+          ),
+          scaffoldBackgroundColor: AppConfig.background,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppConfig.calWidth(context, 2))),
+            backgroundColor: AppConfig.secondaryColor,
+            textStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 2)),
+          )),
+        ),
         initialRoute: "/",
         locale: const Locale("fa", ""),
         localizationsDelegates: const [
@@ -71,29 +92,25 @@ class MyApp extends StatelessWidget {
           LogInScreen.routeName: (context) => LogInScreen(),
           OrdersScreen.routeName: (context) => OrdersScreen(),
           ProductsScreen.routeName: (context) => ProductsScreen(),
-          AddOrder.routeName: (context) => AddOrder(),
           EnterInfData.routeName: (context) => EnterInfData(),
           PdfViewerScreen.routeName: (context) => PdfViewerScreen(),
           ShowPDF.routeName: (context) => ShowPDF(),
+        },
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case ProductFormScreen.createRoute:
+              return MaterialPageRoute(
+                builder: (_) => ProductFormScreen.create(),
+              );
 
-        },onGenerateRoute: (settings){
-        switch (settings.name) {
-          case ProductFormScreen.createRoute:
-            return MaterialPageRoute(
-              builder: (_) => ProductFormScreen.create(),
-            );
-
-          case ProductFormScreen.editRoute:
-            final entity = settings.arguments as OrdersEntity;
-            return MaterialPageRoute(
-              builder: (_) => ProductFormScreen.edit(ordersEntity: entity),
-            );
-        }
-      },
+            case ProductFormScreen.editRoute:
+              final entity = settings.arguments as OrdersEntity;
+              return MaterialPageRoute(
+                builder: (_) => ProductFormScreen.edit(ordersEntity: entity),
+              );
+          }
+        },
       ),
     );
   }
 }
-
-
-

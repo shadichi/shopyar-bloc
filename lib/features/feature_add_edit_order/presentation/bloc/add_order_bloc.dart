@@ -49,7 +49,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     on<LoadAddOrderProductsData>((event, emit) async {
       if(StaticValues.staticProducts.isEmpty){
         OrderDataState dataState = await getProductsUseCase(
-            ProductsParams('10',false,''));
+            ProductsParams('10',false,'',false));
 
         if (dataState is OrderDataSuccess) {
 
@@ -75,23 +75,16 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
 
 
     on<HydrateCartFromOrder>((event, emit) {
-      final cart = <int,int>{};
+      final cart = <int, int>{};
       for (final li in event.order.lineItems ?? const <LineItem>[]) {
-        final id = (li.variationId == null || li.variationId == 0)
-            ? li.productId
-            : li.variationId!;
-        if (id != null && li.quantity != null) {
-          cart[id] = li.quantity!;
-        }
+        final id = (li.variationId == null || li.variationId == 0) ? li.productId : li.variationId!;
+        if (id != null && li.quantity != null) cart[id] = li.quantity!;
       }
-
-      // رفرنس‌های جدید بساز
-      final newCart = Map<int,int>.from(cart);
-
+      final ro = Map<int, int>.unmodifiable(cart);
       emit(state.copyWith(
-        newCount: Map.unmodifiable(newCart),
-        newAddOrderCardProductStatus: AddOrderCardProductLoaded(Map.unmodifiable(newCart)),
-        newAddOrderStatus: AddOrderProductsLoadedStatus(Map.unmodifiable(newCart), const {}),
+        newCount: ro,
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(ro),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(ro, const {}),
       ));
     });
 
@@ -107,46 +100,49 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
 
 
 
-    on<AddOrderAddProduct>((event, emit) async {
+    on<AddOrderAddProduct>((event, emit) {
+      final loaded = state.addOrderStatus as AddOrderProductsLoadedStatus;
 
-      AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-      state.addOrderStatus as AddOrderProductsLoadedStatus;
-      final loadedState = addOrderProductsLoadedStatus;
-      final cart = loadedState.cart;
-      cart[event.product.id!.toInt()] =
-          (cart[event.product.id!.toInt()] ?? 0) + 1;
+      // ❗️به‌جای رفرنس مستقیم، کپی قابل‌تغییر بگیر
+      final cart = Map<int, int>.from(loaded.cart);
 
-      emit(
-          state.copyWith(newCount: cart));
-      emit(
-          state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
-      emit(
-          state.copyWith( newAddOrderCardProductStatus: AddOrderChooseLoadingStatus()));
+      final id = event.product.id!;
+      cart.update(id, (v) => v + 1, ifAbsent: () => 1);
+
+      // (اختیاری) استیت‌های لودینگ
+      emit(state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
+      emit(state.copyWith(newAddOrderCardProductStatus: AddOrderChooseLoadingStatus()));
+
+      // برای ثبات، همیشه نسخه غیرقابل‌تغییر به استیت بده
+      final ro = Map<int, int>.unmodifiable(cart);
       emit(state.copyWith(
-          newAddOrderCardProductStatus: AddOrderCardProductLoaded( cart),
-
-          newAddOrderStatus: AddOrderProductsLoadedStatus(cart, {})));
+        newCount: ro,
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(ro),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(ro, const {}),
+      ));
     });
 
-    on<DecreaseProductCount>((event, emit) async {
-      AddOrderProductsLoadedStatus addOrderProductsLoadedStatus =
-      state.addOrderStatus as AddOrderProductsLoadedStatus;
+    on<DecreaseProductCount>((event, emit) {
+      final loaded = state.addOrderStatus as AddOrderProductsLoadedStatus;
 
-      final loadedState = addOrderProductsLoadedStatus;
-      final cart = loadedState.cart;
+      // ❗️کپی قابل‌تغییر
+      final cart = Map<int, int>.from(loaded.cart);
 
-      if (cart[event.product.id!.toInt()] != null &&
-          cart[event.product.id!.toInt()]! > 0) {
-        cart[event.product.id!.toInt()] = cart[event.product.id!.toInt()]! - 1;
-        if(cart[event.product.id!.toInt()] == 0){
-          cart.remove(event.product.id!.toInt());
-        }
+      final id = event.product.id!;
+      final current = cart[id] ?? 0;
+      if (current > 1) {
+        cart[id] = current - 1;
+      } else {
+        cart.remove(id);
       }
-      emit(
-          state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
+
+      emit(state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
+
+      final ro = Map<int, int>.unmodifiable(cart);
       emit(state.copyWith(
-          newAddOrderCardProductStatus: AddOrderCardProductLoaded( cart),
-          newAddOrderStatus: AddOrderProductsLoadedStatus( cart, {})));
+        newAddOrderCardProductStatus: AddOrderCardProductLoaded(ro),
+        newAddOrderStatus: AddOrderProductsLoadedStatus(ro, const {}),
+      ));
     });
 
     on<SetOrderEvent>((event, emit) async {

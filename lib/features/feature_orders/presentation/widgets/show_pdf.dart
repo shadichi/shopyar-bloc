@@ -379,9 +379,7 @@ class _ShowPDFState extends State<ShowPDF> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConfig.background,
       appBar: AppBar(
-        backgroundColor: AppConfig.background,
         title: Text("فاکتور فروش",style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calTitleFontSize(context)),),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppConfig.white,),

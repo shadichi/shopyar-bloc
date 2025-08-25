@@ -78,9 +78,7 @@ class StatusCounts {
   final int wcOnHold;
   final int wcPending;
   final int wcProcessing;
-  final int wcRefunded;
   final int wcCancelled;
-  final int wcFailed;
   final int wcCheckoutDraft;
   final int trash;
 
@@ -89,9 +87,7 @@ class StatusCounts {
     required this.wcOnHold,
     required this.wcPending,
     required this.wcProcessing,
-    required this.wcRefunded,
     required this.wcCancelled,
-    required this.wcFailed,
     required this.wcCheckoutDraft,
     required this.trash,
   });
@@ -101,10 +97,8 @@ class StatusCounts {
     wcOnHold:        _asInt(json['wc-on-hold'])       ?? 0,
     wcPending:       _asInt(json['wc-pending'])       ?? 0,
     wcProcessing:    _asInt(json['wc-processing'])    ?? 0,
-    wcRefunded:      _asInt(json['wc-refunded'])      ?? 0,
     wcCancelled:     _asInt(json['wc-cancelled'])     ?? 0,
-    wcFailed:        _asInt(json['wc-failed'])        ?? 0,
-    wcCheckoutDraft: _asInt(json['wc-checkout-draft'])?? 0,
+    wcCheckoutDraft: _asInt(json['auto-draft'])?? 0,
     trash:           _asInt(json['trash'])            ?? 0,
   );
 
@@ -113,10 +107,8 @@ class StatusCounts {
     'wc-on-hold': wcOnHold,
     'wc-pending': wcPending,
     'wc-processing': wcProcessing,
-    'wc-refunded': wcRefunded,
     'wc-cancelled': wcCancelled,
-    'wc-failed': wcFailed,
-    'wc-checkout-draft': wcCheckoutDraft,
+    'auto-draft': wcCheckoutDraft,
     'trash': trash,
   };
 }
