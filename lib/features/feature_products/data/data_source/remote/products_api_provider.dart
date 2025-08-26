@@ -9,16 +9,7 @@ import '../../../../../core/resources/order_data_state.dart';
 
 class ProductsApiProvider{
   final Dio _dio = Dio();
-/*  Future<dynamic> GetReportData(ReportDataParams reportDataParams) async {
-    var response =await _dio.get(
-        'http://${reportDataParams.webService}/order-report?${reportDataParams.period}',
-        queryParameters: {//یعنی بعد از یوارال بالا یه علامت سوال بزن و اینارو ادامش بنویس
-          'Authorization': "${reportDataParams.key}",
-        }
-    );
-    return response;
-    //ریترن کرد تموم بقیش هیچی
-  }*/
+
   Future<dynamic> GetProducts(ProductsParams productsParams) async {
     print('productsParams.search');
     print(productsParams.search);
@@ -31,7 +22,7 @@ class ProductsApiProvider{
       if (response.statusCode == 200) {
         return response;
       } else {
-        return []; // در صورت کد نامعتبر، مقدار خالی برگردان
+        return [];
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
@@ -39,10 +30,10 @@ class ProductsApiProvider{
         return Response(
             requestOptions: RequestOptions(path: ''),
             statusCode: 200,
-            data: [] // لیست خالی، چون محصولی وجود ندارد
+            data: []
         );
       }
-      return []; // سایر خطاها
+      return [];
     }
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:shapyar_bloc/core/resources/data_state.dart';
+import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/entities/orders_entity.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/repository/home_repository.dart';
@@ -27,10 +28,13 @@ class HomeRepositoryImpl extends HomeRepository{
 
     if(webService != null && passWord != null){
       try {
-        final response = await homeApiProvider.GetMainData(
+        final response = await homeApiProvider.getMainData(
             WholeUserDataParams(webService,passWord));
 
         if (response.statusCode == 200) {
+
+          StaticValues.webService = webService;
+          StaticValues.passWord = passWord;
 
           jsonResponse = jsonDecode(response.body);
         } else {
@@ -47,48 +51,27 @@ class HomeRepositoryImpl extends HomeRepository{
     }
   }
 
-  @override
-  Future<OrderDataState<OrdersEntity>> getOrders(OrdersParams ordersParams) async{
-    try{
-      Response response = await homeApiProvider.GetOrders(ordersParams);
-
-      //Response response = await apiProvider.GetOrders(ordersParams);
-      if (response.statusCode == 200) {
-
-        List<OrdersEntity> ordersEntity = ordersFromJson(response.data);
-        print("yeeees");
-
-        return OrderDataSuccess(ordersEntity);
-      }else{
-        return const OrderDataFailed("Something Went Wrong. try again...");
-
-      }
-    }catch (e){
-      print(e.toString());
-      return const OrderDataFailed("please check your connection...");
-
-    }
-  }
 
   @override
   Future<DataState<HomeDataEntity>> getHomeData() async {
-
-    try {
-      final response = await homeApiProvider.GetHomeData();
-      if (response.statusCode == 200) {
-        // قبل از پارس، اینو بزن تا نوع‌ها رو ببینی:
-         print(response.data.runtimeType); // باید Map باشه
-        HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
-        return DataSuccess(homeDataEntity);
-      } else {
-        return DataFailed('error in getHomeUserData');
+    final prefs = await SharedPreferences.getInstance();
+    final webService = prefs.getString("webService");
+    final passWord = prefs.getString("passWord");
+    Map<String, dynamic> jsonResponse = {};
+    if(webService != null && passWord != null){
+      try {
+        final response = await homeApiProvider.getHomeData(WholeUserDataParams(webService, passWord));
+        if (response.statusCode == 200) {
+          HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
+          return DataSuccess(homeDataEntity);
+        } else {
+          return DataFailed('error in getHomeUserData');
+        }
+      } catch (e, st) {
+        return DataFailed('error in getHomeUserData:$e');
       }
-    } catch (e, st) {
-      print('eeeeedsddsee');
-      print(e);     // نوع خطا
-      print(st);    // استک ترِیس دقیق
-      return DataFailed('error in getHomeUserData:$e');
     }
+    return DataFailed('error in getHomeUserData: webservice and password are null');
 
 
 

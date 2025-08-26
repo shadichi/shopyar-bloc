@@ -26,7 +26,6 @@ class _LogInScreenState extends State<LogInScreen> {
   late final TextEditingController _webServiceController;
   late final TextEditingController _tokenController;
 
-
   @override
   void initState() {
     super.initState();
@@ -49,13 +48,13 @@ class _LogInScreenState extends State<LogInScreen> {
     }
 
     context.read<LogInBloc>().add(
-      DataLoginEvent(
-        WholeUserDataParams(
-          _webServiceController.text.trim(),
-          _tokenController.text.trim(),
-        ),
-      ),
-    );
+          DataLoginEvent(
+            WholeUserDataParams(
+              _webServiceController.text.trim(),
+              _tokenController.text.trim(),
+            ),
+          ),
+        );
   }
 
   @override
@@ -68,11 +67,20 @@ class _LogInScreenState extends State<LogInScreen> {
             final status = state.logInStatus;
 
             if (status is LoginErrorState) {
-              showSnack(context, "خطا: آدرس وب‌سرویس یا توکن نادرست است!", );
+              showSnack(
+                context,
+                "خطا: آدرس وب‌سرویس یا توکن نادرست است!",
+              );
             } else if (status is EmptyTextFieldsStatus) {
-              showSnack(context, "خطا: لطفاً فیلدهای خالی را تکمیل فرمایید!",);
+              showSnack(
+                context,
+                "خطا: لطفاً فیلدهای خالی را تکمیل فرمایید!",
+              );
             } else if (status is SharedPErrorState) {
-              showSnack(context, "خطا!",);
+              showSnack(
+                context,
+                "خطا!",
+              );
             } else if (status is UserDataLoadedStatus) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => MainWrapper()),
@@ -80,27 +88,27 @@ class _LogInScreenState extends State<LogInScreen> {
             }
           },
           child: SingleChildScrollView(
-           // padding: const EdgeInsets.symmetric(vertical: 16),
+            // padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               children: [
-                 header(context),
+                header(context),
                 SizedBox(height: AppConfig.calHeight(context, 4)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: loginForm(
                     context,
                     _formKey,
-                  _webServiceController,
+                    _webServiceController,
                     _tokenController,
                   ),
                 ),
                 SizedBox(height: AppConfig.calHeight(context, 2)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: loginButton(context,()=> _submit(context)),
+                  child: loginButton(context, () => _submit(context)),
                 ),
-                SizedBox(height: AppConfig.calHeight(context, 2)),
-                 helpButton(context),
+                SizedBox(height: AppConfig.calHeight(context, 4)),
+                helpButton(context),
               ],
             ),
           ),
@@ -110,9 +118,7 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 }
 
-
-Widget header (context){
-
+Widget header(context) {
   return ClipPath(
     clipper: CustomClipPathSignUp(),
     child: Container(
@@ -135,7 +141,7 @@ Widget header (context){
   );
 }
 
-Widget loginForm (context, formKey, webServiceController, tokenController ){
+Widget loginForm(context, formKey, webServiceController, tokenController) {
   final gap = SizedBox(height: AppConfig.calHeight(context, 2));
   final labelStyle = TextStyle(
     fontSize: AppConfig.calFontSize(context, 4),
@@ -160,7 +166,7 @@ Widget loginForm (context, formKey, webServiceController, tokenController ){
   );
 }
 
-Widget loginButton(context, onPressed){
+Widget loginButton(context, onPressed) {
   final buttonWidth = AppConfig.calWidth(context, 40);
   final buttonHeight = AppConfig.calHeight(context, 8);
 
@@ -174,7 +180,7 @@ Widget loginButton(context, onPressed){
 
         final style = ElevatedButton.styleFrom(
           backgroundColor:
-          isLoading ? AppConfig.background : AppConfig.secondaryColor,
+              isLoading ? AppConfig.backgroundColor : AppConfig.secondaryColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
             side: BorderSide(width: 1, color: Colors.grey[300]!),
@@ -186,25 +192,27 @@ Widget loginButton(context, onPressed){
           onPressed: isLoading ? null : onPressed,
           child: isLoading
               ? SizedBox(
-            width: buttonWidth * 0.12,
-            height: buttonHeight * 0.25,
-            child:  ProgressBar(size: 2,), // رنگش اگر خواستی بده: ProgressBar(color: Colors.white)
-          )
-              : const Text(
-            'ورود',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+                  width: buttonWidth * 0.12,
+                  height: buttonHeight * 0.25,
+                  child: ProgressBar(
+                    size: 2,
+                  ), // رنگش اگر خواستی بده: ProgressBar(color: Colors.white)
+                )
+              :  Text(
+                  'ورود',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: AppConfig.calFontSize(context, 4),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         );
       },
     ),
   );
 }
 
-Widget helpButton(context){
+Widget helpButton(context) {
   return InkWell(
     onTap: () {
       alertDialogScreen(
@@ -239,4 +247,3 @@ Widget helpButton(context){
     ),
   );
 }
-

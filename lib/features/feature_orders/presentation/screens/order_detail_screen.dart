@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/widgets/drawer.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:jdate/jdate.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../../core/params/orders_edit_status.dart';
-import '../../../feature_home/presentation/screens/home-screen.dart';
-import '../../functions/OrderBottomSheet.dart';
-import '../bloc/orders_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:intl/intl.dart';
 import '../widgets/order_options.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -24,6 +17,11 @@ class OrderDetailScreen extends StatelessWidget {
   OrderDetailScreen(this.ordersLoadedStatus, this.item);
 
   String selectedStatus = '';
+
+  String formatFaThousands(dynamic value) {
+    final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
+    return NumberFormat.decimalPattern('fa').format(n);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +37,7 @@ class OrderDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'سفارش ${ordersData.id}',
+            'سفارش ${ordersData.id.toString().stringToPersianDigits()}',
           style: TextStyle(fontSize: AppConfig.calTitleFontSize(context),color: AppConfig.white),
         ),
         leading: IconButton(
@@ -60,7 +58,7 @@ class OrderDetailScreen extends StatelessWidget {
         ], // Remove shadow for a seamless look
       ),
       body: Container(
-        color: AppConfig.background,
+        color: AppConfig.backgroundColor,
         child: Stack(
           children: [
             Container(
@@ -77,7 +75,7 @@ class OrderDetailScreen extends StatelessWidget {
                   color:AppConfig.secondaryColor,
                 ),
                 child: Text(
-                  "${ordersData.total} ریال",
+                  "${formatFaThousands(ordersData.total).toString().stringToPersianDigits()} ریال",
                   style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 5)),
                 ),
               ),
@@ -102,7 +100,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3)),
                               ),
                               Text(
-                                dateCreated,
+                                dateCreated.toString().stringToPersianDigits(),
                                 style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3)),
                               ),
                             ],
@@ -202,8 +200,8 @@ class OrderDetailScreen extends StatelessWidget {
 
                                               child: AutoSizeText(
 
-                                                " قیمت: ${ordersData
-                                                    .lineItems![index].total} تومان",
+                                                " قیمت: ${formatFaThousands(ordersData
+                                                    .lineItems![index].total).toString().stringToPersianDigits()} تومان",
                                                 textAlign: TextAlign.right,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
@@ -222,7 +220,7 @@ class OrderDetailScreen extends StatelessWidget {
 
                                             Text(
                                               "تعداد: ${ordersData
-                                                      .lineItems![index].quantity}",
+                                                      .lineItems![index].quantity.toString().stringToPersianDigits()}",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
                                             ),
@@ -258,12 +256,13 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Container(
                           alignment: Alignment.centerRight,
-                          /*color: Colors.red,*/
+                         // color: Colors.red,
                           width: width * 0.4,
                           height: height * 0.22,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            spacing:  AppConfig.calHeight(context, 0.7),
                             children: [
                               Text(
                                 "مشخصات صورتحساب: ",
@@ -272,23 +271,23 @@ class OrderDetailScreen extends StatelessWidget {
                               AutoSizeText(
                                 '${ordersData.shipping!.firstName} ${ordersData.shipping!.lastName}',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: width * 0.04,color: AppConfig.white),
+                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2),color: AppConfig.white),
                                 maxLines: 1,
                                 minFontSize: 9,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 ordersData.shipping!.phone,
-                                style: TextStyle(color: AppConfig.white),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),
                               Text(
                                 ordersData.shipping!.state,
-                                style: TextStyle(color: AppConfig.white),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),
                               AutoSizeText(
                                 ordersData.shipping!.address1,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: width * 0.04,color: AppConfig.white),
+                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2),color: AppConfig.white),
                                 maxLines: 2,
                                 minFontSize: 9,
                                 overflow: TextOverflow.ellipsis,
@@ -298,7 +297,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         Container(
                           alignment: Alignment.centerRight,
-                          /*      color: Colors.yellow,*/
+                          //      color: Colors.green,
                           width: width * 0.4,
                           height: height * 0.22,
                           child: Column(
@@ -328,7 +327,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),
                               Text(
-                                "ثبت نشده",
+                                ordersData.shippingPrice.toString().stringToPersianDigits(),
                                 style: TextStyle(color:AppConfig.white),
                               ),
                             ],

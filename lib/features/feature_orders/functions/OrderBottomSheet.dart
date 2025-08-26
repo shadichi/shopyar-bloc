@@ -18,7 +18,7 @@ void showFilterBottomSheet(BuildContext context,
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: AppConfig.background,
+    backgroundColor: AppConfig.backgroundColor,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -83,7 +83,7 @@ void showFilterBottomSheet(BuildContext context,
                           }else{
                             return Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 0.08))), color: AppConfig.background,
+                                borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 0.08))), color: AppConfig.backgroundColor,
                               ),
                               padding: EdgeInsets.symmetric(vertical: width * 0.02),
                               alignment: Alignment.center,

@@ -14,75 +14,14 @@ import '../../../domain/entities/add_order_orders_entity.dart';
 class AddOrderProductsApiProvider {
   final Dio _dio = Dio();
 
-  Future<dynamic> GetOrderProducts(ProductsParams productsParams) async {
+  Future<dynamic> getOrderProducts(ProductsParams productsParams) async {
     var response = await _dio.get(
-        //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
         "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=23",
         options: Options(headers: {'Authorization': StaticValues.passWord}));
-    // print(response.statusCode);
     return response;
-    //ریترن کرد تموم بقیش هیچی
   }
 
-  /* Future<dynamic> GetOrderData(UserDataParams userDataParams) async {
-    var response =await _dio.get(
-      //'http://${ordersParams.webService}/orders?per_page=${ordersParams.orderCount}${ordersParams.filter}',
-        "${StaticValues.webService}/wp-json/shop-yar/login",
-        options: Options(headers: {'Authorization': StaticValues.passWord})
-    );
-   // print(response.statusCode);
-    return response;
-    //ریترن کرد تموم بقیش هیچی
-  }*/
-/*  Future<bool> SetOrder(AddOrderOrdersEntity order, webService, consumerKey, payType, shipType, String shipPrice) async {
-    try {
-      var products = [];
-      for (var p in order.lineItems!) {
-        products.add({"id": p.productId.toString(), "qty": p.quantity});
-      }
-
-      var maap = {
-        "billing": order.billing,
-        "products": products,
-        "payment_method_id": payType,
-        "shipping_method_id": shipType,
-        "shipping_method_price": shipPrice,
-      };
-
-      if (order.shipping != null && order.shipping!.firstName.isNotEmpty && order.shipping!.city.isNotEmpty) {
-        maap['shipping'] = order.shipping;
-      }
-
-      if (order.id != 0) {
-        maap['order_id'] = order.id;
-      }
-
-      var url = "http://shop-yar.ir/wp-json/shop-yar/add-order";
-
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          "Authorization": "shadi2",  // Adjust if needed
-          "Content-Type": "application/json",
-        },
-        body: json.encode(maap),
-      );
-
-      print("Response: ${response.body}");
-
-      if (response.statusCode == 200) {
-        print("Order saved successfully.");
-        return true;
-      } else {
-        print("Failed to save order. Status code: ${response.statusCode}");
-        return false;
-      }
-    } catch (e) {
-      print("Error occurred: $e");
-      return false;
-    }
-  }*/
-  Future SetOrder(AddOrderOrdersEntity order, webService, consumerKey, payType,
+  Future setOrder(AddOrderOrdersEntity order, webService, consumerKey, payType,
       shipType, String shipPrice) async {
     bool connection = false;
     try {
@@ -122,7 +61,6 @@ class AddOrderProductsApiProvider {
         var json = response.body;
         print(json);
         return connection;
-        // print(ordersFromJson(json));
       }
       return false;
     } catch (e) {

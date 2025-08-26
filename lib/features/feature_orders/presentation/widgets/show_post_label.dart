@@ -254,7 +254,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
         fitPolicy: FitPolicy.BOTH,
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppConfig.background,
+        backgroundColor: AppConfig.backgroundColor,
         onPressed: _savePdf,
         tooltip: "ذخیره PDF",
         child: Icon(Icons.save,color: AppConfig.white,),

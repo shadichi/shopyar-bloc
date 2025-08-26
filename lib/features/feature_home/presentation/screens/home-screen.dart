@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/params/middle_card_data.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_status.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/widgets/middle-card.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
-import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
@@ -14,7 +12,8 @@ import '../bloc/home_bloc.dart';
 import '../widgets/drawer.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:jdate/jdate.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 
 import '../widgets/pie-chart.dart';
 
@@ -34,13 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
-    BlocProvider.of<HomeBloc>(context).add(LoadHomeDataEvent());
 
   }
-
-  var test = '';
-
-
 
 
   @override
@@ -48,8 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    final f = NumberFormat.decimalPattern('fa');
+
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
+
     return BlocConsumer<HomeBloc, HomeState>(listener: (context, state) {
       if (state.homeStatus is HomeAccountExitStatus) {
         Navigator.pushReplacementNamed(context, LogInScreen.routeName);
@@ -65,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
             titleSpacing: 0.0,
             actions: [
               Container(
+                //color: Colors.yellow,
                 alignment: Alignment.center,
                 width: AppConfig.calWidth(context, 40),
 
@@ -74,26 +73,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
+                      height: AppConfig.calHeight(context, 4),
                       alignment: Alignment.center,
+                     // color: Colors.green,
                       //  padding: EdgeInsets.all(width * 0.03),
                       child: Text(
-                        StaticValues.shopName,
-                        textDirection: TextDirection.rtl,
+                        StaticValues.shopName,maxLines: 1,
+
                         style: TextStyle(
+
+                          overflow: TextOverflow.ellipsis,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: AppConfig.calWidth(context, 3)),
                       ),
                     ),
                     Container(
+                     // color: Colors.red,
                       alignment: Alignment.center,
-                      padding: EdgeInsets.only(top: 2),
+                      height: AppConfig.calHeight(context, 4),
                       child: Text(
-                        jd.echo('l، d F'),
-                        textDirection: TextDirection.rtl,
+                        jd.echo('l، d F').stringToPersianDigits(),
+                      //  textDirection: ,
                         style: TextStyle(
-                            color: Colors.grey.shade300,
-                            fontSize: AppConfig.calWidth(context, 4),
+                            color: Colors.grey.shade400,
+                            fontSize: AppConfig.calWidth(context, 3.2),
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -175,24 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       } else if (state.homeStatus is HomeErrorStatus) {
-        // context.read<HomeBloc>().add(LoadOrdersData(OrdersParams(10,"http://shop-yar.ir/wp-json/shop-yar","per_page=10","")));
 
         return Center(
             child: Text(
           'خطا در بارگیری اطلاعات صفحه اصلی!',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
         ));
       } else if (state.homeStatus is HomeLoadedStatus) {
-        /*final UserLoadedStatus userLoadedStatus =
-            state.homeStatus as UserLoadedStatus;*/
-        /* final UserLoadedStatus userLoadedStatus =
-        state.homeStatus as UserLoadedStatus;
-        final HomeUserDataParams homeUserDataParams =
-            userLoadedStatus.homeUserDataParams;*/
 
-        /*   final CwCompleted cwComplete = state.cwStatus as CwCompleted;
-        BookMarkIcon(name: cwComplete.currentCityEntity.name!);
-*/
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
         return Scaffold(
@@ -200,7 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Container(
             height: height,
             width: width,
-            //color: Colors.green,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -227,12 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-      /* final UserDataLoadedStatus userDataLoadedStatus =
-          state.logInStatus as UserDataLoadedStatus;
-      LoginEntity? loginEntity = userDataLoadedStatus.loginEntity;*/
+
 
       return Container(
-        color: AppConfig.background,
+        color: AppConfig.backgroundColor,
         child: Text('خطا در بارگیری اطلاعات!'),
       );
     });

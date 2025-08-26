@@ -132,7 +132,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     },
                     child: StaticValues.staticOrders.isEmpty
                         ? Container(
-                      color: AppConfig.background,
+                      color: AppConfig.backgroundColor,
                       child: Center(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
                               context, 4),
@@ -151,7 +151,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                           )),
                     )
                         : Container(
-                            color: AppConfig.background,
+                            color: AppConfig.backgroundColor,
                             child: ListView.builder(
                                 controller: _scrollController,
                                 itemCount: StaticValues.staticOrders.length + 1,

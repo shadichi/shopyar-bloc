@@ -23,7 +23,7 @@ void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? 
       return Container(
        decoration: BoxDecoration(
          borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-         color: AppConfig.background,
+         color: AppConfig.backgroundColor,
        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

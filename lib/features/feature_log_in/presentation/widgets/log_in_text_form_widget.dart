@@ -8,12 +8,12 @@ class LogInTextFormWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  SizedBox(
-      height: 80,
+      height: AppConfig.calHeight(context, 13),
       child: TextFormField(
         controller: textEditingController,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 17,
+        style:  TextStyle(
+          color: AppConfig.backgroundColor,
+          fontSize: AppConfig.calFontSize(context, 3.7),
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.end,

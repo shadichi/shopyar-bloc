@@ -7,7 +7,7 @@ class NoConnectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    return Container(width: width,height: height,color: Colors.blueGrey,child: Container(
+    return Container(width: width,height: height,color: Colors.blueGrey,child: SizedBox(
       width: width*0.7,height: height*0.5,
       child: Column(
         children: [

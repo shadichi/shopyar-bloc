@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
 import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../data/models/store_info.dart';
@@ -60,15 +61,31 @@ class _EnterInfDataState extends State<EnterInfData> {
     });
   }
 
+  bool _shownOnce = false;
+
   @override
   void initState() {
     super.initState();
-    _showWelcomeDialog();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _shownOnce) return;
+      _shownOnce = true;
+      _showIntroDialog();
+    });
+  }
+
+  Future<void> _showIntroDialog() async {
+    final res = await alertDialogScreen(
+      context,
+      "در این بخش، اطلاعات ارسالی شما برای درج در برچسب پستی دریافت و ذخیره می‌شود.\nمی‌توانید در آینده از طریق صفحه اصلی برنامه آن را ویرایش کنید.",
+      1,
+      true,icon: Icons.announcement
+    );
+    if (!context.mounted) return;
+
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) {    return Scaffold(
       appBar: AppBar(
         title: Text(
           "ثبت اطلاعات برچسب پستی",

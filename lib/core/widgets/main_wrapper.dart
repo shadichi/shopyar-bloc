@@ -30,7 +30,7 @@ class _MainWrapperState extends State<MainWrapper> {
     ];
 
     return Scaffold(
-      backgroundColor: AppConfig.background,
+      backgroundColor: AppConfig.backgroundColor,
       body: Stack(
         children: [
           PageView(

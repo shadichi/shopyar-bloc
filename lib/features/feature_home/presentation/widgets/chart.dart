@@ -10,6 +10,9 @@ import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_ent
 import '../../../../core/config/app-colors.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
+
+
 class Chart extends StatefulWidget {
   HomeDataEntity? homeDataModel;
   Chart(this.homeDataModel);
@@ -210,31 +213,13 @@ class BarChartSample4State extends State<Chart> {
     }));
   }
 
+
   Widget leftTitles(double value, TitleMeta meta) {
-    final formatter = NumberFormat(
-        '#,##'); // Use '#' for any digit, ',' for thousands separators
-    final text = formatter.format(value.toInt());
+    final text = _faFmt.format(value.toInt());
+
     return SideTitleWidget(
-      child: Text(text, style: TextStyle(fontSize: 10, color: Colors.white)),
-      meta: TitleMeta(
-        min: 0,
-        // مقدار حداقل محور
-        max: 100,
-        // مقدار حداکثر محور
-        parentAxisSize: 50,
-        // اندازه محور والد
-        axisPosition: 10,
-        // موقعیت محور
-        appliedInterval: 10,
-        // فاصله بین عناوین محور
-        sideTitles: SideTitles(showTitles: true),
-        // تنظیمات نمایش عناوین
-        formattedValue: text,
-        // مقدار فرمت‌شده برای نمایش
-        axisSide: AxisSide.left,
-        // جهت نمایش عنوان روی محور (چپ/راست)
-        rotationQuarterTurns: 0, // میزان چرخش عنوان (0 یعنی بدون چرخش)
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 10, color: Colors.white)),
+      meta: meta,
     );
   }
 @override

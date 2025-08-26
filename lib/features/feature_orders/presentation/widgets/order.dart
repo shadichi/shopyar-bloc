@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/bloc/orders_status.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
-import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../screens/order_detail_screen.dart';
+import 'package:intl/intl.dart';
 
 class Order extends StatelessWidget {
   OrdersEntity ordersLoadedStatus;
@@ -17,14 +16,21 @@ class Order extends StatelessWidget {
     required this.item,
   });
 
+  String formatFaThousands(dynamic value) {
+    final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
+    return NumberFormat.decimalPattern('fa').format(n);
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return GestureDetector(
-      onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context){
-        return OrderDetailScreen(ordersLoadedStatus, item);
-      }));},
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return OrderDetailScreen(ordersLoadedStatus, item);
+        }));
+      },
       child: Container(
         margin: EdgeInsets.all(width * 0.01),
         child: Card(
@@ -35,15 +41,14 @@ class Order extends StatelessWidget {
               children: [
                 Container(
                     decoration: BoxDecoration(
-                      color: AppConfig.section4,
+                      color: AppConfig.topOrderColor,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(10.0),
                         // Set top-right corner radius
-                        topLeft:
-                            Radius.circular(10.0), // Set top-right corner radius
+                        topLeft: Radius.circular(
+                            10.0), // Set top-right corner radius
                       ),
                     ),
-
                     height: AppConfig.calHeight(context, 8),
                     width: width * 0.97,
                     alignment: Alignment.center,
@@ -53,18 +58,18 @@ class Order extends StatelessWidget {
                         children: [
                           Container(
                               width: width * 0.4,
-                              /*color: Colors.red,*/
                               alignment: Alignment.center,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    ordersLoadedStatus.dateCreated!
-                                        ==  Jalali.now()
+                                    ordersLoadedStatus.dateCreated! ==
+                                            Jalali.now()
                                         ? "امروز"
-                                        :
-                                    "${ordersLoadedStatus.dateCreated!.year}/${ordersLoadedStatus.dateCreated!.month}/${ordersLoadedStatus.dateCreated!.day}",
-                                    style: TextStyle(color: Colors.white,fontSize: width*0.03),
+                                        : "${(ordersLoadedStatus.dateCreated!.year.toString()).stringToPersianDigits()}/${(ordersLoadedStatus.dateCreated!.month).toString().stringToPersianDigits()}/${(ordersLoadedStatus.dateCreated!.day).toString().stringToPersianDigits()}",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: width * 0.03),
                                   ),
                                   IconButton(
                                       onPressed: () {},
@@ -76,26 +81,29 @@ class Order extends StatelessWidget {
                                 ],
                               )),
                           Container(
-                              width: width * 0.3,
-                          /*    color: Colors.green,*/
-                              alignment: Alignment.center,
-
-                              child: AutoSizeText(
-                                "${ordersLoadedStatus.billing!.firstName} ${ordersLoadedStatus.billing!.lastName}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: width*0.03, color: Colors.white),
-                                maxLines: 1,
-                                minFontSize: 9,
-                                overflow: TextOverflow.ellipsis,
-
-                              ),),
+                            width: width * 0.3,
+                            /*    color: Colors.green,*/
+                            alignment: Alignment.center,
+                            child: AutoSizeText(
+                              "${ordersLoadedStatus.billing!.firstName} ${ordersLoadedStatus.billing!.lastName}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: width * 0.03, color: Colors.white),
+                              maxLines: 1,
+                              minFontSize: 9,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           Container(
                               width: width * 0.2,
                               /*color: Colors.red,*/
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                  "سفارش ${ordersLoadedStatus.id.toString()}",
-                                  style: TextStyle(color: Colors.white, fontSize: width*0.03,))),
+                                  "سفارش ${(ordersLoadedStatus.id.toString()).toString().stringToPersianDigits()}",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: width * 0.03,
+                                  ))),
                         ],
                       ),
                     )),
@@ -107,88 +115,103 @@ class Order extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0,top: 8.0),
+                        padding: const EdgeInsets.only(
+                            left: 8.0, right: 8.0, top: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("جمع",style: TextStyle(fontSize: width*0.03,color: Colors.white),),
-                            Text(ordersLoadedStatus.total
-                                .toString(),style: TextStyle(fontSize: width*0.03,color: Colors.white)),
+                            Text(
+                              "جمع",
+                              style: TextStyle(
+                                  fontSize: width * 0.03, color: Colors.white),
+                            ),
+                            Text( formatFaThousands(ordersLoadedStatus.total).toString().stringToPersianDigits(),
+                                style: TextStyle(
+                                    fontSize: width * 0.03,
+                                    color: Colors.white)),
                           ],
                         ),
                       ),
                       Container(
-                        width: width*1,
+                        width: width * 1,
                         height: 1,
                         child: Container(
-
                             decoration: BoxDecoration(
-                              gradient:LinearGradient(
-                                colors: [
-                                 AppConfig.firstLinearColor,
-                                  AppConfig.secondLinearColor,
-                            ],)
-                          )
-                        ),
+                                gradient: LinearGradient(
+                          colors: [
+                            AppConfig.firstLinearColor,
+                            AppConfig.secondLinearColor,
+                          ],
+                        ))),
                       ),
                       Row(
                         children: [
                           Container(
                             width: width * 0.9,
                             height: height * 0.06,
-
                             child: ListView.builder(
                                 itemCount: ordersLoadedStatus.lineItems!.length,
                                 itemBuilder: (context, index) {
                                   return Row(
                                     children: [
                                       Container(
-
                                           width: width * 0.02,
                                           alignment: Alignment.center,
-                                          child: Text(ordersLoadedStatus.lineItems![index]
-                                              .quantity
-                                              .toString(),style: TextStyle(fontSize: width*0.03,color: Colors.white))),
+                                          child: Text(
+                                              ordersLoadedStatus
+                                                  .lineItems![index].quantity
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: width * 0.03,
+                                                  color: Colors.white))),
                                       Container(
-
                                           alignment: Alignment.center,
                                           //  color: Colors.pink,
                                           width: width * 0.05,
-                                          child: Text("×",style: TextStyle(fontSize: width*0.03,color: Colors.white))),
+                                          child: Text("×",
+                                              style: TextStyle(
+                                                  fontSize: width * 0.03,
+                                                  color: Colors.white))),
                                       FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: SingleChildScrollView(
-                                          child: Container(
-                                            width: width*0.8,
-
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                Container(
-                                                  width: width*0.8,
-                                                  alignment: Alignment.centerRight,
-                                                  child: AutoSizeText(
-                                                    ordersLoadedStatus.lineItems![index].name.toString(),
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(fontSize: width*0.03,color: Colors.white),
-                                                    maxLines: 1,
-                                                    minFontSize: 9,
-                                                    overflow: TextOverflow.ellipsis,
-
+                                          fit: BoxFit.scaleDown,
+                                          child: SingleChildScrollView(
+                                            child: Container(
+                                              width: width * 0.8,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    width: width * 0.8,
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: AutoSizeText(
+                                                      ordersLoadedStatus
+                                                          .lineItems![index]
+                                                          .name
+                                                          .toString(),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              width * 0.03,
+                                                          color: Colors.white),
+                                                      maxLines: 1,
+                                                      minFontSize: 9,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        )
-
-                                      ),
+                                          )),
                                     ],
                                   );
                                 }),
                           ),
-
                         ],
                       )
                     ],
@@ -202,10 +225,10 @@ class Order extends StatelessWidget {
     );
   }
 }
+
 class orderData {
   final OrdersEntity ordersLoadedStatus;
   final int item;
 
   orderData({required this.ordersLoadedStatus, required this.item});
 }
-

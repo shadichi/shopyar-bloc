@@ -31,16 +31,11 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   Future<OrderDataState<ProductEntity>> getOrderProducts(
       ProductsParams productsParams) async {
     try {
-      //  print("syeeees");
-      Response response = await apiProvider.GetOrderProducts(productsParams);
+      Response response = await apiProvider.getOrderProducts(productsParams);
 
-      //Response response = await apiProvider.GetOrders(ordersParams);
       if (response.statusCode == 200) {
-        //  print("syeeees");
         List<ProductEntity> editOrderProductEntity =
             productsFromJson(response.data);
-        // print("yeeees");
-//
         return OrderDataSuccess(editOrderProductEntity);
       } else {
         return const OrderDataFailed("Something Went Wrong. try again...");
@@ -50,29 +45,6 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
       return const OrderDataFailed("please check your connection...");
     }
   }
-
-/*  @override
-  Future getOrderData(
-      UserDataParams userDataParams) async {
-    try {
-      Response response = await apiProvider.GetOrderData();
-
-      //Response response = await apiProvider.GetOrders(ordersParams);
-      if (response.statusCode == 200) {
-      //  print("syeeees");
-        AddOrderDataEntity editOrderDataEntity =
-            AddOrderDataModel.fromJson(response.data);
-       // print(editOrderDataEntity.paymentMethods![0].methodTitle);
-
-        return AddOrderDataSuccess(editOrderDataEntity);
-      } else {
-        return const AddOrderDataFailed("Something Went Wrong. try again...");
-      }
-    } catch (e) {
-      print(e.toString());
-      return const AddOrderDataFailed("please check your connection...");
-    }
-  }*/
 
   @override
   Future<AddOrderProductsCard<AddOrderOrdersEntity>> getSelectedProducts(
@@ -88,9 +60,6 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
         productId: selectedProducts[0].id,
         quantity: editOrderGetSelectedProductsParams.selected.productQuantity,
         total: selectedProducts[0].price);
-
-    // print("lineitem");
-    // print(lineItem.name);
 
     editOrderGetSelectedProductsParams.addOrderOrdersEntity.lineItems!
         .add(lineItem);
@@ -109,15 +78,8 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
 
   @override
   Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams) async {
-    print('setOrderParams.order');
-    print(setOrderParams.order);
-    print(StaticValues.webService);
-    print(StaticValues.passWord);
-    print(setOrderParams.payType);
-    print(setOrderParams.shipType);
-    print(setOrderParams.shipPrice);
     try {
-      var response = await apiProvider.SetOrder(
+      var response = await apiProvider.setOrder(
           setOrderParams.order,
           StaticValues.webService,
           StaticValues.passWord,
@@ -137,6 +99,5 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
       print(e.toString());
       return false;
     }
-    return false;
   }
 }

@@ -55,24 +55,26 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           fontFamily: 'IRANSansWeb',
+
           appBarTheme: AppBarTheme(actionsPadding: EdgeInsets.only( left: AppConfig.calWidth(context, 2)),
-              color: AppConfig.background,
+              color: AppConfig.backgroundColor,
               iconTheme: IconThemeData(
                 color: Colors.white,
               )),
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppConfig.firstLinearColor,
-            brightness: Brightness.light, // یا dark
+            brightness: Brightness.light,
           ),
-          scaffoldBackgroundColor: AppConfig.background,
+          scaffoldBackgroundColor: AppConfig.backgroundColor,
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(AppConfig.calWidth(context, 2))),
             backgroundColor: AppConfig.secondaryColor,
-            textStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 2)),
+            textStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 2), fontFamily: 'IRANSansWeb'),
           )),
+
         ),
         initialRoute: "/",
         locale: const Locale("fa", ""),

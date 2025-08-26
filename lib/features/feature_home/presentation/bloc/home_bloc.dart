@@ -6,6 +6,7 @@ import 'package:shapyar_bloc/core/resources/data_state.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_status.dart';
 import '../../../../core/params/home_user_data_params.dart';
+import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../domain/use_cases/get_home-data_use_case.dart';
 import '../../domain/use_cases/get_user_data_use_case.dart';
@@ -21,14 +22,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetMainDataUseCase getMainDataUseCase;
   final GetHomeDataUseCase getHomeDataUseCase;
 
-  //final GetOrdersUseCase getOrdersUseCase;
 
   HomeBloc(this.getMainDataUseCase, this.getHomeDataUseCase)
       : super(HomeState(
             homeStatus: HomeLoading(), homeDataStatus: HomeDataLoading())) {
-    on<HomeEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+
     on<LoadDataEvent>((event, emit) async {
       if (StaticValues.webService.isEmpty ||
           StaticValues.passWord.isEmpty ||
@@ -108,9 +106,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await prefs.remove('consumerKey');
     });
 
-    on<LoadHomeDataEvent>((event, emit) async {
-      final DataState dataState = await getHomeDataUseCase();
-    });
     on<AccountExit>((event, emit) async {
       emit(state.copyWith(newHomeStatus:HomeLoading()));
       final prefs = await SharedPreferences.getInstance();
@@ -118,4 +113,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(newHomeStatus:HomeAccountExitStatus()));
     });
   }
+
+
 }

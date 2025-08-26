@@ -71,11 +71,11 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                 height: AppConfig.calHeight(context, 31),
                 width: AppConfig.calHeight(context, 31),
                 decoration: BoxDecoration(
-                  color: AppConfig.background,
+                  color: AppConfig.backgroundColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppConfig.section3,
+                      color: AppConfig.white,
                       blurRadius: 20,
                       spreadRadius: 5,
                       offset: const Offset(4, 4),

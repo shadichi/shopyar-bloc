@@ -34,13 +34,29 @@ class HomeDrawer extends StatelessWidget {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => SettingPage()));
       },
-          () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PdfViewerScreen()));
-      },
       () {
-     // alertDialogScreen(context, 'آیا از حساب کاربری خود خارج میشوید؟', 1, 1);
-        context.read<HomeBloc>().add(AccountExit());
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => PdfViewerScreen()));
+      },
+      () async {
+        final navigator = Navigator.of(context);
+        final bloc = context.read<HomeBloc>();
+
+        final result = await alertDialogScreen(
+            context, 'آیا از حساب کاربری خود خارج می شوید؟', 2, true,
+            isExit: true);
+
+        if (!context.mounted) return;
+
+        if (result == true) {
+
+          bloc.add(AccountExit());
+
+        } else {
+
+          if (navigator.canPop()) Navigator.pop(context);
+        }
+
       }
     ];
 
@@ -59,11 +75,11 @@ class HomeDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    child: Image.asset('assets/images/icons/shopyar-icon.png'),
+                  SizedBox(
                     width: width * 0.1,
+                    child: Image.asset('assets/images/icons/shopyar-icon.png'),
                   ),
-                  Container(
+                  SizedBox(
                     width: width * 0.3,
                     child: Column(
                       children: [
@@ -97,7 +113,7 @@ class HomeDrawer extends StatelessWidget {
                   alignment: Alignment.bottomCenter,
                   margin: EdgeInsets.only(top: height * 0.12),
                   decoration: BoxDecoration(
-                      color: AppConfig.background,
+                      color: AppConfig.backgroundColor,
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: Column(
                     children: List.generate(3, (index) {
@@ -120,35 +136,35 @@ class HomeDrawer extends StatelessWidget {
 
 Widget _buildDrawerItem(String svgPic, String title, BuildContext context,
     void Function()? onTap, bool isDivider, double size) {
-  return Container(
-    child: Column(
-      children: [
-        ListTile(
-          leading: Container(
-              width: size * 0.065,
-              child: CircleAvatar(
-                backgroundColor: AppConfig.background,
-                child: SvgPicture.asset(svgPic),
-              )),
-          title: Text(title,
-              style: TextStyle(fontSize: size * 0.045, color: AppConfig.white)),
-          onTap: onTap,
-        ),
-        isDivider
-            ? SizedBox(
-                width: size,
-                child:  Container(
-                    margin: EdgeInsets.all(AppConfig.calWidth(context, 2)),
-                    width: AppConfig.calWidth(context, 40),
-                    height: 0.5,
-                    decoration: BoxDecoration(
-                        gradient:LinearGradient(
-                          colors: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],)
-                    )
-                ),
-              )
-            : SizedBox()
-      ],
-    ),
+  return Column(
+    children: [
+      ListTile(
+        leading: SizedBox(
+            width: size * 0.065,
+            child: CircleAvatar(
+              backgroundColor: AppConfig.backgroundColor,
+              child: SvgPicture.asset(svgPic),
+            )),
+        title: Text(title,
+            style: TextStyle(fontSize: size * 0.045, color: AppConfig.white)),
+        onTap: onTap,
+      ),
+      isDivider
+          ? SizedBox(
+              width: size,
+              child: Container(
+                  margin: EdgeInsets.all(AppConfig.calWidth(context, 2)),
+                  width: AppConfig.calWidth(context, 40),
+                  height: 0.5,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                    colors: [
+                      AppConfig.firstLinearColor,
+                      AppConfig.secondLinearColor
+                    ],
+                  ))),
+            )
+          : SizedBox()
+    ],
   );
 }

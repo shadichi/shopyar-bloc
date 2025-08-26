@@ -4,16 +4,11 @@ import 'package:shapyar_bloc/core/params/products_params.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/features/feature_products/presentation/widgets/product.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
-import '../../../../locator.dart';
 import '../bloc/products_status.dart';
-import '../widgets/ending_product.dart';
-import '../widgets/variation_product.dart';
-import 'package:anim_search_bar/anim_search_bar.dart';
 
 class ProductsScreen extends StatefulWidget {
   static const routeName = "/products_screen";
@@ -115,7 +110,7 @@ class _ProductsScreenState extends State<ProductsScreen>
             body: Center(
               child: StaticValues.staticProducts.isEmpty
                   ? Container(
-                      color: AppConfig.background,
+                      color: AppConfig.backgroundColor,
                       child: Center(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
                               context, 4),

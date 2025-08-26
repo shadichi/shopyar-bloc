@@ -405,7 +405,7 @@ class _ShowPDFState extends State<ShowPDF> {
             }
       }),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppConfig.background,
+        backgroundColor: AppConfig.backgroundColor,
         onPressed: _savePdf,
         tooltip: "ذخیره PDF",
         child: Icon(

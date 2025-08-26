@@ -536,7 +536,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           Container(
             width: 40,
             decoration: BoxDecoration(
-              color: AppConfig.background,
+              color: AppConfig.backgroundColor,
               border: activeStep == 1
                   ? Border.all(width: 2, color: Colors.grey)
                   : null,
@@ -587,7 +587,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           Container(
             width: 40,
             decoration: BoxDecoration(
-              color: AppConfig.background,
+              color: AppConfig.backgroundColor,
               border: activeStep == 0
                   ? Border.all(width: 2, color: Colors.grey)
                   : null,
