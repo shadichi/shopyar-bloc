@@ -79,26 +79,28 @@ class HomeDrawer extends StatelessWidget {
                     width: width * 0.1,
                     child: Image.asset('assets/images/icons/shopyar-icon.png'),
                   ),
-                  SizedBox(
+                  Container(
                     width: width * 0.3,
+                    height: height*0.08,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
                           width: width * 0.3,
                           alignment: Alignment.center,
                           child: Text(
-                            'شاپ یار',
+                            StaticValues.shopName,maxLines: 1,
                             style: TextStyle(
-                                color: Colors.white, fontSize: width * 0.05),
+                                color: Colors.white, fontSize: width * 0.045),
                           ),
                         ),
                         Container(
                           width: width * 0.3,
                           alignment: Alignment.center,
                           child: Text(
-                            'شادی مرادیان',
+                            StaticValues.userName,maxLines: 1,
                             style: TextStyle(
-                                color: Colors.grey, fontSize: width * 0.04),
+                                color: Colors.grey, fontSize: width * 0.045),
                           ),
                         ),
                       ],

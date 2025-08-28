@@ -16,7 +16,7 @@ class HomeApiProvider{
   Future<dynamic> getHomeData(WholeUserDataParams wholeUserDataParams) async {
     print('GetHomeData');
    try{
-     final response =await _dio.get('${wholeUserDataParams.webService}/wp-json/shop-yar/get_full_order_report',options: Options(headers: {
+     final response =await _dio.get('${wholeUserDataParams.webService}wp-json/shop-yar/get_full_order_report',options: Options(headers: {
        "Authorization":wholeUserDataParams.key
      }));
 

@@ -120,7 +120,7 @@ class _SettingPageState extends State<SettingPage> {
                                     BorderRadius.all(Radius.circular(5)), side: BorderSide(width: 1, color: Colors.grey[300]!),)),
                             child: Text(
                               'ذخیره',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
                             )),
                       )
                     ],

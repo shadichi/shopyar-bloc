@@ -161,8 +161,15 @@ class _EnterInfDataState extends State<EnterInfData> {
                       _saveData();
                       Navigator.pushNamed(context, '/pdfViewer');
                     }
-                  },
-                  child: Text("ذخیره",style: TextStyle(color: Colors.black,fontSize: AppConfig.calTitleFontSize(context)),),
+                  },   style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConfig.secondaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(5)), side: BorderSide(width: 1, color: Colors.grey[300]!),)),
+                  child: Text(
+                    'ذخیره',
+                    style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+                  ),
                 ),
               ],
             ),
@@ -200,9 +207,10 @@ class CustomTextField extends StatelessWidget {
         validator: validator,
         decoration: InputDecoration(
           hintText: label,
-          hintStyle: TextStyle(fontSize: AppConfig.calTitleFontSize(context) ),
+          hintStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2) ),
           filled: true,
           fillColor: Colors.grey[100],
+          errorStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3), fontWeight: FontWeight.bold),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide(color: Colors.blueAccent),

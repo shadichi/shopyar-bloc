@@ -41,27 +41,27 @@ Future<bool?> alertDialogScreen(
            children: [
              TextButton(
                child: Text(
-                 isExit ? 'خیر' : 'باشه',
+                 isExit ? 'بله' : 'باشه',
                  style: TextStyle(
                    color: AppConfig.backgroundColor,
                    fontSize: AppConfig.calWidth(context, 3),
                  ),
                ),
                onPressed: () {
-                 Navigator.pop(context, false); // 👈 return true
+                 Navigator.pop(context, true); // 👈 return true
                },
              ),
              if (isExit)
                TextButton(
                  child: Text(
-                   'بله',
+                   'خیر',
                    style: TextStyle(
                      color: AppConfig.backgroundColor,
                      fontSize: AppConfig.calWidth(context, 3),
                    ),
                  ),
                  onPressed: () {
-                   Navigator.pop(context, true); // 👈 return false
+                   Navigator.pop(context, false); // 👈 return false
                  },
                ),
            ],

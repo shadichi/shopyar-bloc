@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
 
 import '../../../../core/colors/app-colors.dart';
@@ -41,9 +42,9 @@ class MiddleCard extends StatelessWidget {
                           )
                       ),
                     ),
-                    Text('${statusCounts!.dailyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${statusCounts!.dailySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${statusCounts!.dailyCancelled!.qty.toString()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailyCounts!.toString().stringToPersianDigits()} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailySales!.qty.toString().stringToPersianDigits()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.dailyCancelled!.qty.toString().stringToPersianDigits()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),
@@ -65,9 +66,9 @@ class MiddleCard extends StatelessWidget {
                           )
                       ),
                     ),
-                    Text('${statusCounts!.monthlyCounts} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${statusCounts!.monthlySales!.qty.toString()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
-                    Text('${statusCounts!.monthlyCancelled!.qty.toString()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlyCounts.toString().stringToPersianDigits()} فروش',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlySales!.qty.toString().stringToPersianDigits()} سفارش کامل',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
+                    Text('${statusCounts!.monthlyCancelled!.qty.toString().stringToPersianDigits()} سفارش برگشتی',style: TextStyle(color: Colors.white,fontSize: width*0.03),),
                   ],
                 ),
               )),

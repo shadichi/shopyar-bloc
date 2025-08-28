@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_products/domain/entities/product_entity.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';
-import '../bloc/products_status.dart';
+import 'package:intl/intl.dart';
+
 
 class Product extends StatelessWidget {
   ProductEntity productsLoadedStatus;
 
   Product(this.productsLoadedStatus);
+
+  String formatFaThousands(dynamic value) {
+    final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
+    return NumberFormat.decimalPattern('fa').format(n);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +74,7 @@ class Product extends StatelessWidget {
                   child: AutoSizeText(
                     productsLoadedStatus.price.toString().isEmpty
                         ? 'قیمت نامشخص'
-                        : '${productsLoadedStatus.price.toString()} تومان',
+                        : '${formatFaThousands(productsLoadedStatus.price).toString().stringToPersianDigits()} ریال',
                     style: TextStyle(
                         fontSize: width * 0.03,fontWeight: FontWeight.bold,
                         color: productsLoadedStatus.price.toString().isEmpty
@@ -83,7 +89,7 @@ class Product extends StatelessWidget {
         child: AutoSizeText(
           productsLoadedStatus.stockQuantity.toString().isEmpty
               ? 'موجودی نامشخص'
-              : '${productsLoadedStatus.stockQuantity.toString()} موجودی',
+              : '${productsLoadedStatus.stockQuantity.toString().stringToPersianDigits()} موجودی',
           style: TextStyle(
               fontSize: width * 0.025,
               color: productsLoadedStatus.stockQuantity

@@ -83,7 +83,7 @@ class PdfData {
 Widget _buildListTile({required IconData icon, required String title, required VoidCallback onTap, required BuildContext context}) {
   return ListTile(
     leading: Icon(icon, color: AppConfig.white,size: AppConfig.calHeight(context, 3),),
-    title: Text(title, style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calTitleFontSize(context))),
+    title: Text(title, style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.5))),
     onTap: onTap,
   );
 }
