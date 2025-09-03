@@ -7,6 +7,10 @@ abstract class AddOrderEvent {}
 class LoadAddOrderProductsData extends AddOrderEvent{
   LoadAddOrderProductsData();
 }
+class LoadOnChangedAddOrderProductsData extends AddOrderEvent{
+  final String query;
+  LoadOnChangedAddOrderProductsData(this.query);
+}
 
 class HydrateCartFromOrder extends AddOrderEvent {
   final OrdersEntity order;

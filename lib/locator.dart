@@ -79,7 +79,7 @@ setup() async {
   locator.registerSingleton<HomeBloc>(HomeBloc(locator(),locator()));
   locator.registerSingleton<OrdersBloc>(OrdersBloc(locator(), locator()));
   locator.registerSingleton<ProductsBloc>(ProductsBloc(locator(), locator()));
-  locator.registerSingleton<AddOrderBloc>(AddOrderBloc( locator(), locator(), locator()));
+  locator.registerSingleton<AddOrderBloc>(AddOrderBloc( locator(), locator()));
   locator.registerSingleton<StartBloc>(StartBloc( locator(), locator()));
 
 }

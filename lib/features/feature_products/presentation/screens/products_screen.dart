@@ -48,10 +48,6 @@ class _ProductsScreenState extends State<ProductsScreen>
     }, builder: (context, state) {
       if (state.productsStatus is ProductsLoadingStatus) {
         print("OrdersLoadingStatus");
-        /* context
-            .read<ProductsBloc>()
-            .add(LoadProductsData(ProductsParams('10', false, '')));
-*/
         return Center(child: ProgressBar());
       }
       if (state.productsStatus is UserErrorStatus) {
@@ -78,12 +74,16 @@ class _ProductsScreenState extends State<ProductsScreen>
                   height:  AppConfig.calWidth(context, 9),
                   padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
                   child: SearchBar(
+
                     backgroundColor:
                     WidgetStateProperty.all(AppConfig.secondaryColor),
                     leading: Icon(
                       Icons.search,
                       size: AppConfig.calWidth(context, 5),
-                    ),
+                    )
+                      ,shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)))
+            ),
                     hintText: 'جستجو',textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white,fontSize: AppConfig.calFontSize(context, 3))),
                     hintStyle: WidgetStateProperty.all(
                         TextStyle(fontSize:  AppConfig.calFontSize(context, 3), color: Colors.white60)),
@@ -131,19 +131,16 @@ class _ProductsScreenState extends State<ProductsScreen>
                   : SizedBox(
                       // color: Colors.red,
                       height: height,
-                      //  width: width * 0.87,
                       child: ListView.builder(
-                        // padding: EdgeInsets.all(10),
                         itemCount: StaticValues.staticProducts.length + 1,
-                        // Number of items in the grid
                         itemBuilder: (context, index) {
+
                           if (index == StaticValues.staticProducts.length) {
-                            //,child: _LoadMoreButton()
                             return Container(
                                 height: AppConfig.calHeight(context, 21),
                                 child: _LoadMoreButton());
                           }
-                          return Product(StaticValues.staticProducts[index]);
+                          return Product(StaticValues.staticProducts[index], StaticValues.staticProducts[index].childes!.isEmpty?false:true);
                         },
                       ),
                     ),

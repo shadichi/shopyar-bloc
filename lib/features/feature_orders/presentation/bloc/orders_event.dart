@@ -14,7 +14,10 @@ class LoadOrdersData extends OrdersEvent{
   LoadOrdersData(this.isSearch, this.search,this.isFilter, this.perPage, this.status,
       {this.isLoadMore = false});
 }
-class RefreshOrdersData extends OrdersEvent {}
+class RefreshOrdersData extends OrdersEvent {
+  final Completer<void>? completer;
+  RefreshOrdersData([this.completer]);
+}
 
 class ShowFilter extends OrdersEvent{
   bool showFilter;

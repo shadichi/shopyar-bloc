@@ -234,6 +234,8 @@ class _AddOrderProductState extends State<AddOrderProduct> {
             print(status.cart[widget.product.childes![index].id]);
             print(status.cart);
 
+
+
             if (status.cart[widget.product.childes![index].id] != 0) {
               count = status.cart[widget.product.childes![index].id] ?? 0;
             }
@@ -244,6 +246,9 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                 : _buildQuantitySelector(
                     context, size, theme, count, productChilde);
           } else {
+            print('widget.product.iddddddddddddd');
+            print(widget.product.id);
+            print(status.cart);
             count = status.cart[widget.product.id] ?? 0;
             return count == 0
                 ? _buildAddButton(context, size, theme, isChild, index)

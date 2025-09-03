@@ -26,7 +26,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   String? pdfPath;
   //var args = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
 
-  StoreInfo storeInfo =  StoreInfo(storeName: 'بلبل', storeAddress: 'بلبل', phoneNumber: 'بلبل', instagram: 'بلبل', postalCode: 'بلبل', website: 'بلبل', storeIcon: 'بلبل');
+  StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
 
   @override
   void initState() {
@@ -94,7 +94,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                             pw.Image(instaImage,
                                 width: width * 0.03, height: width * 0.03),
                             pw.SizedBox(width: width * 0.01),
-                            pw.Text('instagram')
+                            pw.Text('')
                           ]))),
               positionedTextWidget(
                   text: storeInfo.storeName,//نام گیرنده
@@ -141,7 +141,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 2),
               positionedTextWidget(
-                  text: '0123456789 ',//کد پستی گیرنده
+                  text: '',//کد پستی گیرنده
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.115,
                   leftPositioned: width * 0.604,
@@ -152,7 +152,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '09122356987 ',
+                  text: '',
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.13,
                   leftPositioned: width * 0.42,
@@ -163,7 +163,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: 'این نام فروشگاه است!',
+                  text: '',
                   heightContainer: height * 0.027,
                   widthContainer: width * 0.3,
                   leftPositioned: width * 0.1,
@@ -174,7 +174,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.bold,
                   maxLine: 1),
               positionedTextWidget(
-                  text: 'آدرس',
+                  text: '',
                   heightContainer: height * 0.077,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.066,
@@ -185,7 +185,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 6),
               positionedTextWidget(
-                  text: '0123456789 ',
+                  text: '',
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.115,
                   leftPositioned: width * 0.225,
@@ -196,7 +196,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '09128888888 ',
+                  text: '',
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.13,
                   leftPositioned: width * 0.06,
@@ -280,7 +280,6 @@ pw.Widget positionedTextWidget({
       top: topPositioned,
       child: pw.Container(
           alignment: alignment,
-          color: PdfColors.green,
           width: widthContainer,
           height: heightContainer,
           child: pw.Directionality(

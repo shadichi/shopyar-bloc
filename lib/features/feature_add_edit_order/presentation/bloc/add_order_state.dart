@@ -7,35 +7,46 @@ class AddOrderState extends Equatable {
   final Map<int, int> count;
   final Map<int, bool> isFirstTime;
 
-  const AddOrderState(
-      {required this.addOrderStatus,
-      required this.addOrderCardProductStatus,
-      required this.addOrderSetOrderStatus,
-      required this.count,
-        required this.isFirstTime
-      });
+  // 👇 اضافه کن
+  final List<ProductEntity> visibleProducts;
 
-  AddOrderState copyWith(
-      {AddOrderStatus? newAddOrderStatus,
-      AddOrderCardProductStatus? newAddOrderCardProductStatus,
-        AddOrderSetOrderStatus? newAddOrderSetOrderStatus,
-        Map<int, int>? newCount,
-        Map<int, bool>? newIsFirstTime
-      }) {
+  const AddOrderState({
+    required this.addOrderStatus,
+    required this.addOrderCardProductStatus,
+    required this.addOrderSetOrderStatus,
+    required this.count,
+    required this.isFirstTime,
+    required this.visibleProducts, // 👈
+  });
+
+  AddOrderState copyWith({
+    AddOrderStatus? newAddOrderStatus,
+    AddOrderCardProductStatus? newAddOrderCardProductStatus,
+    AddOrderSetOrderStatus? newAddOrderSetOrderStatus,
+    Map<int, int>? newCount,
+    Map<int, bool>? newIsFirstTime,
+    List<ProductEntity>? newVisibleProducts, // 👈
+  }) {
     return AddOrderState(
-        addOrderStatus: newAddOrderStatus ?? addOrderStatus,
-        addOrderCardProductStatus:
-        newAddOrderCardProductStatus ?? addOrderCardProductStatus,
-        addOrderSetOrderStatus: newAddOrderSetOrderStatus?? addOrderSetOrderStatus,
-      count: newCount?? count,
-      isFirstTime: newIsFirstTime?? isFirstTime
-
-
+      addOrderStatus: newAddOrderStatus ?? addOrderStatus,
+      addOrderCardProductStatus:
+      newAddOrderCardProductStatus ?? addOrderCardProductStatus,
+      addOrderSetOrderStatus:
+      newAddOrderSetOrderStatus ?? addOrderSetOrderStatus,
+      count: newCount ?? count,
+      isFirstTime: newIsFirstTime ?? isFirstTime,
+      visibleProducts: newVisibleProducts ?? visibleProducts, // 👈
     );
   }
 
   @override
-  // TODO: implement props
-  List<Object?> get props => [addOrderStatus,addOrderCardProductStatus ,addOrderSetOrderStatus, count, isFirstTime];
-
+  List<Object?> get props => [
+    addOrderStatus,
+    addOrderCardProductStatus,
+    addOrderSetOrderStatus,
+    count,
+    isFirstTime,
+    visibleProducts, // 👈
+  ];
 }
+

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
@@ -35,6 +37,14 @@ class _OrdersScreenState extends State<OrdersScreen>
         .add(LoadOrdersData(false, '', false, '', ''));
   }
 
+  Future<void> _onRefresh() {
+    final c = Completer<void>();
+    context
+        .read<OrdersBloc>()
+        .add(RefreshOrdersData(c));
+    return c.future;
+  }
+
   TextEditingController textEditingController = TextEditingController();
   bool searchTemp = true;
   bool showFilter = false;
@@ -46,21 +56,24 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final isRTL = Directionality.of(context) == TextDirection.rtl;
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
     return BlocConsumer<OrdersBloc, OrdersState>(
-        listener: (context, state) {},
-        builder: (context, state) {
-          if (state.ordersStatus is OrdersLoadingStatus) {
-            return Center(child: ProgressBar());
-          }
+        listener: (context, state) {
           if (state.ordersStatus is OrdersSearchFailedStatus) {
             StaticValues.staticOrders.clear();
             BlocProvider.of<OrdersBloc>(context)
                 .add(LoadOrdersData(false, '', false, '', ''));
           }
+        },
+        builder: (context, state) {
+          if (state.ordersStatus is OrdersLoadingStatus) {
+            return Center(child: ProgressBar());
+          }
+
           if (state.ordersStatus is UserErrorStatus) {
             return Center(child: Text("خطا!"));
           }
@@ -83,89 +96,112 @@ class _OrdersScreenState extends State<OrdersScreen>
                 centerTitle: false,
                 automaticallyImplyLeading: false,
                 titleSpacing: 0,
-
                 title: Align(
                   alignment: Alignment.centerRight, // stick to right
                   child: Container(
-                    padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
+                    padding:
+                        EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
                     width: AppConfig.calWidth(context, 62),
                     height: AppConfig.calWidth(context, 9),
                     child: SearchBar(
-                      backgroundColor: MaterialStateProperty.all(AppConfig.secondaryColor),
-                      leading: Icon(Icons.search, size: AppConfig.calWidth(context, 5)),
+                      backgroundColor:
+                          MaterialStateProperty.all(AppConfig.secondaryColor),
+                      leading: Icon(Icons.search,
+                          size: AppConfig.calWidth(context, 5)),
                       hintText: 'جستجو',
                       textStyle: MaterialStateProperty.all(
-                        TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+                        TextStyle(
+                            color: Colors.white,
+                            fontSize: AppConfig.calFontSize(context, 3)),
                       ),
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              AppConfig.calBorderRadiusSize(context)))),
                       hintStyle: MaterialStateProperty.all(
-                        TextStyle(fontSize: AppConfig.calFontSize(context, 3), color: Colors.white60),
+                        TextStyle(
+                            fontSize: AppConfig.calFontSize(context, 3),
+                            color: Colors.white60),
                       ),
                       onSubmitted: (query) {
                         if (query.isEmpty) {
                           searchTemp = false;
                           StaticValues.staticOrders.clear();
                         }
-                        context.read<OrdersBloc>().add(LoadOrdersData(searchTemp, query, false, '', ''));
+                        context.read<OrdersBloc>().add(
+                            LoadOrdersData(searchTemp, query, false, '', ''));
                       },
                     ),
                   ),
                 ),
-
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.filter_alt_outlined, color: Colors.white),
-                    onPressed: () => context.read<OrdersBloc>().add(ShowFilter(showFilter)),
+                    icon: const Icon(Icons.filter_alt_outlined,
+                        color: Colors.white),
+                    onPressed: () =>
+                        context.read<OrdersBloc>().add(ShowFilter(showFilter)),
                   ),
                   IconButton(
                     icon: const Icon(Icons.add, color: Colors.white),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductFormScreen.create())),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => ProductFormScreen.create())),
                   ),
-                 // const SizedBox(width: 8),
+                  // const SizedBox(width: 8),
                 ],
               ),
               body: Stack(
                 children: [
                   RefreshIndicator(
-                    onRefresh: () async {
-                      await Future.delayed(const Duration(seconds: 2));
-                      context.read<OrdersBloc>().add(RefreshOrdersData());
-                    },
+                    onRefresh: _onRefresh,
                     child: StaticValues.staticOrders.isEmpty
-                        ? Container(
-                      color: AppConfig.backgroundColor,
-                      child: Center(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
-                              context, 4),
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             children: [
-                              Text('سفارشی یافت نشد!',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: AppConfig.calFontSize(context, 3)),
+                              Container(alignment: Alignment.center,height: AppConfig.calHeight(context, 90),
+                                child: Center(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  spacing: AppConfig.calWidth(context, 4),
+                                  children: [
+                                    Text(
+                                      'سفارشی یافت نشد!',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: AppConfig.calFontSize(
+                                              context, 3)),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          BlocProvider.of<OrdersBloc>(context)
+                                              .add(LoadOrdersData(
+                                                  false, '', false, '', ''));
+                                        },
+                                        icon: Icon(
+                                          Icons.refresh,
+                                          color: Colors.white,
+                                          size: AppConfig.calWidth(context, 6),
+                                        ))
+                                  ],
+                                )),
                               ),
-                              IconButton(onPressed: (){
-                                BlocProvider.of<OrdersBloc>(context)
-                                    .add(LoadOrdersData(false, '', false, '', ''));
-                              }, icon:   Icon(Icons.refresh,color: Colors.white,size: AppConfig.calWidth(context, 6),))
-
                             ],
-                          )),
-                    )
-                        : Container(
-                            color: AppConfig.backgroundColor,
-                            child: ListView.builder(
-                                controller: _scrollController,
-                                itemCount: StaticValues.staticOrders.length + 1,
-                                itemBuilder: (context, item) {
-                                  if (item ==
-                                      StaticValues.staticOrders.length) {
-                                    return _LoadMoreButton();
-                                  }
-                                  return Order(
-                                      ordersLoadedStatus:
-                                          StaticValues.staticOrders[item],
-                                      item: item);
-                                }),
-                          ),
+                          )
+                        : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                            controller: _scrollController,
+                            itemCount: StaticValues.staticOrders.length + 1,
+                            itemBuilder: (context, item) {
+                              if (item ==
+                                  StaticValues.staticOrders.length) {
+                                return _LoadMoreButton();
+                              }
+                              return Order(
+                                  ordersLoadedStatus:
+                                      StaticValues.staticOrders[item],
+                                  item: item);
+                            }),
                   ),
                   if (state.showFilter)
                     GestureDetector(
@@ -193,34 +229,53 @@ class _OrdersScreenState extends State<OrdersScreen>
                                 children: [
                                   Text("اعمال فیلتر",
                                       style: TextStyle(
-                                          fontSize: AppConfig.calFontSize(context, 4),
+                                          fontSize:
+                                              AppConfig.calFontSize(context, 4),
                                           fontWeight: FontWeight.bold)),
                                   SizedBox(height: height * 0.06),
-                                  DropdownButtonFormField(dropdownColor: Colors.white,
+                                  DropdownButtonFormField(
+                                    dropdownColor: Colors.white,
                                     items: StaticValues.status.entries
                                         .map((entry) {
                                       return DropdownMenuItem(
                                           value: entry.key,
-                                          child: Text(entry.value,style: TextStyle(fontSize: AppConfig.calFontSize(context, 3))));
+                                          child: Text(entry.value,
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      AppConfig.calFontSize(
+                                                          context, 3))));
                                     }).toList(),
                                     onChanged: (value) {
                                       selectedStatus = value!;
                                     },
                                     decoration: InputDecoration(
-                                        labelText: "وضعیت سفارش",labelStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2))),
+                                        labelText: "وضعیت سفارش",
+                                        labelStyle: TextStyle(
+                                            fontSize: AppConfig.calFontSize(
+                                                context, 3.2))),
                                   ),
                                   SizedBox(height: height * 0.06),
-                                  DropdownButtonFormField(dropdownColor: Colors.white,
+                                  DropdownButtonFormField(
+                                    dropdownColor: Colors.white,
                                     items:
                                         ["5", "10", "20", "50"].map((status) {
                                       return DropdownMenuItem(
-                                          value: status, child: Text(status,style: TextStyle(fontSize: AppConfig.calFontSize(context, 3)),));
+                                          value: status,
+                                          child: Text(
+                                            status,
+                                            style: TextStyle(
+                                                fontSize: AppConfig.calFontSize(
+                                                    context, 3)),
+                                          ));
                                     }).toList(),
                                     onChanged: (value) {
                                       selectedCount = value!;
                                     },
                                     decoration: InputDecoration(
-                                        labelText: "تعداد سفارش",labelStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2))),
+                                        labelText: "تعداد سفارش",
+                                        labelStyle: TextStyle(
+                                            fontSize: AppConfig.calFontSize(
+                                                context, 3.2))),
                                   ),
                                   SizedBox(height: height * 0.06),
                                   SizedBox(
@@ -230,30 +285,25 @@ class _OrdersScreenState extends State<OrdersScreen>
                                           MainAxisAlignment.spaceAround,
                                       children: [
                                         GestureDetector(
-                                          onTap: (){
-                                            BlocProvider.of<OrdersBloc>(
-                                                context)
+                                          onTap: () {
+                                            BlocProvider.of<OrdersBloc>(context)
                                                 .add(LoadOrdersData(
-                                                false,
-                                                '',
-                                                true,
-                                                '',
-                                              ''
-                                            ));
-                                            BlocProvider.of<OrdersBloc>(
-                                                context)
-                                                .add(ShowFilterOff(
-                                                showFilter));
+                                                    false, '', true, '', ''));
+                                            BlocProvider.of<OrdersBloc>(context)
+                                                .add(ShowFilterOff(showFilter));
                                             selectedStatus = '';
                                             selectedCount = '10';
                                           },
                                           child: Container(
                                               alignment: Alignment.center,
-                                              height: AppConfig.calHeight(context, 05),
+                                              height: AppConfig.calHeight(
+                                                  context, 05),
                                               child: Text(
                                                 "پاک کردن فیلتر",
                                                 style: TextStyle(
-                                                    fontSize: AppConfig.calFontSize(context, 2.8)),
+                                                    fontSize:
+                                                        AppConfig.calFontSize(
+                                                            context, 2.8)),
                                               )),
                                         ),
                                         SizedBox(
@@ -288,7 +338,9 @@ class _OrdersScreenState extends State<OrdersScreen>
                                             child: Text(
                                               "اعمال تغییرات",
                                               style: TextStyle(
-                                                  fontSize: AppConfig.calFontSize(context,2.8),
+                                                  fontSize:
+                                                      AppConfig.calFontSize(
+                                                          context, 2.8),
                                                   color: Colors.white),
                                             ),
                                           ),
@@ -341,7 +393,6 @@ class _LoadMoreButton extends StatelessWidget {
                       ),
                     );
               },
-
         child: isLoadingMore
             ? SizedBox(
                 child: ProgressBar(

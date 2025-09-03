@@ -75,6 +75,7 @@ dev_dependencies:
   dotted_line: ^3.2.3
   responsive_sizer: ^3.3.1
   flutter_advanced_switch: ^3.1.0
+  image_picker: ^1.2.0
   
 
   # The "flutter_lints" package below contains a set of recommended lints to

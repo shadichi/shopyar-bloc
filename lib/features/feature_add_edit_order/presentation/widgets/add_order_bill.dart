@@ -68,23 +68,54 @@ class _AddOrderBillState extends State<AddOrderBill> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    if(widget.isEditMode == ProductFormMode.edit){
+
+    if (widget.isEditMode == ProductFormMode.edit) {
       final e = widget.ordersEntity!;
-      widget.textEditing[0].text = e.billing!.firstName;
-      widget.textEditing[1].text = e.billing!.lastName;
+      widget.textEditing[0].text = e.billing!.firstName;  // نام
+      widget.textEditing[1].text = e.billing!.lastName;   // نام خانوادگی
       widget.textEditing[2].text = e.billing!.address1;
       widget.textEditing[3].text = e.billing!.city;
       widget.textEditing[4].text = e.billing!.postcode;
-      widget.textEditing[5].text = e.billing!.email.toString();
+      widget.textEditing[5].text = e.billing!.email ?? '';
       widget.textEditing[6].text = e.billing!.phone;
-      widget.textEditing[7].text = e.shippingPrice!;
-    //  widget.textEditing[8].text = e.billing!.firstName;
-    //  widget.textEditing[9].text = e.billing!.firstName;
+      widget.textEditing[7].text = e.shippingPrice ?? '';
 
+      // 🔔 اینجا کال‌بک‌های پدر رو هم صدا بزن
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onTextChange[1](widget.textEditing[0].text); // FN
+        widget.onTextChange[0](widget.textEditing[1].text); // LN
+        widget.onTextChange[4](widget.textEditing[2].text); // Address
+        widget.onTextChange[2](widget.textEditing[3].text); // City
+        widget.onTextChange[5](widget.textEditing[4].text); // Postal
+        widget.onTextChange[6](widget.textEditing[5].text); // Email
+        widget.onTextChange[7](widget.textEditing[6].text); // Phone
+        widget.onTextChange[10](widget.textEditing[7].text); // ShipPrice
+
+        // استان/پرداخت/حمل‌ونقل هم باید به پدر اطلاع داده بشن
+        final prov = e.billing!.state;
+        final payTitle  = e.paymentMethodTitle?.toString() ?? '';
+        final shipTitle = (e.shippingLines?.isNotEmpty ?? false)
+            ? e.shippingLines![0].methodTitle ?? ''
+            : '';
+
+        if (prov.isNotEmpty) widget.onTextChange[3](prov);
+        if (payTitle.isNotEmpty) widget.onTextChange[9](payTitle);
+        if (shipTitle.isNotEmpty) widget.onTextChange[8](shipTitle);
+      });
+    } else {
+      // حالت create → پیش‌فرض‌ها رو هم بفرست به پدر
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final defaultProv = 'آذربایجان شرقی';
+        final defaultPay  = widget.paymentMethod?.first.methodTitle ?? '';
+        final defaultShip = widget.shipmentMethod?.first.methodTitle ?? '';
+        widget.onTextChange[3](defaultProv);
+        if (defaultPay.isNotEmpty) widget.onTextChange[9](defaultPay);
+        if (defaultShip.isNotEmpty) widget.onTextChange[8](defaultShip);
+      });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

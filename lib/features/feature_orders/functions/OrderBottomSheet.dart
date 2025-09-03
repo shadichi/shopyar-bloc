@@ -5,6 +5,7 @@ import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
+import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
 
 import '../../../core/params/orders_edit_status.dart';
 import '../../../core/widgets/progress-bar.dart';
@@ -29,12 +30,14 @@ void showFilterBottomSheet(BuildContext context,
           if (state.editStatus is EditOrderSuccessStatus) {
 
             await  alertDialogScreen(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
-            Navigator.pop(context);
+            Navigator.pushNamed(context, OrdersScreen.routeName);
           }
         },
         builder: (context, state) {
+
           print('showFilterBottomSheet');
           print(state.editStatus);
+          print(StaticValues.status);
           if (state.editStatus is EditOrderLoadingStatus) {
             return Container(
               color: Colors.black.withOpacity(0.5),
@@ -48,7 +51,7 @@ void showFilterBottomSheet(BuildContext context,
             print('Failed');
 
           }
-          if ( state.editStatus is OrdersLoadedStatus) {
+          if ( state.editStatus is OrdersLoadedStatus || state.editStatus is EditOrderInitialStatus) {
             return Padding(padding: EdgeInsets.all(AppConfig.calHeight(context, 0.8)),
               child: SingleChildScrollView(
                 child: Column(
@@ -56,11 +59,12 @@ void showFilterBottomSheet(BuildContext context,
                   mainAxisSize: MainAxisSize.min, // Adjust height dynamically
                   children: [
                     Container(alignment: Alignment.center,
+                      height: AppConfig.calHeight(context, 5),
                       //  padding: EdgeInsets.all(AppConfig.calHeight(context, 1)),
                       child: Text(
                         "جهت تغییر وضعیت سفارش انتخاب کنید:",
                         style: TextStyle(
-                            fontSize: AppConfig.calTitleFontSize(context),color: Colors.white),
+                            fontSize: AppConfig.calFontSize(context, 3.2),color: Colors.white),
                       ),
                     ),
                     SizedBox(height: AppConfig.calHeight(context, 2),),
@@ -93,19 +97,28 @@ void showFilterBottomSheet(BuildContext context,
                                   borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 3))),   color:  AppConfig.secondaryColor,
                                 ),
 
-                                height: height * 0.1,
+                                height: height * 0.07,
                                 width: width * 0.7,
                                 alignment: Alignment.center,
                                 child: ListTile(
-                                  title:
-                                  Text(trueValue, textAlign: TextAlign.center,style: TextStyle(color: Colors.white,fontSize:  AppConfig.calFontSize(context, 4)),),
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  minVerticalPadding: 0,
+                                  horizontalTitleGap: 0,
+                                  title: Center(
+                                    child: Text(
+                                      trueValue,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.8)),
+                                    ),
+                                  ),
                                   onTap: () {
-                                    print(trueKey.substring(3));
                                     BlocProvider.of<OrdersBloc>(context).add(
-                                        EditStatus(OrdersEditStatus(
-                                            ordersId, trueKey.substring(3))));
+                                      EditStatus(OrdersEditStatus(ordersId, trueKey.substring(3))),
+                                    );
                                   },
-                                ),
+                                )
+                                ,
                               ),
                             );
                           }

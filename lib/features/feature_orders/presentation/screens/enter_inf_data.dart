@@ -180,7 +180,6 @@ class _EnterInfDataState extends State<EnterInfData> {
   }
 }
 
-// ویجت اختصاصی برای تکست فیلدها 🚀
 class CustomTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -224,6 +223,39 @@ class CustomTextField extends StatelessWidget {
             borderSide: BorderSide(color: Colors.blue, width: 2),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class IconChooser extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final TextInputFormatter? inputFormatter;
+  final String? Function(String?)? validator;
+
+  const IconChooser({
+    required this.label,
+    required this.controller,
+    this.keyboardType,
+    this.inputFormatter,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(width: AppConfig.calWidth(context, 30),height: AppConfig.calHeight(context, 10),color: Colors.grey,
+            child: Text('انتخاب آیکون از گالری'),
+          ),
+          Container(width: AppConfig.calWidth(context, 30),height: AppConfig.calHeight(context, 10),color: Colors.grey,
+            child: Text('انتخاب آیک.ن از گالری'),
+          )
+        ],
       ),
     );
   }

@@ -30,13 +30,13 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
     on<LoadOrdersData>((event, emit) async {
       final isInitial = StaticValues.staticOrders.isEmpty && !event.isLoadMore;
 
-      // برای سرچ/فیلتر: لیست رو خالی و لودینگ صفحه‌ای
+      // اگر سرچ یا فیلتره، لیست رو صفر کن و لودینگ تمام‌صفحه بده
       if (event.isSearch || event.isFilter) {
         StaticValues.staticOrders.clear();
         emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
       }
 
-      // 👇 شروع لود بیشتر: فقط فلگ دکمه رو روشن کن، نه لودینگ کل صفحه
+      // اگر load more هست فقط فلگ دکمه رو روشن کن
       if (event.isLoadMore) {
         emit(state.copyWith(newIsLoadingMore: true));
       } else if (isInitial) {
@@ -44,30 +44,28 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       }
 
       try {
-        // perPage محاسبه
+        // perPage
         String perPage = '10';
         if (event.perPage.isNotEmpty) perPage = event.perPage;
 
-        // فراخوانی
         final dataState = await getOrdersUseCase(
-          OrdersParams(10, "", {}, event.search, perPage, event.status),
+          OrdersParams(
+            10,          // page یا offset اگر داری، اینجا تنظیم کن (الان ثابت گذاشتی)
+            "",          // query
+            {},          // فیلترها
+            event.search, // متن سرچ
+            perPage,
+            event.status,
+          ),
         );
 
         if (dataState is OrderDataSuccess) {
           final fetched = dataState.data!.cast<OrdersEntity>();
 
-          // 👇 اگر isLoadMore داری و API صفحه‌بندی‌ات «تجمعی» نیست،
-          // یا append کن یا کل لیست رو با fetched جایگزین کن. پیشنهاد:
-          if (event.isLoadMore && StaticValues.staticOrders.isNotEmpty) {
-            // اگر API فقط همون perPage آخر رو می‌ده، این خط گزینه امن‌تره:
-            StaticValues.staticOrders = fetched;
-            // یا اگر API واقعاً «صفحه بعدی» رو می‌ده، از این استفاده کن:
-            // StaticValues.staticOrders.addAll(fetched);
-          } else {
-            StaticValues.staticOrders = fetched;
-          }
+          // چون دکمه Load More توی UI تعداد perPage رو زیاد می‌کنه،
+          // منطقیه کل لیست رو با fetched جایگزین کنیم (تجمعی).
+          StaticValues.staticOrders = fetched;
 
-          // حالت صفحه: Loaded باقی بمونه
           emit(state.copyWith(newOrdersStatus: OrdersLoadedStatus()));
         } else {
           emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
@@ -75,43 +73,54 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       } catch (_) {
         emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
       } finally {
-        // 👇 حتماً خاموش کن تا دکمه از لودینگ خارج شه
+        // خاموش کردن لودینگ load more
         if (event.isLoadMore) {
           emit(state.copyWith(newIsLoadingMore: false));
         }
       }
     });
 
+
     on<RefreshOrdersData>((event, emit) async {
+      // اختیاری: دوست داری حین رفرش اسپینر هم داشته باشی
       emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
-      OrderDataState dataState =
-          await getOrdersUseCase(OrdersParams(10, "", {}, '','',''));
-      if (dataState is OrderDataSuccess) {
-        try {
-          print("OrdersLoadedStatus");
-          emit(state.copyWith(
-              newOrdersStatus:
-                  OrdersLoadedStatus()));
-        } catch (error) {
-          print("OrdersErrorStatus");
+
+      try {
+        // لیست محلی را خالی می‌کنیم (اختیاری)
+        StaticValues.staticOrders.clear();
+
+        // ❗️ مهم: perPage را '10' بده (مثل لود اولیه)
+        final dataState = await getOrdersUseCase(
+          OrdersParams(10, "", {}, /*search*/ '', /*perPage*/ '10', /*status*/ ''),
+        );
+
+        if (dataState is OrderDataSuccess) {
+          // ⭐️ خیلی مهم: لیست را با دادهٔ جدید پر کن
+          StaticValues.staticOrders = dataState.data!.cast<OrdersEntity>();
+
+          emit(state.copyWith(newOrdersStatus: OrdersLoadedStatus()));
+        } else {
           emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
         }
+      } catch (e) {
+        emit(state.copyWith(newOrdersStatus: OrdersErrorStatus()));
+      } finally {
+        // ⭐️ همیشه complete کن تا RefreshIndicator بسته شود
+        event.completer?.complete();
       }
     });
 
+
+
     on<ShowFilter>((event, emit) async {
-      event.showFilter = !event.showFilter;
-
-      emit(state.copyWith(newShowFilter: event.showFilter));
-
+      // به جای تغییر event، از state بخون و برعکسش کن
+      emit(state.copyWith(newShowFilter: !state.showFilter));
     });
 
     on<ShowFilterOff>((event, emit) async {
-      event.showFilter = false;
-
-      emit(state.copyWith(newShowFilter: event.showFilter));
-
+      emit(state.copyWith(newShowFilter: false));
     });
+
     on<EditStatus>((event, emit) async {
 
       emit(state.copyWith(newEditStatus: EditOrderLoadingStatus()));
@@ -124,6 +133,10 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           emit(state.copyWith(
               newEditStatus:
               EditOrderSuccessStatus()));
+          emit(state.copyWith(
+              newEditStatus:
+              EditOrderInitialStatus()));
+
         } catch (error) {
           emit(state.copyWith(newEditStatus: EditOrderFailedStatus()));
         }
