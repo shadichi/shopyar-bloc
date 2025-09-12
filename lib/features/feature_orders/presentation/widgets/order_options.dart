@@ -107,7 +107,9 @@ Future<void> _handleStoreInfo(BuildContext context) async {
   var store = storeBox.get('storeInfo');
 
   if (store == null || store.storeName.isEmpty) {
-    Navigator.pushNamed(context, EnterInfData.routeName);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
+      return EnterInfData(isFirstTime: true,);
+    }));
   } else {
     Navigator.pushNamed(context, PdfViewerScreen.routeName, arguments: store);
   }

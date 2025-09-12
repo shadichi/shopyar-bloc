@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
 import '../../../../core/config/app-colors.dart';
+import '../../../../core/widgets/snackBar.dart';
 import '../../data/models/store_info.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +11,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EnterInfData extends StatefulWidget {
+  final isFirstTime;
+  EnterInfData({this.isFirstTime = false});
+
   static String routeName = 'EnterInfData';
 
   @override
@@ -24,71 +28,56 @@ class _EnterInfDataState extends State<EnterInfData> {
   final TextEditingController _instagramController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
-  final TextEditingController _storeIconController = TextEditingController();
+
+  String path = '';
 
   File? _imageFile;
   static const _kSavedPathKey = 'saved_image_path';
   final _picker = ImagePicker();
 
   Future<void> _saveData() async {
-    var box = await Hive.openBox<StoreInfo>('storeBox');
-    var storeInfo = StoreInfo(
-      storeName: _storeNameController.text,
-      storeAddress: _storeAddressController.text,
-      phoneNumber: _phoneNumberController.text,
-      instagram: _instagramController.text,
-      postalCode: _postalCodeController.text,
-      website: _websiteController.text,
-      storeIcon: _storeIconController.text,
-    );
-    await box.put('storeInfo', storeInfo);
-    await box.close();
-  }
-
-  void _showWelcomeDialog() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              "📢 اطلاعیه",
-              style: TextStyle(fontSize: AppConfig.calTitleFontSize(context)),
-            ),
-            content: Text(
-              "در این بخش، اطلاعات ارسالی شما برای درج در برچسب پستی دریافت و ذخیره می‌شود.\n"
-              "می‌توانید در آینده از طریق صفحه اصلی برنامه آن را ویرایش کنید.",
-              style: TextStyle(fontSize: AppConfig.calTitleFontSize(context)),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  "متوجه شدم ✅",
-                  style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: AppConfig.calTitleFontSize(context)),
-                ),
-              ),
-            ],
-          );
-        },
+    try{
+      var box = await Hive.openBox<StoreInfo>('storeBox');
+      var storeInfo = StoreInfo(
+        storeName: _storeNameController.text,
+        storeAddress: _storeAddressController.text,
+        phoneNumber: _phoneNumberController.text,
+        instagram: _instagramController.text,
+        postalCode: _postalCodeController.text,
+        website: _websiteController.text,
+        storeIcon: path,
       );
-    });
+      await box.put('storeInfo', storeInfo);
+      await box.close();
+
+      showSnack(context, 'اطلاعات برچسب پستی با موفقیت ذخیره شد.');
+
+    }catch(e){
+      showSnack(context, 'خطا در ثبت اطلاعات برچسب پستی: $e');
+    }
   }
 
-  bool _shownOnce = false;
 
   @override
   void initState() {
     super.initState();
     _loadSavedImage();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _shownOnce) return;
-      _shownOnce = true;
-      _showIntroDialog();
+      if (!mounted || !widget.isFirstTime) return;
+      if(widget.isFirstTime){
+        _showIntroDialog();
+      }
     });
   }
+
+  /*Future<void> _checkFirstTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isDbFirstTime = prefs.getBool('isDbFirstTime') ?? false;
+
+    if (isDbFirstTime == true) {
+      Navigator.pushReplacementNamed(context, '/anotherPage');
+    }
+  }*/
 
   Future<void> _showIntroDialog() async {
     final res = await alertDialogScreen(
@@ -102,8 +91,8 @@ class _EnterInfDataState extends State<EnterInfData> {
 
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
-    final path = prefs.getString(_kSavedPathKey);
-    if (path != null && File(path).existsSync()) {
+   path = prefs.getString(_kSavedPathKey).toString();
+    if (path.isNotEmpty && File(path).existsSync()) {
       setState(() => _imageFile = File(path));
     }
   }
@@ -158,7 +147,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                   label: "نام فروشگاه",
                   controller: _storeNameController,
                   inputFormatter:
-                      FilteringTextInputFormatter.allow(RegExp(r'[آ-ی ]')),
+                      FilteringTextInputFormatter.allow(RegExp(r'[آ-ی 0-9.,a-z]')),
                   validator: (value) =>
                       value!.isEmpty ? "نام فروشگاه را وارد کنید" : null,
                 ),
@@ -166,7 +155,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                   label: "آدرس فروشگاه",
                   controller: _storeAddressController,
                   inputFormatter:
-                      FilteringTextInputFormatter.allow(RegExp(r'[آ-ی 0-9.,]')),
+                      FilteringTextInputFormatter.allow(RegExp(r'[آ-ی 0-9.,a-z]')),
                   validator: (value) =>
                       value!.isEmpty ? "آدرس فروشگاه را وارد کنید" : null,
                 ),
@@ -197,26 +186,20 @@ class _EnterInfDataState extends State<EnterInfData> {
                   label: "وبسایت",
                   controller: _websiteController,
                   inputFormatter:
-                      FilteringTextInputFormatter.allow(RegExp(r'[آ-ی 0-9.,]')),
+                      FilteringTextInputFormatter.allow(RegExp(r'[a-z ,0-9.,آ-ی]')),
                   validator: (value) =>
                       value!.isEmpty ? "وبسایت را وارد کنید" : null,
                 ),
-                CustomTextField(
-                  label: "آیکون فروشگاه",
-                  controller: _storeIconController,
-                  keyboardType: TextInputType.number,
-                  inputFormatter: FilteringTextInputFormatter.digitsOnly,
-                  validator: (value) =>
-                      value!.isEmpty ? "آیکون فروشگاه را وارد کنید" : null,
-                ),
-                SizedBox(height: 20),
-                Container(//color: Colors.red,
+
+                SizedBox(height: AppConfig.calHeight(context, 1)),
+                Container(
+                  //color: Colors.red,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Container(
                         width: AppConfig.calWidth(context, 40),
-                        height: AppConfig.calHeight(context, 8),
+                        height: AppConfig.calHeight(context, 10),
                         child: ElevatedButton(
                           onPressed: () {
                             //   _saveData();
@@ -226,8 +209,8 @@ class _EnterInfDataState extends State<EnterInfData> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: AppConfig.secondaryColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(AppConfig.calBorderRadiusSize(context))),
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                    AppConfig.calBorderRadiusSize(context))),
                                 side: BorderSide(
                                     width: 1, color: Colors.grey[300]!),
                               )),
@@ -241,27 +224,19 @@ class _EnterInfDataState extends State<EnterInfData> {
                           ),
                         ),
                       ),
-                      if (_imageFile != null)
-                        Container(child: IconButton(onPressed: (){}, icon: Icon(Icons.delete_forever_rounded,color: Colors.white,)),
-                          width: AppConfig.calWidth(context, 10),
-                          height: AppConfig.calHeight(context, 10), alignment: Alignment.center,  decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(
-                                      AppConfig.calBorderRadiusSize(
-                                          context)))),),
+
                       Center(
                         child: _imageFile == null
                             ? Container(
-                          alignment: Alignment.center,
+                                alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.white),
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(
                                             AppConfig.calBorderRadiusSize(
                                                 context)))),
-                                height: AppConfig.calHeight(context, 6),
-                                width: AppConfig.calWidth(context, 25),
+                          height: AppConfig.calHeight(context, 10),
+                          width: AppConfig.calWidth(context, 25),
                                 child: Text(
                                   'آیکونی انتخاب نشده',
                                   style: TextStyle(
@@ -272,11 +247,12 @@ class _EnterInfDataState extends State<EnterInfData> {
                                 ),
                               )
                             : ClipRRect(
-                                borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)),
+                                borderRadius: BorderRadius.circular(
+                                    AppConfig.calBorderRadiusSize(context)),
                                 child: Image.file(
                                   _imageFile!,
                                   height: AppConfig.calHeight(context, 10),
-                                  width: AppConfig.calWidth(context, 22),
+                                  width: AppConfig.calWidth(context, 25),
                                   fit: BoxFit
                                       .cover, // looks like an uploaded preview
                                 ),
@@ -285,24 +261,35 @@ class _EnterInfDataState extends State<EnterInfData> {
                     ],
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _saveData();
-                      Navigator.pushNamed(context, '/pdfViewer');
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppConfig.secondaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                        side: BorderSide(width: 1, color: Colors.grey[300]!),
-                      )),
-                  child: Text(
-                    'ذخیره',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: AppConfig.calFontSize(context, 3)),
+                SizedBox(height: AppConfig.calHeight(context, 5),),
+                Container(
+                  width: AppConfig.calWidth(context, 73),
+                  height: AppConfig.calHeight(context, 6),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        if(_imageFile != null){
+                          _saveData();
+                          Navigator.pushNamed(context, '/pdfViewer');
+                        }else{
+                          alertDialogScreen(context, 'لطفا یک آیکون انتخاب کنید.', 0, false);
+                        }
+
+                      }
+                     // _clearImage();
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppConfig.secondaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          side: BorderSide(width: 1, color: Colors.grey[300]!),
+                        )),
+                    child: Text(
+                      'ذخیره',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: AppConfig.calFontSize(context, 3)),
+                    ),
                   ),
                 ),
               ],

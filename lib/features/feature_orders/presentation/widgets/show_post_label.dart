@@ -8,7 +8,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:shapyar_bloc/core/colors/app-colors.dart';
-
+import 'package:hive/hive.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/store_info.dart';
@@ -28,10 +28,42 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
   StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
 
+  //StoreInfo? storeInfo;
   @override
   void initState() {
     super.initState();
-    _generatePdf(); // تولید PDF در لحظه ورود
+    getHiveData();
+    _init(); // تولید PDF در لحظه ورود
+  }
+  Future<void> _init() async {
+    try {
+      await getHiveData();      // اینجا تا گرفتن دیتا صبر می‌کنه
+      await _generatePdf();    // حالا که دیتا هست، PDF بساز
+    } catch (e) {
+      // هندل خطا (مثلاً SnackBar یا لاگ)
+      print('Error in init: $e');
+    }
+  }
+
+  Future<void> getHiveData() async {
+    final box = await Hive.openBox<StoreInfo>('storeBox');
+    final stored = box.get('storeInfo');
+    if (stored != null) {
+      storeInfo = stored;
+    } else {
+      // اگر انتظار داشتی حتما داده باشه، اینجا می‌تونی مقدار پیش‌فرض یا لاگ بذاری
+      storeInfo = StoreInfo(
+        storeName: '',
+        storeAddress: '',
+        phoneNumber: '',
+        instagram: '',
+        postalCode: '',
+        website: '',
+        storeIcon: '',
+      );
+    }
+    await box.close();
+    setState(() {}); // اگه می‌خوای UI تغییر کنه
   }
 
 /*  @override
@@ -97,7 +129,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                             pw.Text('')
                           ]))),
               positionedTextWidget(
-                  text: storeInfo.storeName,//نام گیرنده
+                  text: 'storeInfo.storeName' ,//نام گیرنده
                   heightContainer: height * 0.02,
                   widthContainer: width * 0.28,
                   leftPositioned: width * 0.445,
@@ -279,6 +311,8 @@ pw.Widget positionedTextWidget({
       left: leftPositioned,
       top: topPositioned,
       child: pw.Container(
+        color: PdfColors.red,
+
           alignment: alignment,
           width: widthContainer,
           height: heightContainer,

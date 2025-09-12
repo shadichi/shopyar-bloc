@@ -4,6 +4,7 @@ import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/setting.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shapyar_bloc/features/feature_orders/presentation/screens/enter_inf_data.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
@@ -36,7 +37,7 @@ class HomeDrawer extends StatelessWidget {
       },
       () {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => PdfViewerScreen()));
+            MaterialPageRoute(builder: (context) => EnterInfData()));
       },
       () async {
         final navigator = Navigator.of(context);

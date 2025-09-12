@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'store_info.g.dart';
 
-@HiveType(typeId: 0) // تعیین یک شناسه یکتا
+@HiveType(typeId: 0) //for each hive model
 class StoreInfo extends HiveObject {
   @HiveField(0)
   String storeName;
@@ -24,6 +24,7 @@ class StoreInfo extends HiveObject {
 
   @HiveField(6)
   String storeIcon;
+
 
   StoreInfo({
     required this.storeName,

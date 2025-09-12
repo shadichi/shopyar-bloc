@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:shapyar_bloc/extension/persian_digits.dart';
 
 import '../widgets/pie-chart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = "/home_screen";
@@ -33,13 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
-
   }
-
 
   @override
   Widget build(BuildContext context) {
-
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
@@ -75,26 +73,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       height: AppConfig.calHeight(context, 4),
                       alignment: Alignment.center,
-                     // color: Colors.green,
+                      // color: Colors.green,
                       //  padding: EdgeInsets.all(width * 0.03),
                       child: Text(
-                        StaticValues.shopName,maxLines: 1,
-
+                        StaticValues.shopName,
+                        maxLines: 1,
                         style: TextStyle(
-
-                          overflow: TextOverflow.ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: AppConfig.calWidth(context, 3)),
                       ),
                     ),
                     Container(
-                     // color: Colors.red,
+                    //   color: Colors.red,
                       alignment: Alignment.center,
-                      height: AppConfig.calHeight(context, 4),
+                      height: AppConfig.calHeight(context, 3),
                       child: Text(
                         jd.echo('l، d F').stringToPersianDigits(),
-                      //  textDirection: ,
+                        //  textDirection: ,
                         style: TextStyle(
                             color: Colors.grey.shade400,
                             fontSize: AppConfig.calWidth(context, 3.2),
@@ -117,36 +114,48 @@ class _HomeScreenState extends State<HomeScreen> {
                   spacing: height * 0.03,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcCompleted == 0&&
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcOnHold == 0&&
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcPending == 0&&
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcProcessing == 0&&
-                StaticValues.staticHomeDataEntity!.statusCounts!.wcCancelled == 0
-                ?  Center(
-                child: Container(
-                  height: AppConfig.calHeight(context, 30),alignment: Alignment.center,
-                  child: Text(
-                    'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
-                    style: TextStyle(fontSize: AppConfig.calFontSize(context, 3), fontWeight: FontWeight.bold,color: Colors.white),
-                  ),
-                ),
-              )
-                    :                       HomeScreenPieChart(
-                  items: [
-                    StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcCompleted,
-                    StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcOnHold,
-                    StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcPending,
-                    StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcProcessing,
-                    StaticValues
-                        .staticHomeDataEntity!.statusCounts!.wcCancelled
-                  ],
-                ),
-
+                    StaticValues.staticHomeDataEntity!.statusCounts!
+                                    .wcCompleted ==
+                                0 &&
+                            StaticValues.staticHomeDataEntity!.statusCounts!
+                                    .wcOnHold ==
+                                0 &&
+                            StaticValues
+                                    .staticHomeDataEntity!.statusCounts!.wcPending ==
+                                0 &&
+                            StaticValues.staticHomeDataEntity!.statusCounts!
+                                    .wcProcessing ==
+                                0 &&
+                            StaticValues.staticHomeDataEntity!.statusCounts!
+                                    .wcCancelled ==
+                                0
+                        ? Center(
+                            child: Container(
+                              height: AppConfig.calHeight(context, 30),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
+                                style: TextStyle(
+                                    fontSize: AppConfig.calFontSize(context, 3),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          )
+                        : HomeScreenPieChart(
+                            items: [
+                              StaticValues.staticHomeDataEntity!.statusCounts!
+                                  .wcCompleted,
+                              StaticValues
+                                  .staticHomeDataEntity!.statusCounts!.wcOnHold,
+                              StaticValues.staticHomeDataEntity!.statusCounts!
+                                  .wcPending,
+                              StaticValues.staticHomeDataEntity!.statusCounts!
+                                  .wcProcessing,
+                              StaticValues.staticHomeDataEntity!.statusCounts!
+                                  .wcCancelled
+                            ],
+                          ),
                     MiddleCard(
                       statusCounts: StaticValues.staticHomeDataEntity,
                     ),
@@ -167,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               topLeft: Radius.circular(width * 0.07),
                               topRight: Radius.circular(width * 0.07))),
                       child: Chart(StaticValues.staticHomeDataEntity),
-
                     ),
                     SizedBox(
                       height: height * 0.08,
@@ -179,18 +187,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       } else if (state.homeStatus is HomeErrorStatus) {
-
         return Center(
-            child: Text(
-          'خطا در بارگیری اطلاعات صفحه اصلی!',
-          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+            child: Column(
+          children: [
+            Text(
+              'خطا در بارگیری اطلاعات صفحه اصلی!',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConfig.calFontSize(context, 3)),
+            ),
+            ElevatedButton(
+                onPressed: () async {
+
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    print('clear');
+
+                },
+                child: Text('data'))
+          ],
         ));
       } else if (state.homeStatus is HomeLoadedStatus) {
-
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
         return Scaffold(
-
           body: Container(
             height: height,
             width: width,
@@ -220,7 +240,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-
 
       return Container(
         color: AppConfig.backgroundColor,

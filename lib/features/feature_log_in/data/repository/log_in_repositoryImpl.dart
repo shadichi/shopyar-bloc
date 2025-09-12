@@ -34,7 +34,7 @@ class LogInRepositoryImpl extends LogInRepository {
   Future<Map<String, dynamic>> callLogInData(
       WholeUserDataParams userDataParams) async {
     try {
-      final response = await apiProvider.GetLoginData(WholeUserDataParams(
+      final response = await apiProvider.GetLoginDataApi(WholeUserDataParams(
           ensureHttps(userDataParams.webService), userDataParams.key));
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
