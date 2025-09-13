@@ -9,6 +9,7 @@ import '../../../../core/config/app-colors.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
+import '../../../feature_orders/presentation/bloc/orders_bloc.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
 import '../../data/models/add_order_data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -170,7 +171,23 @@ class _AddOrderTest extends State<ProductFormScreen> {
             icon: Icons.check_circle,
           );
           if(isSuccess!){
-            Navigator.pushNamed(context, OrdersScreen.routeName);
+            context.read<OrdersBloc>().add(
+              LoadOrdersData(
+                false,
+                '',
+                false,
+                (
+                    10).toString(),
+                '',
+                isChangeStatus: true,
+              ),
+            );
+            if(widget.mode == ProductFormMode.edit){
+              Navigator.pop(context);
+              Navigator.pop(context);
+            }
+           // Navigator.pop(context);
+            Navigator.pop(context);
           }
 
         }
@@ -206,7 +223,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 ListTile(
                   title: Text(
                     activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style:  TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3.7)),
                   ),
                   subtitle: Text(
                     activeStep == 0 ? 'لطفا مشخصات صورتحساب را وارد فرمایید.' : 'لطفا محصولات را انتخاب فرمایید.',
@@ -254,7 +271,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           body: Stack(
             children: [
               mainContent,
-              if (isSubmitting) _loadingBarrier('در حال ثبت سفارش...'),
+              if (isSubmitting) _loadingBarrier(widget.mode == ProductFormMode.edit?'در حال ویرایش سفارش...':'در حال ثبت سفارش...'),
             ],
           ),
         );
@@ -309,9 +326,11 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 onSubmitted: (q) => context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(q)),
               ),
             ),
-            SizedBox(
-              height: AppConfig.calHeight(context, 47),
+            Expanded(
+
               child: ListView.builder(
+                shrinkWrap: true, // ← Add this
+                physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];

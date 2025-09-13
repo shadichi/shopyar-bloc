@@ -198,7 +198,7 @@ class _LoadMoreButton extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        bottom: AppConfig.calWidth(context, 24),
+        bottom: AppConfig.calWidth(context, 26),
         right: AppConfig.calWidth(context, 3),
         left: AppConfig.calWidth(context, 3),
       ),

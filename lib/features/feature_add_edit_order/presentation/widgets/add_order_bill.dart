@@ -193,19 +193,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
                 ],
               ),
 
-// تلفن
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
-                    widget.textEditing[6], 'شماره همراه خریدار', height, context,
-                    isOnlyChild: true,
-                    onChanged: widget.onTextChange[7], // Phone
-                  ),
-                ],
-              ),
 
-// پرداخت + حمل‌ونقل (خودت قبلاً onTextChange گذاشتی، اوکیه)
               PaymentDropdownMenu(
                 itemList: widget.paymentMethod!.toList(),
                 key1: "روش پرداخت",
@@ -231,8 +219,13 @@ class _AddOrderBillState extends State<AddOrderBill> {
                 children: [
                   textField(
                     widget.textEditing[7], 'هزینه حمل ونقل', height, context,
-                    isOnlyChild: true,
+                   // isOnlyChild: true,
                     onChanged: widget.onTextChange[10], // ShipPrice
+                  ),
+                  textField(
+                    widget.textEditing[6], 'شماره همراه خریدار', height, context,
+                    //isOnlyChild: true,
+                    onChanged: widget.onTextChange[7], // Phone
                   ),
                 ],
               ),
@@ -250,7 +243,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
       double height,
       BuildContext context, {
         bool isOnlyChild = false,
-        required ValueChanged<String> onChanged, // 👈 اضافه شد
+        required ValueChanged<String> onChanged,
       }) {
     return SizedBox(
       width: isOnlyChild ? 310 : 150,
@@ -258,7 +251,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
       child: TextFormField(
         controller: controller,
         style: TextStyle(
-          fontSize: AppConfig.calFontSize(context, 2),
+          fontSize: AppConfig.calFontSize(context, 3),
           color: Colors.black87,
         ),
         decoration: InputDecoration(
@@ -319,7 +312,7 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
         : widget.itemList!.first; // ✅
 
     return SizedBox(
-      width: width * 0.33,
+      width: width * 0.4,
       child: Column(children: [
         Container(
           height: height * 0.05,
@@ -408,63 +401,69 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
         : widget.itemList!.first.methodTitle; // ✅
 
     return SizedBox(
-      width: width * 0.33,
+      width: width * 0.85,
       child: Column(children: [
         Container(
           height: height * 0.05,
           child: DropdownButtonFormField2(
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                contentPadding: EdgeInsets.symmetric(vertical: width * 0.02),
-                fillColor: const Color(0xffededed),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(),
-                ),
-                errorBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(width: 0.5, color: Colors.red),
-                ),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(width: 0.5),
-                ),
-                errorStyle: const TextStyle(fontSize: 15, color: Colors.grey),
-                border: OutlineInputBorder(
-                  borderSide: const BorderSide(width: 1, color: Colors.red),
-                  borderRadius: BorderRadius.circular(width * 0.01),
-                ),
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: width * 0.02,
+                horizontal: width * 0.02, // Added horizontal padding
               ),
-              isExpanded: true,
-              hint: Text('Choose'),
-              // Check for duplicates before passing to DropdownButtonFormField2
-              items: widget.itemList!
-                  .map((item) => DropdownMenuItem(
-                      value: item.methodTitle,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: 150,
-                        height: 150,
-                        child: Text(
-                          item.methodTitle.toString(),
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )))
-                  .toList(),
-              value: selectedItem,
-              onChanged: (value) {
-                setState(() {
-                  print('value');
-                  print(value);
-                  selectedItem = value as String;
-                  widget.onTextChange(value);
-                });
-              }),
+              fillColor: const Color(0xffededed),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(),
+              ),
+              errorBorder: const OutlineInputBorder(
+                borderSide: BorderSide(width: 0.5, color: Colors.red),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(width: 0.5),
+              ),
+              errorStyle: const TextStyle(fontSize: 15, color: Colors.grey),
+              border: OutlineInputBorder(
+                borderSide: const BorderSide(width: 1, color: Colors.red),
+                borderRadius: BorderRadius.circular(width * 0.01),
+              ),
+            ),
+            isExpanded: true,
+            hint: Text(
+              'Choose',
+              textAlign: TextAlign.right, // Right align hint text
+            ),
+            // Check for duplicates before passing to DropdownButtonFormField2
+            items: widget.itemList!
+                .map((item) => DropdownMenuItem(
+                value: item.methodTitle,
+                child: Container(
+                  alignment: Alignment.centerRight, // Changed to right alignment
+                  width: double.infinity, // Changed to take full width
+                  height: 150,
+                  child: Text(
+                    item.methodTitle.toString(),
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.right, // Changed to right alignment
+                  ),
+                )))
+                .toList(),
+            value: selectedItem,
+            onChanged: (value) {
+              setState(() {
+                print('value');
+                print(value);
+                selectedItem = value as String;
+                widget.onTextChange(value);
+              });
+            },
+          ),
         ),
       ]),
-    );
-  }
+    );  }
 }
 
 class PaymentDropdownMenu extends StatefulWidget {
@@ -497,60 +496,70 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
    /* print('selectedItem');
     print(selectedItem);*/
     return SizedBox(
-      width: width * 0.33,
+      width: width * 0.85,
       child: Column(
         children: [
           Container(
             height: height * 0.05,
             child: DropdownButtonFormField2(
-                decoration: InputDecoration(
-                  isDense: true,
-                  filled: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: width * 0.02),
-                  fillColor: const Color(0xffededed),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(),
-                  ),
-                  errorBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(width: 0.5, color: Colors.red),
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(width: 0.5),
-                  ),
-                  errorStyle: const TextStyle(fontSize: 15, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderSide: const BorderSide(width: 1, color: Colors.red),
-                    borderRadius: BorderRadius.circular(width * 0.01),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: width * 0.02,
+                  horizontal: width * 0.02, // Add horizontal padding
+                ),
+                fillColor: const Color(0xffededed),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(),
+                ),
+                errorBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(width: 0.5, color: Colors.red),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(width: 0.5),
+                ),
+                errorStyle: const TextStyle(fontSize: 15, color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderSide: const BorderSide(width: 1, color: Colors.red),
+                  borderRadius: BorderRadius.circular(width * 0.01),
+                ),
+                // Add alignment to the InputDecoration
+                alignLabelWithHint: true,
+              ),
+              isExpanded: true,
+              hint: Text(
+                'Choose',
+                textAlign: TextAlign.right, // Right align hint text
+              ),
+              // Check for duplicates before passing to DropdownButtonFormField2
+              items: widget.itemList!
+                  .map((item) => DropdownMenuItem(
+                value: item.methodTitle,
+                child: Container(
+                  alignment: Alignment.centerRight, // Right align container
+                  width: double.infinity, // Take full width
+                  child: Text(
+                    item.methodTitle.toString(),
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.right, // Right align text
                   ),
                 ),
-                isExpanded: true,
-                hint: Text('Choose'),
-                // Check for duplicates before passing to DropdownButtonFormField2
-                items: widget.itemList!
-                    .map((item) => DropdownMenuItem(
-                        value: item.methodTitle,
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: 150,
-                          height: 150,
-                          child: Text(
-                            item.methodTitle.toString(),
-                            style: TextStyle(
-                              fontSize: 10,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )))
-                    .toList(),
-                value: selectedItem,
-                onChanged: (value) {
-                  setState(() {
-                    print('value');
-                    print(value);
-                    selectedItem = value as String ;
-                    widget.onTextChange(value);
-                  });
-                }),
+              ))
+                  .toList(),
+              value: selectedItem,
+              onChanged: (value) {
+                setState(() {
+                  print('value');
+                  print(value);
+                  selectedItem = value as String;
+                  widget.onTextChange(value);
+                });
+              },
+
+            ),
           ),
         ],
       ),

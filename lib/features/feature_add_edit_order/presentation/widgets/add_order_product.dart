@@ -42,6 +42,9 @@ class _AddOrderProductState extends State<AddOrderProduct> {
 
   }
 
+  final ScrollController _scrollController = ScrollController();
+
+
   @override
   Widget build(BuildContext context) {
     print(widget.product.name);
@@ -87,11 +90,18 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                       height: widget.product.childes!.isEmpty
                           ? AppConfig.calHeight(context, 5)
                           : AppConfig.calHeight(context, 12),
-                      child: ListView.builder(
-                        itemBuilder: (context, index) => _buildProductControls(
-                            context, size, theme,
-                            isChild: true, index: index),
-                        itemCount: widget.product.childes!.length,
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        thickness: 4.0,
+                        controller: _scrollController,
+                        radius: Radius.circular(3.0),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemBuilder: (context, index) => _buildProductControls(
+                              context, size, theme,
+                              isChild: true, index: index),
+                          itemCount: widget.product.childes!.length,
+                        ),
                       )),
                 ],
               ),

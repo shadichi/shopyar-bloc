@@ -18,7 +18,7 @@ class LogInTextFormWidget extends StatelessWidget {
         ),
         textAlign: TextAlign.end,
         textAlignVertical: TextAlignVertical.center,
-        keyboardType: TextInputType.number,
+        //keyboardType: TextInputType.number,
         decoration: InputDecoration(
           filled: true,
           contentPadding: const EdgeInsets.symmetric(

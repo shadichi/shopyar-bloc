@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(width * 0.03),
                   child: Column(
-                    spacing: height * 0.03,
+                    spacing: height * 0.02,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       StaticValues.staticHomeDataEntity!.statusCounts!
@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             )
                           : Padding(
-                        padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.7)),
+                        padding: EdgeInsets.only(top: AppConfig.calHeight(context, 5),bottom: AppConfig.calHeight(context, 1.2)),
                             child: HomeScreenPieChart(
                                 items: [
                                   StaticValues.staticHomeDataEntity!.statusCounts!
@@ -170,10 +170,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                           ),
+                      SizedBox(height: AppConfig.calHeight(context, 1),),
                       MiddleCard(
                         statusCounts: StaticValues.staticHomeDataEntity,
                       ),
                       Container(
+                        padding: EdgeInsets.only(right: AppConfig.calWidth(context, 2)),
                         alignment: Alignment.centerRight,
                         child: Text(
                           "تعداد سفارشات هفته اخیر",
@@ -184,15 +186,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         width: width,
                         height: height * 0.3,
+                        margin: EdgeInsets.only(right: AppConfig.calWidth(context, 6)),
+
                         decoration: BoxDecoration(
-                            //color: AppColors.section4,
+                        //    color: Colors.red,
                             borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(width * 0.07),
                                 topRight: Radius.circular(width * 0.07))),
                         child: Chart(StaticValues.staticHomeDataEntity),
                       ),
                       SizedBox(
-                        height: height * 0.08,
+                        height: height * 0.1,
                       )
                     ],
                   ),
@@ -204,23 +208,12 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       else if (state.homeStatus is HomeErrorStatus) {
         return Center(
-            child: Column(
-          children: [
-            Text(
+            child: Text(
               'خطا در بارگیری اطلاعات صفحه اصلی!',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: AppConfig.calFontSize(context, 3)),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  prefs.clear();
-                  print('clear');
-                },
-                child: Text('data'))
-          ],
-        ));
+            ));
       }
       else if (state.homeStatus is HomeLoadedStatus) {
         final HomeLoadedStatus ordersLoadedStatus =

@@ -62,7 +62,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
     }
 
     return AspectRatio(
-      aspectRatio: 1.4,
+      aspectRatio: 1.7,
       child: AspectRatio(
         aspectRatio: 0.5,
         child: Stack(

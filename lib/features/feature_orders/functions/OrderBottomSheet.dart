@@ -24,6 +24,8 @@ void showFilterBottomSheet(BuildContext context,
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     builder: (context) {
+      final ScrollController _scrollController = ScrollController();
+
       return BlocConsumer<OrdersBloc, OrdersState>(
         listener: (context, state) async {
 
@@ -89,60 +91,67 @@ void showFilterBottomSheet(BuildContext context,
                     SizedBox(height: AppConfig.calHeight(context, 2),),
                     SizedBox(
                       height: AppConfig.calHeight(context, 90),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: StaticValues.status.length+1,
-                        itemBuilder: (context, index) {
-                          String trueValue = '';
-                          String trueKey = '';
-                          if(index != StaticValues.status.length){
-                            final key = StaticValues.status.keys.elementAt(index)??'';
-                            final value = StaticValues.status[key]??'';
-                            trueValue = value;
-                            trueKey = key;
-                          }
-                          if(index == StaticValues.status.length){
-                            return Container(height: AppConfig.calHeight(context, 40));
-                          }else{
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 0.08))), color: AppConfig.backgroundColor,
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: width * 0.02),
-                              alignment: Alignment.center,
-
-                              child: Container(
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        thickness: 4.0,
+                        controller: _scrollController,
+                        radius: Radius.circular(3.0),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          shrinkWrap: true,
+                          itemCount: StaticValues.status.length+1,
+                          itemBuilder: (context, index) {
+                            String trueValue = '';
+                            String trueKey = '';
+                            if(index != StaticValues.status.length){
+                              final key = StaticValues.status.keys.elementAt(index)??'';
+                              final value = StaticValues.status[key]??'';
+                              trueValue = value;
+                              trueKey = key;
+                            }
+                            if(index == StaticValues.status.length){
+                              return Container(height: AppConfig.calHeight(context, 43));
+                            }else{
+                              return Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 3))),   color:  AppConfig.secondaryColor,
+                                  borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 0.08))), color: AppConfig.backgroundColor,
                                 ),
-
-                                height: height * 0.07,
-                                width: width * 0.7,
+                                padding: EdgeInsets.symmetric(vertical: width * 0.02),
                                 alignment: Alignment.center,
-                                child: ListTile(
-                                  dense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                  minVerticalPadding: 0,
-                                  horizontalTitleGap: 0,
-                                  title: Center(
-                                    child: Text(
-                                      trueValue,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.8)),
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    BlocProvider.of<OrdersBloc>(context).add(
-                                      EditStatus(OrdersEditStatus(ordersId, trueKey.substring(3))),
-                                    );
-                                  },
-                                )
-                                ,
-                              ),
-                            );
-                          }
-                        },
 
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(AppConfig.calWidth(context, 3))),   color:  AppConfig.secondaryColor,
+                                  ),
+
+                                  height: height * 0.07,
+                                  width: width * 0.7,
+                                  alignment: Alignment.center,
+                                  child: ListTile(
+                                    dense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    minVerticalPadding: 0,
+                                    horizontalTitleGap: 0,
+                                    title: Center(
+                                      child: Text(
+                                        trueValue,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.8)),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      BlocProvider.of<OrdersBloc>(context).add(
+                                        EditStatus(OrdersEditStatus(ordersId, trueKey.substring(3))),
+                                      );
+                                    },
+                                  )
+                                  ,
+                                ),
+                              );
+                            }
+                          },
+
+                        ),
                       ),
                     ),
                     SizedBox(height: AppConfig.calHeight(context, 2),),

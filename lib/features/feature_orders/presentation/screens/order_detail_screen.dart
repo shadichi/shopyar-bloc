@@ -22,6 +22,7 @@ class OrderDetailScreen extends StatelessWidget {
     final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
     return NumberFormat.decimalPattern('fa').format(n);
   }
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -142,97 +143,104 @@ class OrderDetailScreen extends StatelessWidget {
                           : ordersData.lineItems!.length == 2
                               ? height * 0.25
                               : height * 0.38,
-                      child: ListView.builder(
-                          itemCount: ordersData.lineItems!.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              width: width * 0.5,
-                              height: height * 0.1,
-                              margin: EdgeInsets.all(width * 0.013),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      border: Border.all(color: AppConfig.white),
-                                    ),
-                                    width: width * 0.2,
-                                    height: height * 0.2,
-                                    padding: EdgeInsets.all(width * 0.013),
-                                    child: ordersData.lineItems![index].img
-                                                .toString() ==
-                                            null
-                                        ? Image.network(ordersData
-                                            .lineItems![index].img
-                                            .toString())
-                                        : Image.asset("assets/images/index.png"),
-                                  ),
-
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Container(
-                                        width: width * 0.6,
-                                        child: AutoSizeText(
-                                          ordersData.lineItems![index].name,
-                                          textAlign: TextAlign.right,
-                                          style: TextStyle(
-                                              fontSize:  AppConfig.calFontSize(context, 3.2),
-                                              color:  AppConfig.white),
-                                          maxLines: 1,
-                                          minFontSize: (AppConfig.calFontSize(context, 2.5).round()).toDouble(),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        thickness: 4.0,
+                        controller: _scrollController,
+                        radius: Radius.circular(3.0),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                            itemCount: ordersData.lineItems!.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                width: width * 0.5,
+                                height: height * 0.1,
+                                margin: EdgeInsets.all(width * 0.013),
+                                child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(10)),
+                                        border: Border.all(color: AppConfig.white),
                                       ),
-                                      Container(
-                                        alignment: Alignment.centerRight,
-                                              color: Colors.white24,
-                                        width: width * 0.6,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Container(
+                                      width: width * 0.2,
+                                      height: height * 0.2,
+                                      padding: EdgeInsets.all(width * 0.013),
+                                      child: ordersData.lineItems![index].img
+                                                  .toString() ==
+                                              null
+                                          ? Image.network(ordersData
+                                              .lineItems![index].img
+                                              .toString())
+                                          : Image.asset("assets/images/index.png"),
+                                    ),
 
-                                              width: width*0.4,
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Container(
+                                          width: width * 0.6,
+                                          child: AutoSizeText(
+                                            ordersData.lineItems![index].name,
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                fontSize:  AppConfig.calFontSize(context, 3.2),
+                                                color:  AppConfig.white),
+                                            maxLines: 1,
+                                            minFontSize: (AppConfig.calFontSize(context, 2.5).round()).toDouble(),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.centerRight,
+                                                color: Colors.white24,
+                                          width: width * 0.6,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Container(
+
+                                                width: width*0.4,
 
 
-                                              child: AutoSizeText(
+                                                child: AutoSizeText(
 
-                                                " قیمت: ${formatFaThousands(ordersData
-                                                    .lineItems![index].total).toString().stringToPersianDigits()} تومان",
-                                                textAlign: TextAlign.right,
+                                                  " قیمت: ${formatFaThousands(ordersData
+                                                      .lineItems![index].total).toString().stringToPersianDigits()} تومان",
+                                                  textAlign: TextAlign.right,
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+
+                                                  maxLines: 1,
+                                                  minFontSize: width*0.01.toInt(),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+
+                                              Container(
+                                                height: width * 0.05,
+                                                width: width * 0.002,
+                                                color: AppConfig.white,
+                                              ),
+
+                                              Text(
+                                                "تعداد: ${ordersData
+                                                        .lineItems![index].quantity.toString().stringToPersianDigits()}",
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
-
-                                                maxLines: 1,
-                                                minFontSize: width*0.01.toInt(),
-                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            ),
-
-                                            Container(
-                                              height: width * 0.05,
-                                              width: width * 0.002,
-                                              color: AppConfig.white,
-                                            ),
-
-                                            Text(
-                                              "تعداد: ${ordersData
-                                                      .lineItems![index].quantity.toString().stringToPersianDigits()}",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ), /*  color: Colors.grey,*/
-                            );
-                          }),
+                                      ],
+                                    ),
+                                  ],
+                                ), /*  color: Colors.grey,*/
+                              );
+                            }),
+                      ),
                       /*color: Colors.yellow,*/
                     ),
                     SizedBox(
