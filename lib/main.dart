@@ -30,6 +30,7 @@ void main() async {
 
   Hive.registerAdapter(StoreInfoAdapter()); // ثبت مدل
   // await Hive.openBox<StoreInfo>('storeBox'); // باز کردن باکس مخصوص فروشگاه اما چون گهگاهی میخایمش ازینجا بازش نمیکنم
+  await Hive.openBox<StoreInfo>('storeBox');
 
   await setup();
   runApp(const MyApp());
@@ -95,7 +96,7 @@ class MyApp extends StatelessWidget {
           OrdersScreen.routeName: (context) => OrdersScreen(),
           ProductsScreen.routeName: (context) => ProductsScreen(),
           EnterInfData.routeName: (context) => EnterInfData(),
-          PdfViewerScreen.routeName: (context) => PdfViewerScreen(),
+         // PdfViewerScreen.routeName: (context) => PdfViewerScreen(),
           ShowPDF.routeName: (context) => ShowPDF(),
         },
         onGenerateRoute: (settings) {

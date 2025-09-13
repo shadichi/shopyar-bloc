@@ -11,8 +11,9 @@ class LoadOrdersData extends OrdersEvent{
   String perPage;
   String status;
   bool isLoadMore;
+  bool isChangeStatus;
   LoadOrdersData(this.isSearch, this.search,this.isFilter, this.perPage, this.status,
-      {this.isLoadMore = false});
+      {this.isLoadMore = false, this.isChangeStatus = false});
 }
 class RefreshOrdersData extends OrdersEvent {
   final Completer<void>? completer;

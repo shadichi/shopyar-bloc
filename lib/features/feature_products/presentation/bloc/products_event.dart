@@ -10,3 +10,8 @@ class LoadProductsData extends ProductsEvent{
   LoadProductsData(this.productsParams);
 }
 
+class RefreshProductsData extends ProductsEvent {
+  final Completer<void>? completer;
+  RefreshProductsData([this.completer]);
+}
+

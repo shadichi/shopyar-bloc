@@ -69,6 +69,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
           children: [
             Center(
               child: Container(
+
                 height: AppConfig.calHeight(context, 31),
                 width: AppConfig.calHeight(context, 31),
                 decoration: BoxDecoration(
@@ -126,7 +127,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
 
       final percent = (s.value * 100) / sum;
-      final titleText = '${percent.toStringAsFixed(2).stringToPersianDigits()}%';
+      final titleText = '${percent.round().toString().stringToPersianDigits()}%';
 
       return PieChartSectionData(
         color: s.color,

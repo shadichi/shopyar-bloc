@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
+import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../data/models/store_info.dart';
@@ -10,9 +11,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../widgets/show_post_label.dart';
+
 class EnterInfData extends StatefulWidget {
   final isFirstTime;
-  EnterInfData({this.isFirstTime = false});
+  final ordersEntity;
+  final bool isFromDrawer;
+  EnterInfData({this.isFirstTime = false, this.ordersEntity, this.isFromDrawer = false});
 
   static String routeName = 'EnterInfData';
 
@@ -23,17 +28,20 @@ class EnterInfData extends StatefulWidget {
 class _EnterInfDataState extends State<EnterInfData> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _storeNameController = TextEditingController();
+  final TextEditingController _storeSenderNameController = TextEditingController();
   final TextEditingController _storeAddressController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _instagramController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
 
   String path = '';
 
   File? _imageFile;
   static const _kSavedPathKey = 'saved_image_path';
   final _picker = ImagePicker();
+  var storeInfo = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
 
   Future<void> _saveData() async {
     try{
@@ -46,9 +54,12 @@ class _EnterInfDataState extends State<EnterInfData> {
         postalCode: _postalCodeController.text,
         website: _websiteController.text,
         storeIcon: path,
+        storeSenderName: _storeSenderNameController.text,
+        storeNote: _noteController.text
+
       );
       await box.put('storeInfo', storeInfo);
-      await box.close();
+    //  await box.close();
 
       showSnack(context, 'اطلاعات برچسب پستی با موفقیت ذخیره شد.');
 
@@ -95,6 +106,20 @@ class _EnterInfDataState extends State<EnterInfData> {
     if (path.isNotEmpty && File(path).existsSync()) {
       setState(() => _imageFile = File(path));
     }
+    var box = await Hive.openBox<StoreInfo>('storeBox');
+    storeInfo = box.get('storeInfo')!;
+    if(storeInfo.storeName.isNotEmpty){
+      _storeNameController.text =storeInfo.storeName;
+      _storeAddressController.text = storeInfo.storeAddress;
+      _phoneNumberController.text = storeInfo.phoneNumber;
+      _instagramController.text = storeInfo.instagram;
+      _postalCodeController.text = storeInfo.postalCode;
+      _websiteController.text = storeInfo.website;
+      path = storeInfo.storeIcon;
+      _storeSenderNameController.text = storeInfo.storeSenderName!;
+      _noteController.text = storeInfo.storeNote!;
+    }
+
   }
 
   Future<void> _pickFromGallery() async {
@@ -152,6 +177,14 @@ class _EnterInfDataState extends State<EnterInfData> {
                       value!.isEmpty ? "نام فروشگاه را وارد کنید" : null,
                 ),
                 CustomTextField(
+                  label: "نام فرستنده",
+                  controller: _storeSenderNameController,
+                  inputFormatter:
+                  FilteringTextInputFormatter.allow(RegExp(r'[آ-ی 0-9.,a-z]')),
+                  validator: (value) =>
+                  value!.isEmpty ? "نام فرستنده را وارد کنید" : null,
+                ),
+                CustomTextField(
                   label: "آدرس فروشگاه",
                   controller: _storeAddressController,
                   inputFormatter:
@@ -190,6 +223,15 @@ class _EnterInfDataState extends State<EnterInfData> {
                   validator: (value) =>
                       value!.isEmpty ? "وبسایت را وارد کنید" : null,
                 ),
+                CustomTextField(
+                  label: "یادداشت",
+                  controller: _noteController,
+                  inputFormatter:
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-z ,0-9.,آ-ی]')),
+                  validator: (value) =>
+                  value!.isEmpty ? "یادداشت را وارد کنید" : null,
+                ),
+
 
                 SizedBox(height: AppConfig.calHeight(context, 1)),
                 Container(
@@ -270,7 +312,12 @@ class _EnterInfDataState extends State<EnterInfData> {
                       if (_formKey.currentState!.validate()) {
                         if(_imageFile != null){
                           _saveData();
-                          Navigator.pushNamed(context, '/pdfViewer');
+                          if(!widget.isFromDrawer){
+                            Navigator.push(context, MaterialPageRoute(builder: (context){
+                              return PdfViewerScreen(widget.ordersEntity);
+                            }));
+                          }
+
                         }else{
                           alertDialogScreen(context, 'لطفا یک آیکون انتخاب کنید.', 0, false);
                         }
@@ -321,12 +368,16 @@ class CustomTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        style: TextStyle(
+            fontSize: AppConfig.calFontSize(context, 3.2)
+        ),
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatter != null ? [inputFormatter!] : null,
         validator: validator,
         decoration: InputDecoration(
           hintText: label,
+
           hintStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2)),
           filled: true,
           fillColor: Colors.grey[100],

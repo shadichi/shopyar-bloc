@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_status.dart';
@@ -7,6 +9,7 @@ import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
+import '../../../feature_orders/data/models/store_info.dart';
 import '../widgets/chart.dart';
 import '../bloc/home_bloc.dart';
 import '../widgets/drawer.dart';
@@ -14,7 +17,7 @@ import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:jdate/jdate.dart';
 import 'package:intl/intl.dart';
 import 'package:shapyar_bloc/extension/persian_digits.dart';
-
+import 'package:hive/hive.dart';
 import '../widgets/pie-chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,12 +39,18 @@ class _HomeScreenState extends State<HomeScreen> {
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
   }
 
+  Future<void> _onRefresh() {
+    final c = Completer<void>();
+    context
+        .read<HomeBloc>()
+        .add(RefreshHomeData(c));
+    return c.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-
-    final f = NumberFormat.decimalPattern('fa');
 
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
@@ -86,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Container(
-                    //   color: Colors.red,
+                      //   color: Colors.red,
                       alignment: Alignment.center,
                       height: AppConfig.calHeight(context, 3),
                       child: Text(
@@ -107,86 +116,93 @@ class _HomeScreenState extends State<HomeScreen> {
             widget.onDrawerStatusChange!(isOpened);
           },
           body: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(width * 0.03),
-                child: Column(
-                  spacing: height * 0.03,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    StaticValues.staticHomeDataEntity!.statusCounts!
-                                    .wcCompleted ==
-                                0 &&
-                            StaticValues.staticHomeDataEntity!.statusCounts!
-                                    .wcOnHold ==
-                                0 &&
-                            StaticValues
-                                    .staticHomeDataEntity!.statusCounts!.wcPending ==
-                                0 &&
-                            StaticValues.staticHomeDataEntity!.statusCounts!
-                                    .wcProcessing ==
-                                0 &&
-                            StaticValues.staticHomeDataEntity!.statusCounts!
-                                    .wcCancelled ==
-                                0
-                        ? Center(
-                            child: Container(
-                              height: AppConfig.calHeight(context, 30),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
-                                style: TextStyle(
-                                    fontSize: AppConfig.calFontSize(context, 3),
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          )
-                        : HomeScreenPieChart(
-                            items: [
+            child: RefreshIndicator(
+              onRefresh: ()=>_onRefresh(),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(width * 0.03),
+                  child: Column(
+                    spacing: height * 0.03,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcCompleted ==
+                                  0 &&
                               StaticValues.staticHomeDataEntity!.statusCounts!
-                                  .wcCompleted,
+                                      .wcOnHold ==
+                                  0 &&
                               StaticValues
-                                  .staticHomeDataEntity!.statusCounts!.wcOnHold,
+                                      .staticHomeDataEntity!.statusCounts!.wcPending ==
+                                  0 &&
                               StaticValues.staticHomeDataEntity!.statusCounts!
-                                  .wcPending,
+                                      .wcProcessing ==
+                                  0 &&
                               StaticValues.staticHomeDataEntity!.statusCounts!
-                                  .wcProcessing,
-                              StaticValues.staticHomeDataEntity!.statusCounts!
-                                  .wcCancelled
-                            ],
+                                      .wcCancelled ==
+                                  0
+                          ? Center(
+                              child: Container(
+                                height: AppConfig.calHeight(context, 30),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
+                                  style: TextStyle(
+                                      fontSize: AppConfig.calFontSize(context, 3),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : Padding(
+                        padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.7)),
+                            child: HomeScreenPieChart(
+                                items: [
+                                  StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcCompleted,
+                                  StaticValues
+                                      .staticHomeDataEntity!.statusCounts!.wcOnHold,
+                                  StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcPending,
+                                  StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcProcessing,
+                                  StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcCancelled
+                                ],
+                              ),
                           ),
-                    MiddleCard(
-                      statusCounts: StaticValues.staticHomeDataEntity,
-                    ),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "آمار سفارش هفته اخیر",
-                        style: TextStyle(
-                            color: Colors.white, fontSize: width * 0.03),
+                      MiddleCard(
+                        statusCounts: StaticValues.staticHomeDataEntity,
                       ),
-                    ),
-                    Container(
-                      width: width,
-                      height: height * 0.3,
-                      decoration: BoxDecoration(
-                          //color: AppColors.section4,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(width * 0.07),
-                              topRight: Radius.circular(width * 0.07))),
-                      child: Chart(StaticValues.staticHomeDataEntity),
-                    ),
-                    SizedBox(
-                      height: height * 0.08,
-                    )
-                  ],
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "تعداد سفارشات هفته اخیر",
+                          style: TextStyle(
+                              color: Colors.white, fontSize: width * 0.03),
+                        ),
+                      ),
+                      Container(
+                        width: width,
+                        height: height * 0.3,
+                        decoration: BoxDecoration(
+                            //color: AppColors.section4,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(width * 0.07),
+                                topRight: Radius.circular(width * 0.07))),
+                        child: Chart(StaticValues.staticHomeDataEntity),
+                      ),
+                      SizedBox(
+                        height: height * 0.08,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         );
-      } else if (state.homeStatus is HomeErrorStatus) {
+      }
+      else if (state.homeStatus is HomeErrorStatus) {
         return Center(
             child: Column(
           children: [
@@ -198,16 +214,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
-
-                    final prefs = await SharedPreferences.getInstance();
-                    prefs.clear();
-                    print('clear');
-
+                  final prefs = await SharedPreferences.getInstance();
+                  prefs.clear();
+                  print('clear');
                 },
                 child: Text('data'))
           ],
         ));
-      } else if (state.homeStatus is HomeLoadedStatus) {
+      }
+      else if (state.homeStatus is HomeLoadedStatus) {
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
         return Scaffold(
@@ -240,7 +255,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-
       return Container(
         color: AppConfig.backgroundColor,
         child: Text('خطا در بارگیری اطلاعات!'),

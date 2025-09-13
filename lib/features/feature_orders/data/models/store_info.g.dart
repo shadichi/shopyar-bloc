@@ -1,5 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'store_info.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
   @override
@@ -19,13 +24,15 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
       postalCode: fields[4] as String,
       website: fields[5] as String,
       storeIcon: fields[6] as String,
+      storeSenderName: fields[7] as String?,
+      storeNote: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, StoreInfo obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.storeName)
       ..writeByte(1)
@@ -39,7 +46,11 @@ class StoreInfoAdapter extends TypeAdapter<StoreInfo> {
       ..writeByte(5)
       ..write(obj.website)
       ..writeByte(6)
-      ..write(obj.storeIcon);
+      ..write(obj.storeIcon)
+      ..writeByte(7)
+      ..write(obj.storeSenderName)
+      ..writeByte(8)
+      ..write(obj.storeNote);
   }
 
   @override

@@ -21,6 +21,9 @@ class Order extends StatelessWidget {
     return NumberFormat.decimalPattern('fa').format(n);
   }
 
+  final ScrollController _scrollController = ScrollController();
+
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -149,68 +152,76 @@ class Order extends StatelessWidget {
                           Container(
                             width: width * 0.9,
                             height: height * 0.06,
-                            child: ListView.builder(
-                                itemCount: ordersLoadedStatus.lineItems!.length,
-                                itemBuilder: (context, index) {
-                                  return Row(
-                                    children: [
-                                      Container(
-                                          width: width * 0.02,
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                              ordersLoadedStatus
-                                                  .lineItems![index].quantity
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontSize: width * 0.03,
-                                                  color: Colors.white))),
-                                      Container(
-                                          alignment: Alignment.center,
-                                          //  color: Colors.pink,
-                                          width: width * 0.05,
-                                          child: Text("×",
-                                              style: TextStyle(
-                                                  fontSize: width * 0.03,
-                                                  color: Colors.white))),
-                                      FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: SingleChildScrollView(
-                                            child: Container(
-                                              width: width * 0.8,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    width: width * 0.8,
-                                                    alignment:
-                                                        Alignment.centerRight,
-                                                    child: AutoSizeText(
-                                                      ordersLoadedStatus
-                                                          .lineItems![index]
-                                                          .name
-                                                          .toString(),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.03,
-                                                          color: Colors.white),
-                                                      maxLines: 1,
-                                                      minFontSize: 9,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                            child: Scrollbar(
+                              thumbVisibility: true,
+                              thickness: 4.0, // Adjust width
+
+                              controller: _scrollController,
+                              radius: Radius.circular(3.0),
+                              child: ListView.builder(
+                                  controller: _scrollController,
+
+                                  itemCount: ordersLoadedStatus.lineItems!.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
+                                      children: [
+                                        Container(
+                                            width: width * 0.02,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                                formatFaThousands( ordersLoadedStatus
+                                                    .lineItems![index].quantity.toString()).toString().stringToPersianDigits(),
+                                                style: TextStyle(
+                                                    fontSize: width * 0.03,
+                                                    color: Colors.white))),
+                                        Container(
+                                            alignment: Alignment.center,
+                                            //  color: Colors.pink,
+                                            width: width * 0.05,
+                                            child: Text("×",
+                                                style: TextStyle(
+                                                    fontSize: width * 0.03,
+                                                    color: Colors.white))),
+                                        FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: SingleChildScrollView(
+                                              child: Container(
+                                                width: width * 0.8,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: width * 0.8,
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      child: AutoSizeText(
+                                                        ordersLoadedStatus
+                                                            .lineItems![index]
+                                                            .name
+                                                            .toString(),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.03,
+                                                            color: Colors.white),
+                                                        maxLines: 1,
+                                                        minFontSize: 9,
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          )),
-                                    ],
-                                  );
-                                }),
+                                            )),
+                                      ],
+                                    );
+                                  }),
+                            ),
                           ),
                         ],
                       )

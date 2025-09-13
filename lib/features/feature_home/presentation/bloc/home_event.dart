@@ -11,3 +11,8 @@ class LogOutEvent extends HomeEvent{}
 class LoadHomeDataEvent extends HomeEvent{}
 
 class AccountExit extends HomeEvent{}
+
+class RefreshHomeData extends HomeEvent {
+  final Completer<void>? completer;
+  RefreshHomeData([this.completer]);
+}

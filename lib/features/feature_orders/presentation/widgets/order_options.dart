@@ -54,7 +54,7 @@ void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? 
               _buildListTile(
                 icon: Icons.local_post_office,
                 title: 'ایجاد برچسب پستی',
-                onTap: () => _handleStoreInfo(context),
+                onTap: () => _handleStoreInfo(context, ordersEntity),
                   context: context
               ),
               _buildDivider(context),
@@ -101,19 +101,21 @@ Widget _buildDivider(context) {
 }
 
 
-Future<void> _handleStoreInfo(BuildContext context) async {
+Future<void> _handleStoreInfo(BuildContext context, ordersEntity) async {
   await Hive.openBox<StoreInfo>('storeBox');
   var storeBox = Hive.box<StoreInfo>('storeBox');
   var store = storeBox.get('storeInfo');
 
   if (store == null || store.storeName.isEmpty) {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-      return EnterInfData(isFirstTime: true,);
+      return EnterInfData(isFirstTime: true,ordersEntity: ordersEntity,);
     }));
   } else {
-    Navigator.pushNamed(context, PdfViewerScreen.routeName, arguments: store);
+    Navigator.push(context, MaterialPageRoute(builder: (context){
+      return PdfViewerScreen(ordersEntity);
+    }));
   }
 
-  await storeBox.close();
+ // await storeBox.close();
  // Navigator.pop(context);
 }

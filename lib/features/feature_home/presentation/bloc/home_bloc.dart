@@ -112,7 +112,47 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       prefs.clear();
       emit(state.copyWith(newHomeStatus:HomeAccountExitStatus()));
     });
+
+    // Add this to your HomeBloc, after the other event handlers
+    on<RefreshHomeData>((event, emit) async {
+      // Show loading state during refresh
+      emit(state.copyWith(newHomeStatus: HomeLoading()));
+
+      try {
+        // Refresh the home data
+        final DataState dataState = await getHomeDataUseCase();
+
+        if (dataState is DataSuccess) {
+          StaticValues.staticHomeDataEntity = dataState.data;
+
+          // Refresh user data if needed
+          final UserDataParams homeUserDataParams = await getMainDataUseCase();
+          final prefs = await SharedPreferences.getInstance();
+
+          StaticValues.webService = prefs.getString("webService") ?? '';
+          StaticValues.passWord = prefs.getString("passWord") ?? '';
+          StaticValues.shopName = homeUserDataParams.response['name'] ?? '';
+          StaticValues.userName = homeUserDataParams.response['user'] ?? '';
+          StaticValues.shippingMethods = homeUserDataParams.response['shipping_methods'] ?? [];
+          StaticValues.paymentMethods = homeUserDataParams.response['payment_methods'] ?? [];
+          StaticValues.status = homeUserDataParams.response['status'] ?? {};
+
+          emit(state.copyWith(newHomeStatus: HomeLoadedStatus()));
+        } else {
+          emit(state.copyWith(newHomeStatus: HomeErrorStatus()));
+        }
+      } catch (e) {
+        emit(state.copyWith(newHomeStatus: HomeErrorStatus()));
+      } finally {
+        // Complete the completer if provided
+        event.completer?.complete();
+      }
+    });
+
   }
+
+
+
 
 
 }

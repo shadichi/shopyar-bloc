@@ -373,11 +373,18 @@ class _LoadMoreButton extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(
         bottom: AppConfig.calWidth(context, 24),
-        right: AppConfig.calWidth(context, 10),
-        left: AppConfig.calWidth(context, 10),
+        right: AppConfig.calWidth(context, 3),
+        left: AppConfig.calWidth(context, 3),
       ),
       height: AppConfig.calHeight(context, 20),
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppConfig.secondaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(width: 0.3, color: Colors.grey[300]!),
+          ),
+        ),
         onPressed: isLoadingMore
             ? null
             : () {

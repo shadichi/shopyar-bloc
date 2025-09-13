@@ -25,6 +25,12 @@ class StoreInfo extends HiveObject {
   @HiveField(6)
   String storeIcon;
 
+  @HiveField(7)
+  String? storeSenderName;
+
+  @HiveField(8)
+  String? storeNote;
+
 
   StoreInfo({
     required this.storeName,
@@ -34,5 +40,7 @@ class StoreInfo extends HiveObject {
     required this.postalCode,
     required this.website,
     required this.storeIcon,
+     this.storeSenderName,
+     this.storeNote,
   });
 }

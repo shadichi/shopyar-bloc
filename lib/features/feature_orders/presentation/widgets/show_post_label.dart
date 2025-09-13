@@ -9,14 +9,16 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:shapyar_bloc/core/colors/app-colors.dart';
 import 'package:hive/hive.dart';
+import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/store_info.dart';
 
 class PdfViewerScreen extends StatefulWidget {
   static String routeName = 'PdfViewerScreen';
+  final OrdersEntity ordersEntity;
 
-  const PdfViewerScreen({super.key});
+  const PdfViewerScreen(this.ordersEntity,{super.key});
 
   @override
   _PdfViewerScreenState createState() => _PdfViewerScreenState();
@@ -26,7 +28,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   String? pdfPath;
   //var args = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
 
-  StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
+  StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '',storeSenderName: '',storeNote: '');
 
   //StoreInfo? storeInfo;
   @override
@@ -60,9 +62,11 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
         postalCode: '',
         website: '',
         storeIcon: '',
+        storeSenderName: '',
+        storeNote: ''
       );
     }
-    await box.close();
+  //  await box.close();
     setState(() {}); // اگه می‌خوای UI تغییر کنه
   }
 
@@ -75,7 +79,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
 
-    // خواندن تصویر از assets
     final ByteData imageData =
     await rootBundle.load('assets/images/post_label.jpg');
     final Uint8List imageBytes = imageData.buffer.asUint8List();
@@ -85,7 +88,11 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     final Uint8List instaIconImageBytes = instaIcon.buffer.asUint8List();
     final instaImage = pw.MemoryImage(instaIconImageBytes);
 
-    final ttfData = await rootBundle.load("assets/fonts/Yekan.ttf");
+    final File storeIconFile = File(storeInfo.storeIcon);
+    final Uint8List storeIconBytes = await storeIconFile.readAsBytes();
+    final storeIconImage = pw.MemoryImage(storeIconBytes);
+
+    final ttfData = await rootBundle.load("assets/fonts/IRANSansWeb.ttf");
     final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
    // await Hive.openBox<StoreInfo>('storeBox');
@@ -109,7 +116,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                 height: height * 0.02,
                 // color: PdfColors.red,
                 alignment: pw.Alignment.center,
-                child:  pw.Image(instaImage,
+                child:  pw.Image(storeIconImage,
                     width: width * 0.09, height: width * 0.09),)
               ),
               pw.Positioned(
@@ -126,10 +133,20 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                             pw.Image(instaImage,
                                 width: width * 0.03, height: width * 0.03),
                             pw.SizedBox(width: width * 0.01),
-                            pw.Text('')
+                            positionedTextWidget(
+                                text: storeInfo.instagram,
+                                heightContainer: height * 0.027,
+                                widthContainer: width * 0.1,
+                                leftPositioned: width * 0.45,
+                                topPositioned: height * 0.34,
+                                font: ttf,
+                                fontSize: width * 0.015,
+                                alignment: pw.Alignment.center,
+                                fontWeight: pw.FontWeight.bold,
+                                maxLine: 1),
                           ]))),
               positionedTextWidget(
-                  text: 'storeInfo.storeName' ,//نام گیرنده
+                  text: widget.ordersEntity.billing!.firstName.toString() + widget.ordersEntity.billing!.lastName.toString() ,//نام گیرنده
                   heightContainer: height * 0.02,
                   widthContainer: width * 0.28,
                   leftPositioned: width * 0.445,
@@ -151,7 +168,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.bold,
                   maxLine: 1),
               positionedTextWidget(
-                  text: storeInfo.storeAddress,
+                  text: widget.ordersEntity.billing!.address1,//ادرس گیرنده
                   heightContainer: height * 0.059,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.445,
@@ -162,7 +179,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 4),
               positionedTextWidget(
-                  text: storeInfo.storeName,//یادداشت
+                  text: storeInfo.storeNote.toString(),//یادداشت
                   heightContainer: height * 0.023,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.445,
@@ -173,7 +190,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 2),
               positionedTextWidget(
-                  text: '',//کد پستی گیرنده
+                  text: widget.ordersEntity.billing!.postcode,//کد پستی گیرنده
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.115,
                   leftPositioned: width * 0.604,
@@ -184,7 +201,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '',
+                  text: widget.ordersEntity.billing!.phone,//تلفن گیرنده
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.13,
                   leftPositioned: width * 0.42,
@@ -195,18 +212,18 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '',
+                  text: storeInfo.storeSenderName.toString(),//نام فرستنده
                   heightContainer: height * 0.027,
                   widthContainer: width * 0.3,
                   leftPositioned: width * 0.1,
                   topPositioned: height * 0.28,
                   font: ttf,
-                  fontSize: width * 0.03,
+                  fontSize: width * 0.02,
                   alignment: pw.Alignment.centerRight,
                   fontWeight: pw.FontWeight.bold,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '',
+                  text: storeInfo.storeAddress,//ادرس فرستنده
                   heightContainer: height * 0.077,
                   widthContainer: width * 0.33,
                   leftPositioned: width * 0.066,
@@ -217,7 +234,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 6),
               positionedTextWidget(
-                  text: '',
+                  text:storeInfo.postalCode,//کد پستی فرستنده
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.115,
                   leftPositioned: width * 0.225,
@@ -228,7 +245,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   fontWeight: pw.FontWeight.normal,
                   maxLine: 1),
               positionedTextWidget(
-                  text: '',
+                  text: storeInfo.phoneNumber,
                   heightContainer: height * 0.017,
                   widthContainer: width * 0.13,
                   leftPositioned: width * 0.06,
@@ -311,7 +328,7 @@ pw.Widget positionedTextWidget({
       left: leftPositioned,
       top: topPositioned,
       child: pw.Container(
-        color: PdfColors.red,
+       // color: PdfColors.red,
 
           alignment: alignment,
           width: widthContainer,

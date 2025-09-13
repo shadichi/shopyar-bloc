@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shapyar_bloc/core/params/products_params.dart';
@@ -24,8 +26,8 @@ class _ProductsScreenState extends State<ProductsScreen>
   TextEditingController searchProduct = TextEditingController();
 
   bool searchTemp = true;
-
   bool _suppressNextSubmit = false;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -35,119 +37,152 @@ class _ProductsScreenState extends State<ProductsScreen>
         .add(LoadProductsData(ProductsParams('10', false, '', false)));
   }
 
+  Future<void> _onRefresh() {
+    final c = Completer<void>();
+    context
+        .read<ProductsBloc>()
+        .add(RefreshProductsData(c));
+    return c.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
     return BlocConsumer<ProductsBloc, ProductsState>(
         listener: (context, state) {
-      if (state.productsStatus is ProductsSearchFailedStatus) {
-        alertDialogScreen(context, 'هیچ محصولی یافت نشد!', 1, false);
-      }
-    }, builder: (context, state) {
-      if (state.productsStatus is ProductsLoadingStatus) {
-        print("OrdersLoadingStatus");
-        return Center(child: ProgressBar());
-      }
-      if (state.productsStatus is UserErrorStatus) {
-        return Text("خطا در بارگذاری اطلاعات یوزر!");
-      }
+          if (state.productsStatus is ProductsSearchFailedStatus) {
+            alertDialogScreen(context, 'هیچ محصولی یافت نشد!', 1, false);
+          }
+        },
+        builder: (context, state) {
+          if (state.productsStatus is ProductsLoadingStatus) {
+            return Center(child: ProgressBar());
+          }
+          if (state.productsStatus is UserErrorStatus) {
+            return Text("خطا در بارگذاری اطلاعات یوزر!");
+          }
+          if (state.productsStatus is ProductsErrorStatus) {
+            return Text("خطا هنگام بارگذاری محصولات!");
+          }
 
-      if (state.productsStatus is ProductsErrorStatus) {
-        return Text("خطا هنگام بارگذاری محصولات!");
-      }
-
-      if (state.productsStatus is ProductsLoadedStatus) {
-        final ProductsLoadedStatus productsLoadedStatus =
+          if (state.productsStatus is ProductsLoadedStatus) {
+            final ProductsLoadedStatus productsLoadedStatus =
             state.productsStatus as ProductsLoadedStatus;
 
-        return Scaffold(
-            appBar: AppBar(
-              centerTitle: false,
-              automaticallyImplyLeading: false,
-              titleSpacing: 0,
-              title: Align(
-                alignment: Alignment.centerRight,
-                child:  Container(
-                  width: AppConfig.calWidth(context, 94),
-                  height:  AppConfig.calWidth(context, 9),
-                  padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
-                  child: SearchBar(
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: false,
+                automaticallyImplyLeading: false,
+                titleSpacing: 0,
+                title: Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    width: AppConfig.calWidth(context, 94),
+                    height: AppConfig.calWidth(context, 9),
+                    padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
+                    child: SearchBar(
+                      backgroundColor: WidgetStateProperty.all(AppConfig.secondaryColor),
+                      leading: Icon(Icons.search, size: AppConfig.calWidth(context, 5)),
+                      shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)))
+                      ),
+                      hintText: 'جستجو',
+                      textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3))),
+                      hintStyle: WidgetStateProperty.all(
+                          TextStyle(fontSize: AppConfig.calFontSize(context, 3), color: Colors.white60)
+                      ),
+                      onSubmitted: (query) {
+                        if (_suppressNextSubmit) {
+                          _suppressNextSubmit = false;
+                          return;
+                        }
+                        if (query.trim().isEmpty) return;
 
-                    backgroundColor:
-                    WidgetStateProperty.all(AppConfig.secondaryColor),
-                    leading: Icon(
-                      Icons.search,
-                      size: AppConfig.calWidth(context, 5),
-                    )
-                      ,shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)))
-            ),
-                    hintText: 'جستجو',textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white,fontSize: AppConfig.calFontSize(context, 3))),
-                    hintStyle: WidgetStateProperty.all(
-                        TextStyle(fontSize:  AppConfig.calFontSize(context, 3), color: Colors.white60)),
-                    onSubmitted: (query) {
-                      if (_suppressNextSubmit) {
-                        _suppressNextSubmit = false;
-                        return;
-                      }
-                      if (query.trim().isEmpty) return;
+                        context.read<ProductsBloc>().add(
+                          LoadProductsData(ProductsParams('10', true, query, false)),
+                        );
 
-                      context.read<ProductsBloc>().add(
-                        LoadProductsData(
-                            ProductsParams('10', true, query, false)),
-                      );
-
-                      _suppressNextSubmit = true;
-                      searchProduct.clear();
-                    },
-
+                        _suppressNextSubmit = true;
+                        searchProduct.clear();
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            body: Center(
-              child: StaticValues.staticProducts.isEmpty
-                  ? Container(
-                      color: AppConfig.backgroundColor,
-                      child: Center(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,spacing: AppConfig.calWidth(
-                              context, 4),
-                            children: [
-                              Text('محصولی یافت نشد!',
-                                                      style: TextStyle(
-                                color: Colors.white,
-                                fontSize: AppConfig.calFontSize(context, 3)),
-                                                    ),
-                              IconButton(onPressed: (){
-                                BlocProvider.of<ProductsBloc>(context)
-                                    .add(LoadProductsData(ProductsParams('10', false, '', false)));
-                              }, icon:   Icon(Icons.refresh,color: Colors.white,size: AppConfig.calWidth(context, 6),))
+              body: RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: StaticValues.staticProducts.isEmpty
+                    ? _buildEmptyState()
+                    : _buildProductsList(),
+              ),
+            );
+          }
+          return Container();
+        }
+    );
+  }
 
-                            ],
-                          )),
-                    )
-                  : SizedBox(
-                      // color: Colors.red,
-                      height: height,
-                      child: ListView.builder(
-                        itemCount: StaticValues.staticProducts.length + 1,
-                        itemBuilder: (context, index) {
-
-                          if (index == StaticValues.staticProducts.length) {
-                            return Container(
-                                height: AppConfig.calHeight(context, 21),
-                                child: _LoadMoreButton());
-                          }
-                          return Product(StaticValues.staticProducts[index], StaticValues.staticProducts[index].childes!.isEmpty?false:true);
-                        },
-                      ),
+  Widget _buildEmptyState() {
+    return Stack(
+      children: [
+        ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Container(
+              alignment: Alignment.center,
+              height: AppConfig.calHeight(context, 90),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'سفارشی یافت نشد!',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppConfig.calFontSize(context, 3)
                     ),
-            ));
-      }
-      return Container();
-    });
+                  ),
+                  SizedBox(height: AppConfig.calWidth(context, 4)),
+                  IconButton(
+                      onPressed: () {
+                        BlocProvider.of<ProductsBloc>(context).add(RefreshProductsData());
+                      },
+                      icon: Icon(
+                        Icons.refresh,
+                        color: Colors.white,
+                        size: AppConfig.calWidth(context, 6),
+                      )
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+        // This Center might interfere with scrolling - consider removing or repositioning
+      ],
+    );
+  }
+
+  Widget _buildProductsList() {
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: StaticValues.staticProducts.length + 1,
+      itemBuilder: (context, index) {
+        if (index == StaticValues.staticProducts.length) {
+          return Container(
+            height: AppConfig.calHeight(context, 21),
+            child: _LoadMoreButton(),
+          );
+        }
+        return Product(
+            StaticValues.staticProducts[index],
+            StaticValues.staticProducts[index].childes!.isEmpty ? false : true
+        );
+      },
+    );
   }
 
   @override

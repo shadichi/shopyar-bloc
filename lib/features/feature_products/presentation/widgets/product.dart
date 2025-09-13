@@ -17,6 +17,9 @@ class Product extends StatelessWidget {
     return NumberFormat.decimalPattern('fa').format(n);
   }
 
+
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -78,7 +81,7 @@ class Product extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Container(color: Colors.white24,
+                    Container(
                       child: Row(mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
@@ -160,109 +163,95 @@ class Product extends StatelessWidget {
                           color: Colors.white60),
                     ),
                   ),
-               /*   Container(
-                    width: AppConfig.calWidth(context, 80),
-                    height: AppConfig.calHeight(context, 0.52),
-                    alignment: Alignment.center,
-                    child: DottedLine(
-                      direction: Axis.horizontal,
-                      alignment: WrapAlignment.center,
-                      lineLength: double.infinity,
-                      lineThickness: 1.0,
-                      dashLength: 4.0,
-                      dashColor: Colors.black,
-                      dashGradient: [
-                        AppConfig.firstLinearColor,
-                        AppConfig.secondLinearColor
-                      ],
-                      dashRadius: 0.0,
-                      dashGapLength: 4.0,
-                      dashGapColor: Colors.transparent,
-                      dashGapGradient: [
-                        AppConfig.firstLinearColor,
-                        AppConfig.secondLinearColor
-                      ],
-                      dashGapRadius: 0.0,
-                    ),
-                  ),*/
+
                   Container(
-                  /*  color: Colors.red,*/
+padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                     width: AppConfig.calWidth(context, 90),
                     height: AppConfig.calHeight(context, 14),
-                    child: ListView.builder(itemCount: productsLoadedStatus.childes!.length,itemBuilder: (context, index) {
-                      final product = productsLoadedStatus.childes![index];
-                      return Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Container(alignment: Alignment.centerRight,
-                               /* color: Colors.green,*/
-                                width: AppConfig.calWidth(context, 43),
-                                height: AppConfig.calHeight(context, 3),
-                                child: Text('شناسه: ${product.id}',
-                                    style: TextStyle(
-                                        fontSize:
-                                            AppConfig.calFontSize(context, 2.7),
-                                        color: Colors.white)),
-                              ),
-                              Container(alignment: Alignment.centerRight,
-                                /*  color: Colors.grey,*/
+                    decoration: BoxDecoration(   color: Colors.white24,
+                        borderRadius: BorderRadius.all(Radius.circular(4))),
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      thickness: 4.0,
+                      controller: _scrollController,
+                      radius: Radius.circular(3.0),
+                      child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: productsLoadedStatus.childes!.length,itemBuilder: (context, index) {
+                        final product = productsLoadedStatus.childes![index];
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Container(alignment: Alignment.centerRight,
+                                 /* color: Colors.green,*/
                                   width: AppConfig.calWidth(context, 43),
                                   height: AppConfig.calHeight(context, 3),
-                                  child: AutoSizeText(
-                                    'قیمت: ${formatFaThousands(product.price).toString().stringToPersianDigits()} ریال',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: AppConfig.calFontSize(context, 2.7), color: Colors.white),
-                                    maxLines: 1,
-                                    minFontSize: 9,
-                                    overflow: TextOverflow.ellipsis,
-                                  ))
-                            ],
-                          ),
-                          Container(alignment: Alignment.centerRight,
-                          /*  color: Colors.yellow,*/
-                            width: AppConfig.calWidth(context, 88),
-                            height: AppConfig.calHeight(context, 5),
-                            child: AutoSizeText(
-                              product.name,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: AppConfig.calFontSize(context, 2.5), color: Colors.white),
-                              maxLines: 1,
-                              minFontSize: 9,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Container(
-                            width: AppConfig.calWidth(context, 90),
-                            height: AppConfig.calHeight(context, 3),
-                            alignment: Alignment.center,
-                            child: DottedLine(
-                              direction: Axis.horizontal,
-                              alignment: WrapAlignment.center,
-                              lineLength: double.infinity,
-                              lineThickness: 1.0,
-                              dashLength: 4.0,
-                              dashColor: Colors.black,
-                              dashGradient: [
-                                AppConfig.firstLinearColor,
-                                AppConfig.secondLinearColor
+                                  child: Text('شناسه: ${product.id}',
+                                      style: TextStyle(
+                                          fontSize:
+                                              AppConfig.calFontSize(context, 2.7),
+                                          color: Colors.white)),
+                                ),
+                                Container(alignment: Alignment.centerRight,
+                                  /*  color: Colors.grey,*/
+                                    width: AppConfig.calWidth(context, 43),
+                                    height: AppConfig.calHeight(context, 3),
+                                    child: AutoSizeText(
+                                      'قیمت: ${formatFaThousands(product.price).toString().stringToPersianDigits()} ریال',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: AppConfig.calFontSize(context, 2.7), color: Colors.white),
+                                      maxLines: 1,
+                                      minFontSize: 9,
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
                               ],
-                              dashRadius: 0.0,
-                              dashGapLength: 4.0,
-                              dashGapColor: Colors.transparent,
-                              dashGapGradient: [
-                                AppConfig.firstLinearColor,
-                                AppConfig.secondLinearColor
-                              ],
-                              dashGapRadius: 0.0,
                             ),
-                          ),
-                        ],
-                      );
-                    }),
+                            Container(alignment: Alignment.centerRight,
+                            /*  color: Colors.yellow,*/
+                              width: AppConfig.calWidth(context, 88),
+                              height: AppConfig.calHeight(context, 5),
+                              child: AutoSizeText(
+                                product.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: AppConfig.calFontSize(context, 2.5), color: Colors.white),
+                                maxLines: 1,
+                                minFontSize: 9,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Container(
+                              width: AppConfig.calWidth(context, 83),
+                              height: AppConfig.calHeight(context, 3),
+                              alignment: Alignment.center,
+                              child: DottedLine(
+                                direction: Axis.horizontal,
+                                alignment: WrapAlignment.center,
+                                lineLength: double.infinity,
+                                lineThickness: 1.0,
+                                dashLength: 4.0,
+                                dashColor: Colors.black,
+                                dashGradient: [
+                                  AppConfig.firstLinearColor,
+                                  AppConfig.secondLinearColor
+                                ],
+                                dashRadius: 0.0,
+                                dashGapLength: 4.0,
+                                dashGapColor: Colors.transparent,
+                                dashGapGradient: [
+                                  AppConfig.firstLinearColor,
+                                  AppConfig.secondLinearColor
+                                ],
+                                dashGapRadius: 0.0,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
                   ),
                 ],
               ),

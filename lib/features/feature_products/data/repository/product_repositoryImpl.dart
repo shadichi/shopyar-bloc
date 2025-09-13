@@ -39,10 +39,6 @@ class ProductRepositoryImpl extends ProductRepository{
     try{
       Response response = await apiProvider.GetProducts(productsParams);
 
-      //Response response = await apiProvider.GetOrders(ordersParams);
-
-
-
       if (response.statusCode == 200) {
         print('response.statusCode');
         print(response.statusCode);

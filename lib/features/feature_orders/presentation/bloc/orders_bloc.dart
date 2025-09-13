@@ -31,7 +31,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       final isInitial = StaticValues.staticOrders.isEmpty && !event.isLoadMore;
 
       // اگر سرچ یا فیلتره، لیست رو صفر کن و لودینگ تمام‌صفحه بده
-      if (event.isSearch || event.isFilter) {
+      if (event.isSearch || event.isFilter || event.isChangeStatus) {
         StaticValues.staticOrders.clear();
         emit(state.copyWith(newOrdersStatus: OrdersLoadingStatus()));
       }

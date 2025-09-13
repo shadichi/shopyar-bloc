@@ -30,7 +30,26 @@ void showFilterBottomSheet(BuildContext context,
           if (state.editStatus is EditOrderSuccessStatus) {
 
             await  alertDialogScreen(context, 'سفارش تغییر وضعیت داده شد!', 2, true);
-            Navigator.pushNamed(context, OrdersScreen.routeName);
+
+           // StaticValues.staticOrders.clear();
+            context.read<OrdersBloc>().add(
+              LoadOrdersData(
+                false,
+                '',
+                false,
+                (
+                    10).toString(),
+                '',
+                isChangeStatus: true,
+              ),
+            );
+
+            Navigator.pop(context);
+            Navigator.pop(context);
+            Navigator.pop(context);
+
+
+           // Navigator.pushNamed(context, OrdersScreen.routeName);
           }
         },
         builder: (context, state) {

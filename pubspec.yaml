@@ -131,6 +131,10 @@ flutter:
       fonts:
          - asset: assets/fonts/Yekan.ttf
 
+    - family: NotoSansArabic
+      fonts:
+        - asset: assets/fonts/NotoSansArabic-Medium.ttf
+
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

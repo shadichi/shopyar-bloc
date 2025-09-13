@@ -27,7 +27,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch || event.productsParams.isLoadMore) {
         print('1');
 
-        if (event.productsParams.isSearch) {
+        if (event.productsParams.isSearch || event.productsParams.isRefresh) {
           StaticValues.staticProducts.clear();
           emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
         }
@@ -99,6 +99,35 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
       */
     }});
+
+    on<RefreshProductsData>((event, emit) async {
+      // اختیاری: دوست داری حین رفرش اسپینر هم داشته باشی
+      emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
+
+      try {
+        // لیست محلی را خالی می‌کنیم (اختیاری)
+        StaticValues.staticProducts.clear();
+
+        // ❗️ مهم: perPage را '10' بده (مثل لود اولیه)
+        final dataState = await getProductsUseCase(
+          ProductsParams('10', false, '', false,),
+        );
+
+        if (dataState is OrderDataSuccess) {
+          // ⭐️ خیلی مهم: لیست را با دادهٔ جدید پر کن
+          StaticValues.staticProducts = dataState.data!.cast<ProductEntity>();
+
+          emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
+        } else {
+          emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
+        }
+      } catch (e) {
+        emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
+      } finally {
+        // ⭐️ همیشه complete کن تا RefreshIndicator بسته شود
+        event.completer?.complete();
+      }
+    });
 
 
 
