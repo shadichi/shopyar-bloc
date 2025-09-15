@@ -277,7 +277,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
                               ),
                               AutoSizeText(
-                                '${ordersData.shipping!.firstName} ${ordersData.shipping!.lastName}',
+                                '${ordersData.shipping!.lastName} ${ordersData.shipping!.firstName}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2),color: AppConfig.white),
                                 maxLines: 1,

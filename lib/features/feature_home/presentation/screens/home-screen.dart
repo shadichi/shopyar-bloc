@@ -157,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.only(top: AppConfig.calHeight(context, 5),bottom: AppConfig.calHeight(context, 1.2)),
                             child: HomeScreenPieChart(
                                 items: [
-                                  StaticValues.staticHomeDataEntity!.statusCounts!
+                               /*   StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcCompleted,
                                   StaticValues
                                       .staticHomeDataEntity!.statusCounts!.wcOnHold,
@@ -166,11 +166,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcProcessing,
                                   StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCancelled
+                                      .wcCancelled*/
+                                  15,10,10,10,01
                                 ],
                               ),
                           ),
-                      SizedBox(height: AppConfig.calHeight(context, 1),),
+                      SizedBox(height: AppConfig.calHeight(context, 2.5),),
                       MiddleCard(
                         statusCounts: StaticValues.staticHomeDataEntity,
                       ),

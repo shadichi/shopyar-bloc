@@ -37,7 +37,13 @@ class AddOrderProductsApiProvider {
         "payment_method_id": payType,
         "shipping_method_id": shipType,
         "shipping_method_price": shipPrice,
+        "customer_email": (order.billing != null && order.billing!.email != null)
+            ? order.billing!.email
+            : 'shadi@yahoo.com',
       };
+      print("Billing object: ${order.billing}");
+      print("Billing email: ${order.billing!.email}");
+      print("Sending customer_email: ${(order.billing != null && order.billing!.email != null) ? order.billing!.email : 'shadi@yahoo.com'}");
       if (order.shipping!.firstName.isNotEmpty &&
           order.shipping!.city.isNotEmpty) {
         maap['shipping'] = order.shipping;

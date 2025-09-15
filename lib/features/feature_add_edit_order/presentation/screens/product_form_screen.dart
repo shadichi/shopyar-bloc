@@ -406,7 +406,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
               lastName: customerFNBill,
               address1: addressBill,
               city: cityBill,
-              email: 'shadichi@gmail.com',
+              email: emailBill,
               state: provinceBill,
               postcode: postalCodeBill,
               country: "IR",

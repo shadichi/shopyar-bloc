@@ -120,7 +120,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
       final s = slices[i];
       final isTouched = i == touchedIndex;
       final fontSize =
-      isTouched ? AppConfig.calWidth(context, 4) : AppConfig.calWidth(context, 2.5);
+      isTouched ? AppConfig.calWidth(context, 5) : AppConfig.calWidth(context, 3.5);
       final radius = isTouched
           ? AppConfig.calWidth(context, 30)
           : AppConfig.calWidth(context, 28);
@@ -128,6 +128,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
 
       final percent = (s.value * 100) / sum;
       final titleText = '${percent.round().toString().stringToPersianDigits()}%';
+      final isSmall = percent.round() < 7?true:false;
 
       return PieChartSectionData(
         color: s.color,
@@ -135,7 +136,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
         title: titleText,
         radius: radius,
         titleStyle: TextStyle(
-          fontSize: fontSize,
+          fontSize: isSmall?fontSize/1.3:fontSize,
           fontWeight: FontWeight.bold,
           color: const Color(0xffffffff),
           shadows: shadows,

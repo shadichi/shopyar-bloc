@@ -88,7 +88,7 @@ class Order extends StatelessWidget {
                             /*    color: Colors.green,*/
                             alignment: Alignment.center,
                             child: AutoSizeText(
-                              "${ordersLoadedStatus.billing!.firstName} ${ordersLoadedStatus.billing!.lastName}",
+                              "${ordersLoadedStatus.billing!.lastName} ${ordersLoadedStatus.billing!.firstName} ",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: width * 0.03, color: Colors.white),
