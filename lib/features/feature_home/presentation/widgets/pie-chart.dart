@@ -73,14 +73,14 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                 height: AppConfig.calHeight(context, 31),
                 width: AppConfig.calHeight(context, 31),
                 decoration: BoxDecoration(
-                  color: AppConfig.backgroundColor,
+                  color: AppConfig.white,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppConfig.white,
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                      offset: const Offset(4, 4),
+                      color: Colors.blue,
+                      blurRadius: 30,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 0),
                     ),
                   ],
                 ),
@@ -88,6 +88,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
             ),
             PieChart(
               PieChartData(
+                borderData: FlBorderData(show: true, border: Border.all(color: Colors.white, width: 1)),
                 pieTouchData: PieTouchData(
                   touchCallback: (event, pieTouchResponse) {
                     setState(() {
@@ -102,12 +103,12 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
                     });
                   },
                 ),
-                sectionsSpace: 5,
+                sectionsSpace: 1,
                 centerSpaceRadius: 0.1,
                 sections: sections,
                 centerSpaceColor: Colors.transparent,
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -120,7 +121,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
       final s = slices[i];
       final isTouched = i == touchedIndex;
       final fontSize =
-      isTouched ? AppConfig.calWidth(context, 5) : AppConfig.calWidth(context, 3.5);
+      isTouched ? AppConfig.calWidth(context, 7) : AppConfig.calWidth(context, 6);
       final radius = isTouched
           ? AppConfig.calWidth(context, 30)
           : AppConfig.calWidth(context, 28);
@@ -136,7 +137,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
         title: titleText,
         radius: radius,
         titleStyle: TextStyle(
-          fontSize: isSmall?fontSize/1.3:fontSize,
+          fontSize: isSmall?fontSize/1.6:fontSize,
           fontWeight: FontWeight.bold,
           color: const Color(0xffffffff),
           shadows: shadows,
@@ -182,7 +183,7 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
         text,
         style: TextStyle(
           color: Colors.white,
-          fontSize: AppConfig.calWidth(context, 2.6),
+          fontSize: AppConfig.calWidth(context, 3.2),
           fontWeight: FontWeight.w600,
         ),
       ),

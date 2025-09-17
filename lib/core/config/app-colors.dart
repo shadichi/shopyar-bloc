@@ -40,7 +40,7 @@ class AppConfig {
 
   static double calTitleFontSize (BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return screenWidth * (4 / 100);
+    return screenWidth * (5 / 100);
   }
 
   static double calBorderRadiusSize (BuildContext context) {

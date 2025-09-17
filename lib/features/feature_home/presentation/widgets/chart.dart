@@ -131,7 +131,7 @@ class BarChartSample4State extends State<Chart> {
 
   Widget bottomTitles(double value, TitleMeta meta) {
     print(value);
-    const style = TextStyle(fontSize: 10, color: Colors.white);
+    TextStyle style = TextStyle(fontSize: AppConfig.calFontSize(context, 3.2), color: Colors.white);
     String text;
     switch (value.toInt()) {
       case 0:
@@ -218,7 +218,7 @@ class BarChartSample4State extends State<Chart> {
     final text = _faFmt.format(value.toInt());
 
     return SideTitleWidget(
-      child: Text(text, style: const TextStyle(fontSize: 10, color: Colors.white)),
+      child: Text(text, style:  TextStyle(fontSize: AppConfig.calFontSize(context, 4.2), color: Colors.white)),
       meta: meta,
     );
   }

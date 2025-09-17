@@ -92,7 +92,7 @@ class HomeDrawer extends StatelessWidget {
                           child: Text(
                             StaticValues.shopName,maxLines: 1,
                             style: TextStyle(
-                                color: Colors.white, fontSize: width * 0.045),
+                                color: Colors.white, fontSize: width * 0.06),
                           ),
                         ),
                         Container(
@@ -101,7 +101,7 @@ class HomeDrawer extends StatelessWidget {
                           child: Text(
                             StaticValues.userName,maxLines: 1,
                             style: TextStyle(
-                                color: Colors.grey, fontSize: width * 0.045),
+                                color: Colors.grey, fontSize: width * 0.055),
                           ),
                         ),
                       ],
@@ -149,7 +149,7 @@ Widget _buildDrawerItem(String svgPic, String title, BuildContext context,
               child: SvgPicture.asset(svgPic),
             )),
         title: Text(title,
-            style: TextStyle(fontSize: size * 0.045, color: AppConfig.white)),
+            style: TextStyle(fontSize: size * 0.058, color: AppConfig.white)),
         onTap: onTap,
       ),
       isDivider

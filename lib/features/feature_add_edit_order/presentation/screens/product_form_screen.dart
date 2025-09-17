@@ -223,11 +223,11 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 ListTile(
                   title: Text(
                     activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                    style:  TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3.7)),
+                    style:  TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4.5)),
                   ),
                   subtitle: Text(
                     activeStep == 0 ? 'لطفا مشخصات صورتحساب را وارد فرمایید.' : 'لطفا محصولات را انتخاب فرمایید.',
-                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    style:  TextStyle(color: Colors.grey, fontSize:  AppConfig.calFontSize(context, 4.3)),
                   ),
                 ),
                 Expanded(
@@ -265,7 +265,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
               widget.mode == ProductFormMode.create
                   ? 'ایجاد سفارش جدید'
                   : 'ویرایش سفارش ${widget.ordersEntity?.id ?? ""}',
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              style:  TextStyle(color: Colors.white, fontSize: AppConfig.calTitleFontSize(context)),
             ),
           ),
           body: Stack(
@@ -358,8 +358,8 @@ class _AddOrderTest extends State<ProductFormScreen> {
 
   Widget nextButton(AddOrderProductsLoadedStatus _) {
     return Container(
-      margin: const EdgeInsets.all(10),
-      width: AppConfig.calWidth(context, 30),
+    //  margin: const EdgeInsets.all(10),
+      width: AppConfig.calWidth(context, 31),
       child: ElevatedButton(
         onPressed: () {
           if (activeStep == 0) {
@@ -449,7 +449,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
         ),
         child: Text(
           activeStep == 1 ? (widget.mode == ProductFormMode.edit ? 'ویرایش سفارش' : 'ثبت سفارش') : 'بعدی',
-          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.5)),
+          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
         ),
       ),
     );
@@ -471,7 +471,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           backgroundColor: AppConfig.secondaryColor,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
-        child: Text('قبلی', style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.5))),
+        child: Text('قبلی', style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4))),
       ),
     );
   }

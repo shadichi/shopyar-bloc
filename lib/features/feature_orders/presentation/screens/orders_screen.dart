@@ -107,19 +107,19 @@ class _OrdersScreenState extends State<OrdersScreen>
                       backgroundColor:
                           MaterialStateProperty.all(AppConfig.secondaryColor),
                       leading: Icon(Icons.search,
-                          size: AppConfig.calWidth(context, 5)),
+                          size: AppConfig.calWidth(context, 6)),
                       hintText: 'جستجو',
                       textStyle: MaterialStateProperty.all(
                         TextStyle(
                             color: Colors.white,
-                            fontSize: AppConfig.calFontSize(context, 3)),
+                            fontSize: AppConfig.calFontSize(context,4.3)),
                       ),
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                               AppConfig.calBorderRadiusSize(context)))),
                       hintStyle: MaterialStateProperty.all(
                         TextStyle(
-                            fontSize: AppConfig.calFontSize(context, 3),
+                            fontSize: AppConfig.calFontSize(context, 4.3),
                             color: Colors.white60),
                       ),
                       onSubmitted: (query) {
@@ -135,13 +135,13 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.filter_alt_outlined,
-                        color: Colors.white),
+                    icon:  Icon(Icons.filter_alt_outlined,
+                        color: Colors.white,size: AppConfig.calFontSize(context, 7.5),),
                     onPressed: () =>
                         context.read<OrdersBloc>().add(ShowFilter(showFilter)),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add, color: Colors.white),
+                    icon:  Icon(Icons.add, color: Colors.white,size: AppConfig.calFontSize(context, 8.1),),
                     onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -230,7 +230,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                   Text("اعمال فیلتر",
                                       style: TextStyle(
                                           fontSize:
-                                              AppConfig.calFontSize(context, 4),
+                                              AppConfig.calFontSize(context, 5),
                                           fontWeight: FontWeight.bold)),
                                   SizedBox(height: height * 0.06),
                                   DropdownButtonFormField(
@@ -252,7 +252,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                         labelText: "وضعیت سفارش",
                                         labelStyle: TextStyle(
                                             fontSize: AppConfig.calFontSize(
-                                                context, 3.2))),
+                                                context, 3.8))),
                                   ),
                                   SizedBox(height: height * 0.06),
                                   DropdownButtonFormField(
@@ -275,7 +275,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                         labelText: "تعداد سفارش",
                                         labelStyle: TextStyle(
                                             fontSize: AppConfig.calFontSize(
-                                                context, 3.2))),
+                                                context, 3.8))),
                                   ),
                                   SizedBox(height: height * 0.06),
                                   SizedBox(
@@ -303,11 +303,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                                                 style: TextStyle(
                                                     fontSize:
                                                         AppConfig.calFontSize(
-                                                            context, 2.8)),
+                                                            context, 3.35)),
                                               )),
                                         ),
                                         SizedBox(
-                                          width: width * 0.3,
+                                          width: width * 0.35,
                                           height: height * 0.06,
                                           child: ElevatedButton(
                                             onPressed: () {
@@ -340,7 +340,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                                               style: TextStyle(
                                                   fontSize:
                                                       AppConfig.calFontSize(
-                                                          context, 2.8),
+                                                          context,3.4),
                                                   color: Colors.white),
                                             ),
                                           ),
@@ -408,7 +408,7 @@ class _LoadMoreButton extends StatelessWidget {
             : Text(
                 "بارگیری بیشتر",
                 style: TextStyle(
-                  fontSize: AppConfig.calFontSize(context, 3.2),
+                  fontSize: AppConfig.calFontSize(context, 3.4),
                   color: Colors.white,
                 ),
               ),

@@ -35,7 +35,7 @@ class MiddleCard extends StatelessWidget {
               children: [
                 Text(
                   'امروز',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.05),
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: width * 0.1),
@@ -53,15 +53,15 @@ class MiddleCard extends StatelessWidget {
                 ),
                 Text(
                   '${statusCounts!.dailyCounts!.toString().stringToPersianDigits()} فروش',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
                 Text(
                   '${statusCounts!.dailySales!.qty.toString().stringToPersianDigits()} سفارش کامل',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
                 Text(
                   '${statusCounts!.dailyCancelled!.qty.toString().stringToPersianDigits()} سفارش برگشتی',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
               ],
             ),
@@ -76,7 +76,7 @@ class MiddleCard extends StatelessWidget {
               children: [
                 Text(
                   'ماهانه',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.05),
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: width * 0.1),
@@ -94,15 +94,15 @@ class MiddleCard extends StatelessWidget {
                 ),
                 Text(
                   '${statusCounts!.monthlyCounts.toString().stringToPersianDigits()} فروش',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
                 Text(
                   '${statusCounts!.monthlySales!.qty.toString().stringToPersianDigits()} سفارش کامل',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
                 Text(
                   '${statusCounts!.monthlyCancelled!.qty.toString().stringToPersianDigits()} سفارش برگشتی',
-                  style: TextStyle(color: Colors.white, fontSize: width * 0.03),
+                  style: TextStyle(color: Colors.white, fontSize: width * 0.04),
                 ),
               ],
             ),

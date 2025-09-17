@@ -257,7 +257,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey.shade500),
+          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: AppConfig.calFontSize(context, 4)),
           filled: true,
           fillColor: Colors.white,
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
@@ -350,7 +350,7 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
                         child: Text(
                           item.toString(),
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize:  AppConfig.calFontSize(context, 4),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -445,7 +445,7 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
                   child: Text(
                     item.methodTitle.toString(),
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: AppConfig.calFontSize(context, 4),
                     ),
                     textAlign: TextAlign.right, // Changed to right alignment
                   ),
@@ -542,7 +542,7 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
                   child: Text(
                     item.methodTitle.toString(),
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: AppConfig.calFontSize(context, 4),
                     ),
                     textAlign: TextAlign.right, // Right align text
                   ),

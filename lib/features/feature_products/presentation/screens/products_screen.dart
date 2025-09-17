@@ -90,9 +90,9 @@ class _ProductsScreenState extends State<ProductsScreen>
                           RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)))
                       ),
                       hintText: 'جستجو',
-                      textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3))),
+                      textStyle: WidgetStateProperty.all(TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4.3))),
                       hintStyle: WidgetStateProperty.all(
-                          TextStyle(fontSize: AppConfig.calFontSize(context, 3), color: Colors.white60)
+                          TextStyle(fontSize: AppConfig.calFontSize(context, 4.3), color: Colors.white60)
                       ),
                       onSubmitted: (query) {
                         if (_suppressNextSubmit) {
@@ -142,7 +142,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                     'سفارشی یافت نشد!',
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: AppConfig.calFontSize(context, 3)
+                        fontSize: AppConfig.calFontSize(context, 4)
                     ),
                   ),
                   SizedBox(height: AppConfig.calWidth(context, 4)),
@@ -235,7 +235,7 @@ class _LoadMoreButton extends StatelessWidget {
             : Text(
                 "بارگیری بیشتر",
                 style: TextStyle(
-                  fontSize: AppConfig.calFontSize(context, 3.2),
+                  fontSize: AppConfig.calFontSize(context, 3.4),
                   color: Colors.white,
                 ),
               ),

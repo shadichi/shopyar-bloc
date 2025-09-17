@@ -72,13 +72,13 @@ class Order extends StatelessWidget {
                                         : "${(ordersLoadedStatus.dateCreated!.year.toString()).stringToPersianDigits()}/${(ordersLoadedStatus.dateCreated!.month).toString().stringToPersianDigits()}/${(ordersLoadedStatus.dateCreated!.day).toString().stringToPersianDigits()}",
                                     style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: width * 0.03),
+                                        fontSize: width * 0.05),
                                   ),
                                   IconButton(
                                       onPressed: () {},
                                       icon: Icon(
                                         Icons.date_range,
-                                        size: 16,
+                                        size: width * 0.05,
                                         color: Colors.white,
                                       )),
                                 ],
@@ -91,7 +91,7 @@ class Order extends StatelessWidget {
                               "${ordersLoadedStatus.billing!.lastName} ${ordersLoadedStatus.billing!.firstName} ",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.white),
+                                  fontSize: width * 0.04, color: Colors.white),
                               maxLines: 1,
                               minFontSize: 9,
                               overflow: TextOverflow.ellipsis,
@@ -105,7 +105,7 @@ class Order extends StatelessWidget {
                                   "سفارش ${(ordersLoadedStatus.id.toString()).toString().stringToPersianDigits()}",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: width * 0.03,
+                                    fontSize: width * 0.04,
                                   ))),
                         ],
                       ),
@@ -126,11 +126,11 @@ class Order extends StatelessWidget {
                             Text(
                               "جمع",
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.white),
+                                  fontSize: width * 0.036, color: Colors.white),
                             ),
-                            Text( formatFaThousands(ordersLoadedStatus.total).toString().stringToPersianDigits(),
+                            Text( '${formatFaThousands(ordersLoadedStatus.total).toString().stringToPersianDigits()} ریال',
                                 style: TextStyle(
-                                    fontSize: width * 0.03,
+                                    fontSize: width * 0.045,
                                     color: Colors.white)),
                           ],
                         ),
@@ -172,7 +172,7 @@ class Order extends StatelessWidget {
                                                 formatFaThousands( ordersLoadedStatus
                                                     .lineItems![index].quantity.toString()).toString().stringToPersianDigits(),
                                                 style: TextStyle(
-                                                    fontSize: width * 0.03,
+                                                    fontSize: width * 0.035,
                                                     color: Colors.white))),
                                         Container(
                                             alignment: Alignment.center,
@@ -180,7 +180,7 @@ class Order extends StatelessWidget {
                                             width: width * 0.05,
                                             child: Text("×",
                                                 style: TextStyle(
-                                                    fontSize: width * 0.03,
+                                                    fontSize: width * 0.035,
                                                     color: Colors.white))),
                                         FittedBox(
                                             fit: BoxFit.scaleDown,
@@ -206,7 +206,7 @@ class Order extends StatelessWidget {
                                                             TextAlign.center,
                                                         style: TextStyle(
                                                             fontSize:
-                                                                width * 0.03,
+                                                                width * 0.035,
                                                             color: Colors.white),
                                                         maxLines: 1,
                                                         minFontSize: 9,

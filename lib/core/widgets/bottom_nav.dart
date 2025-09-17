@@ -104,7 +104,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
                           labels[index],
                           key: ValueKey(index),
                           textAlign: TextAlign.center,
-                          style:  TextStyle(fontSize: AppConfig.calFontSize(context, 2.4), fontWeight: FontWeight.w600, color: isSelected?AppConfig.firstLinearColor:Colors.white),
+                          style:  TextStyle(fontSize: AppConfig.calFontSize(context, 3.5), fontWeight: FontWeight.w600, color: isSelected?AppConfig.firstLinearColor:Colors.white),
                         ),
                       )
                       : const SizedBox.shrink(),

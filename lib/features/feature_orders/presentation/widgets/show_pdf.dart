@@ -64,7 +64,7 @@ class _ShowPDFState extends State<ShowPDF> {
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
 
-    final ttfData = await rootBundle.load("assets/fonts/Yekan.ttf");
+    final ttfData = await rootBundle.load("assets/fonts/IRANSansWeb.ttf");
     final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
     pdf.addPage(pw.Page(

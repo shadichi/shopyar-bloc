@@ -157,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.only(top: AppConfig.calHeight(context, 5),bottom: AppConfig.calHeight(context, 1.2)),
                             child: HomeScreenPieChart(
                                 items: [
-                               /*   StaticValues.staticHomeDataEntity!.statusCounts!
+                                  StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcCompleted,
                                   StaticValues
                                       .staticHomeDataEntity!.statusCounts!.wcOnHold,
@@ -166,8 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcProcessing,
                                   StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCancelled*/
-                                  15,10,10,10,01
+                                      .wcCancelled
                                 ],
                               ),
                           ),
@@ -181,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           "تعداد سفارشات هفته اخیر",
                           style: TextStyle(
-                              color: Colors.white, fontSize: width * 0.03),
+                              color: Colors.white, fontSize: width * 0.04),
                         ),
                       ),
                       Container(
@@ -213,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'خطا در بارگیری اطلاعات صفحه اصلی!',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: AppConfig.calFontSize(context, 3)),
+                  fontSize: AppConfig.calFontSize(context, 4)),
             ));
       }
       else if (state.homeStatus is HomeLoadedStatus) {

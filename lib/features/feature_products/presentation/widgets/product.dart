@@ -76,7 +76,7 @@ class Product extends StatelessWidget {
                     AutoSizeText(
                       productsLoadedStatus.name.toString(),
                       style: TextStyle(
-                          fontSize: isChild?width * 0.025:width * 0.027, color: Colors.white),
+                          fontSize: isChild?width * 0.03:width * 0.04, color: Colors.white),
                       minFontSize: width * 0.001.toInt(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -90,7 +90,7 @@ class Product extends StatelessWidget {
                             height: height * 0.03,
                             child: AutoSizeText('شناسه: ${productsLoadedStatus.id}',
                               style: TextStyle(
-                                  fontSize: width * 0.03,
+                                  fontSize: width * 0.035,
                                //   fontWeight: FontWeight.bold,
                                   color: productsLoadedStatus.price.toString().isEmpty
                                       ? Colors.red
@@ -109,7 +109,7 @@ class Product extends StatelessWidget {
                                   ? 'قیمت نامشخص'
                                   : '${formatFaThousands(productsLoadedStatus.price).toString().stringToPersianDigits()} ریال',
                               style: TextStyle(
-                                  fontSize: width * 0.03,
+                                  fontSize: width * 0.035,
                                   fontWeight:isChild? FontWeight.normal: FontWeight.bold,
                                   color: productsLoadedStatus.price.toString().isEmpty
                                       ? Colors.red
@@ -128,7 +128,7 @@ class Product extends StatelessWidget {
                             ? 'موجودی نامشخص'
                             : '${productsLoadedStatus.stockQuantity.toString().stringToPersianDigits()} موجودی',
                         style: TextStyle(
-                            fontSize: width * 0.025,
+                            fontSize: width * 0.03,
                             color: productsLoadedStatus.stockQuantity
                                     .toString()
                                     .isEmpty
@@ -159,7 +159,7 @@ class Product extends StatelessWidget {
                     child: Text(
                       'محصولات متغیر:',
                       style: TextStyle(
-                          fontSize: AppConfig.calFontSize(context, 2.7),
+                          fontSize: AppConfig.calFontSize(context, 2.9),
                           color: Colors.white60),
                     ),
                   ),
@@ -191,7 +191,7 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                                   child: Text('شناسه: ${product.id}',
                                       style: TextStyle(
                                           fontSize:
-                                              AppConfig.calFontSize(context, 2.7),
+                                              AppConfig.calFontSize(context, 3),
                                           color: Colors.white)),
                                 ),
                                 Container(alignment: Alignment.centerRight,
@@ -202,7 +202,7 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                                       'قیمت: ${formatFaThousands(product.price).toString().stringToPersianDigits()} ریال',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          fontSize: AppConfig.calFontSize(context, 2.7), color: Colors.white),
+                                          fontSize: AppConfig.calFontSize(context, 3), color: Colors.white),
                                       maxLines: 1,
                                       minFontSize: 9,
                                       overflow: TextOverflow.ellipsis,
@@ -217,7 +217,7 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                                 product.name,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: AppConfig.calFontSize(context, 2.5), color: Colors.white),
+                                    fontSize: AppConfig.calFontSize(context, 2.9), color: Colors.white),
                                 maxLines: 1,
                                 minFontSize: 9,
                                 overflow: TextOverflow.ellipsis,

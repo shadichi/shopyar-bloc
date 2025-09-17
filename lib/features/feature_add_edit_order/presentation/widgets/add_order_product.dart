@@ -82,7 +82,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                     child: Text(
                       'محصولات متغیر :',
                       style:
-                          TextStyle(fontSize: AppConfig.calWidth(context, 2.5)),
+                          TextStyle(fontSize: AppConfig.calWidth(context, 3.5)),
                     ),
                   ),
                   Container(
@@ -183,7 +183,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                   child: AutoSizeText(
                     widget.product.childes![index].variable,
                     style: TextStyle(
-                        fontSize: AppConfig.calWidth(context, 3),
+                        fontSize: AppConfig.calWidth(context, 4),
                         color: Colors.black),
                     maxLines: 1,
                     minFontSize: 7,
@@ -191,16 +191,17 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                   ),
                 ),
               Container(
+                //color: Colors.red,
                 alignment: Alignment.center,
                 height: AppConfig.calHeight(context, 4),
                 width: AppConfig.calWidth(context, 20),
                 child: AutoSizeText(
                   isChild
-                      ? '${widget.product.childes![index].price} تومان'
-                      : '${widget.product.price} تومان',
+                      ? '${widget.product.childes![index].price} ریال'
+                      : '${widget.product.price} ریال',
                   style: TextStyle(
-                      fontSize: AppConfig.calWidth(context, 3),
-                      color: Colors.black),
+                      fontSize: AppConfig.calWidth(context,4),
+                      color: Colors.black,fontWeight: FontWeight.bold),
                   maxLines: 1,
                   minFontSize: 7,
                   overflow: TextOverflow.ellipsis,
@@ -297,9 +298,9 @@ class _AddOrderProductState extends State<AddOrderProduct> {
           }
         },
         child: Text(
-          'انتخاب محصول',
+          'انتخاب',
           style: theme.textTheme.labelSmall?.copyWith(
-            fontSize: size.width * 0.022,
+            fontSize: size.width * 0.032,
             color: Colors.white,
           ),
         ),
