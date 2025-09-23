@@ -10,18 +10,46 @@ import '../../../../core/params/whole_user_data_params.dart';
 import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../feature_orders/presentation/widgets/show_post_label.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
-class HomeDrawer extends StatelessWidget {
+class HomeDrawer extends StatefulWidget {
+  @override
+  State<HomeDrawer> createState() => _HomeDrawerState();
+}
+
+class _HomeDrawerState extends State<HomeDrawer> {
+
+  String _version = "";
+
   final List<String> icons = [
     'assets/images/icons/setting.svg',
     'assets/images/icons/mail.svg',
     'assets/images/icons/logout.svg',
   ];
+
   final List<String> title = [
     'تنظیمات نمایش فاکتور',
     'برچسب پستی',
     'خروج از حساب',
   ];
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = info.version;
+      print('info.version');
+      print(info.version);
+      // info.version => همون versionName
+      // info.buildNumber => همون versionCode
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadVersion();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +157,16 @@ class HomeDrawer extends StatelessWidget {
                           width * 0.7);
                     }),
                   )),
+            ),
+            Padding(
+              padding:  EdgeInsets.symmetric(vertical: width*0.02),
+              child: Text(
+                'ورژن $_version',
+                style: TextStyle(
+                  color: AppConfig.progressBarColor,
+                  fontSize: AppConfig.calWidth(context, 3.2),
+                ),
+              ),
             ),
           ],
         ),

@@ -11,6 +11,7 @@ import '../bloc/log_in_status.dart';
 import '../widgets/cusrom_clippath_login.dart';
 import 'package:shimmer/shimmer.dart';
 import '../widgets/log_in_text_form_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class LogInScreen extends StatefulWidget {
   static const routeName = '/login_widget';
@@ -26,11 +27,25 @@ class _LogInScreenState extends State<LogInScreen> {
   late final TextEditingController _webServiceController;
   late final TextEditingController _tokenController;
 
+  String _version = "";
+
   @override
   void initState() {
     super.initState();
+    _loadVersion();
     _webServiceController = TextEditingController();
     _tokenController = TextEditingController();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = info.version;
+      print('info.version');
+      print(info.version);
+      // info.version => همون versionName
+      // info.buildNumber => همون versionCode
+    });
   }
 
   @override
@@ -109,6 +124,8 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
                 SizedBox(height: AppConfig.calHeight(context, 4)),
                 helpButton(context),
+                SizedBox(height: AppConfig.calHeight(context, 4)),
+                versionText(context, _version),
               ],
             ),
           ),
@@ -244,6 +261,26 @@ Widget helpButton(context) {
           ),
         ],
       ),
+    ),
+  );
+}
+
+Widget versionText(context, version) {
+  return SizedBox(
+    width: AppConfig.calWidth(context, 25),
+    height: AppConfig.calHeight(context, 5),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'ورژن $version',
+          style: TextStyle(
+            color: AppConfig.progressBarColor,
+            fontSize: AppConfig.calWidth(context, 3.2),
+          ),
+        ),
+        SizedBox(width: AppConfig.calWidth(context, 2)),
+      ],
     ),
   );
 }

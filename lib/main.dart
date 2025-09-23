@@ -22,6 +22,7 @@ import 'features/feature_products/presentation/screens/products_screen.dart';
 import 'features/feature_orders/data/models/store_info.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'features/feature_start/presentation/widgets/no_connection_screen.dart';
 import 'locator.dart';
 
 void main() async {
