@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/config/app-colors.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/widgets/main_wrapper.dart';
@@ -273,7 +274,7 @@ Widget versionText(context, version) {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'ورژن $version',
+          'ورژن ${version.toString().stringToPersianDigits()}',
           style: TextStyle(
             color: AppConfig.progressBarColor,
             fontSize: AppConfig.calWidth(context, 3.2),

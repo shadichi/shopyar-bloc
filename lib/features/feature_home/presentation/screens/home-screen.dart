@@ -79,32 +79,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      height: AppConfig.calHeight(context, 4),
-                      alignment: Alignment.center,
-                      // color: Colors.green,
-                      //  padding: EdgeInsets.all(width * 0.03),
-                      child: Text(
-                        StaticValues.shopName,
-                        maxLines: 1,
-                        style: TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppConfig.calWidth(context, 3)),
+                    Expanded(
+                      child: Container(
+                        height: AppConfig.calHeight(context, 4),
+                        alignment: Alignment.center,
+                        //  padding: EdgeInsets.all(width * 0.03),
+                        child: Text(
+                          StaticValues.shopName,
+                          maxLines: 1,
+                          style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: AppConfig.calWidth(context, 4.3)),
+                        ),
                       ),
                     ),
-                    Container(
-                      //   color: Colors.red,
-                      alignment: Alignment.center,
-                      height: AppConfig.calHeight(context, 3),
-                      child: Text(
-                        jd.echo('l، d F').stringToPersianDigits(),
-                        //  textDirection: ,
-                        style: TextStyle(
-                            color: Colors.grey.shade400,
-                            fontSize: AppConfig.calWidth(context, 3.2),
-                            fontWeight: FontWeight.bold),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: AppConfig.calHeight(context, 3),
+                        child: Text(
+                          jd.echo('l، d F').stringToPersianDigits(),
+                          //  textDirection: ,
+                          style: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: AppConfig.calWidth(context, 3.8),
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -219,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
         return Scaffold(
-          body: Container(
+          body: SizedBox(
             height: height,
             width: width,
             child: Column(

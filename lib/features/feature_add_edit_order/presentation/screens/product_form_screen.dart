@@ -92,6 +92,9 @@ class _AddOrderTest extends State<ProductFormScreen> {
     // 2) محصولات رو لود کن
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
     // 3) Hydrate فقط بعد از ProductsLoaded و فقط یک بار (در listener)
+    print('widget.ordersEntity!.billing!.email');
+    print(widget.ordersEntity!.billing!.email);
+    print(widget.ordersEntity!.billing!.phone);
   }
 
 
@@ -231,16 +234,21 @@ class _AddOrderTest extends State<ProductFormScreen> {
                   ),
                 ),
                 Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    transitionBuilder: (child, animation) => SlideTransition(
-                      position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
-                      child: child,
-                    ),
-                    child: SizedBox(
-                      key: ValueKey<int>(activeStep),
-                      width: 350,
-                      child: _buildSection(onTextChange, textEditing, widget.mode, widget.ordersEntity, products),
+                  child: Container(
+                   // color: Colors.green,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder: (child, animation) => SlideTransition(
+                        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
+                        child: child,
+                      ),
+                      child: Padding(
+                        
+                        key: ValueKey<int>(activeStep),
+                        //width: 500,
+                        padding: EdgeInsets.symmetric(horizontal: width*0.01),
+                        child: _buildSection(onTextChange, textEditing, widget.mode, widget.ordersEntity, products),
+                      ),
                     ),
                   ),
                 ),
@@ -265,7 +273,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
               widget.mode == ProductFormMode.create
                   ? 'ایجاد سفارش جدید'
                   : 'ویرایش سفارش ${widget.ordersEntity?.id ?? ""}',
-              style:  TextStyle(color: Colors.white, fontSize: AppConfig.calTitleFontSize(context)),
+              style:  TextStyle(color: Colors.white, fontSize: AppConfig.calTitleFontSize(context))
             ),
           ),
           body: Stack(
@@ -448,8 +456,8 @@ class _AddOrderTest extends State<ProductFormScreen> {
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
         child: Text(
-          activeStep == 1 ? (widget.mode == ProductFormMode.edit ? 'ویرایش سفارش' : 'ثبت سفارش') : 'بعدی',
-          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
+          activeStep == 1 ? (widget.mode == ProductFormMode.edit ? 'ویرایش' : 'ثبت') : 'بعدی',
+          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),textAlign: TextAlign.center,
         ),
       ),
     );

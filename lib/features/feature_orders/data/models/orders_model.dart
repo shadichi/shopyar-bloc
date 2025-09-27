@@ -74,6 +74,7 @@ class Ing {
     required this.state,
     required this.postcode,
     required this.country,
+    required this.email,
     required this.phone,
   });
 
@@ -95,6 +96,7 @@ class Ing {
         state: json["state"],
         postcode: json["postcode"],
         country: json["country"],
+    email: json["email"],
         phone: json["phone"],
       );
 
@@ -106,6 +108,7 @@ class Ing {
         "state": state,
         "postcode": postcode,
         "country": country,
+        "email": email,
         "phone": phone,
       };
 }

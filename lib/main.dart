@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/core/config/app-colors.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
@@ -34,6 +35,14 @@ void main() async {
   await Hive.openBox<StoreInfo>('storeBox');
 
   await setup();
+
+  // فقط حالت portrait رو فعال می‌کنیم (از چرخش جلوگیری می‌کنه)
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    // اگر می‌خواید حالت برعکس هم مجاز باشه (سر-پا وارونه) این خط رو باز کنید:
+    // DeviceOrientation.portraitDown,
+  ]);
+
   runApp(const MyApp());
 }
 

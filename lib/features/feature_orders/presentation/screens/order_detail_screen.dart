@@ -77,7 +77,7 @@ class OrderDetailScreen extends StatelessWidget {
                 ),
                 child: Text(
                   "${formatFaThousands(ordersData.total).toString().stringToPersianDigits()} ریال",
-                  style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 5)),
+                  style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 6)),
                 ),
               ),
             ),
@@ -98,11 +98,11 @@ class OrderDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 "تاریخ سفارش: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3)),
+                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               Text(
                                 dateCreated.toString().stringToPersianDigits(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3)),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                             ],
                           ),
@@ -115,7 +115,7 @@ class OrderDetailScreen extends StatelessWidget {
                             StaticValues
                                 .status['wc-${ordersData.status}']
                                 .toString(),
-                            style: TextStyle(color: AppConfig.contentColorGreen,fontSize: AppConfig.calFontSize(context, 3)),
+                            style: TextStyle(color: AppConfig.contentColorGreen,fontSize: AppConfig.calFontSize(context, 4)),
                           ),
                           /*    color: Colors.pink,*/
                         ),
@@ -186,7 +186,7 @@ class OrderDetailScreen extends StatelessWidget {
                                             ordersData.lineItems![index].name,
                                             textAlign: TextAlign.right,
                                             style: TextStyle(
-                                                fontSize:  AppConfig.calFontSize(context, 3.2),
+                                                fontSize:  AppConfig.calFontSize(context, 3.6),
                                                 color:  AppConfig.white),
                                             maxLines: 1,
                                             minFontSize: (AppConfig.calFontSize(context, 2.5).round()).toDouble(),
@@ -208,10 +208,10 @@ class OrderDetailScreen extends StatelessWidget {
                                                 child: AutoSizeText(
 
                                                   " قیمت: ${formatFaThousands(ordersData
-                                                      .lineItems![index].total).toString().stringToPersianDigits()} تومان",
+                                                      .lineItems![index].total).toString().stringToPersianDigits()} ریال",
                                                   textAlign: TextAlign.right,
                                                   style: TextStyle(
-                                                      fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                                      fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4.1)),
 
                                                   maxLines: 1,
                                                   minFontSize: width*0.01.toInt(),
@@ -229,7 +229,7 @@ class OrderDetailScreen extends StatelessWidget {
                                                 "تعداد: ${ordersData
                                                         .lineItems![index].quantity.toString().stringToPersianDigits()}",
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                                    fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.6)),
                                               ),
                                             ],
                                           ),
@@ -274,28 +274,28 @@ class OrderDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 "مشخصات صورتحساب: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               AutoSizeText(
                                 '${ordersData.shipping!.lastName} ${ordersData.shipping!.firstName}',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2),color: AppConfig.white),
+                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
                                 maxLines: 1,
                                 minFontSize: 9,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 ordersData.shipping!.phone,
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                               Text(
                                 ordersData.shipping!.state,
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                               AutoSizeText(
                                 ordersData.shipping!.address1,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2),color: AppConfig.white),
+                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
                                 maxLines: 2,
                                 minFontSize: 9,
                                 overflow: TextOverflow.ellipsis,
@@ -315,28 +315,28 @@ class OrderDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 "روش پرداخت: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               Text(
                                 ordersData.paymentMethodTitle.toString(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                               Text(
                                 "روش حمل و نقل: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               Text(
                                 ordersData.shippingLines!.isEmpty?'':  ordersData.shippingLines![0].methodTitle
                                     .toString(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                               Text(
                                 "هزینه حمل و نقل: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 3.2)),
+                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               Text(
                                 ordersData.shippingPrice.toString().stringToPersianDigits(),
-                                style: TextStyle(color:AppConfig.white),
+                                style: TextStyle(color:AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                             ],
                           ),

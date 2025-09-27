@@ -260,9 +260,10 @@ class _EnterInfDataState extends State<EnterInfData> {
                             _imageFile == null
                                 ? 'انتخاب آیکون از گالری'
                                 : 'تغییر آیکون',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: AppConfig.calFontSize(context, 3)),
+                                fontSize: AppConfig.calFontSize(context, 3.5)),
                           ),
                         ),
                       ),
@@ -284,7 +285,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize:
-                                          AppConfig.calFontSize(context, 2.5)),
+                                          AppConfig.calFontSize(context, 3.5)),
                                   textAlign: TextAlign.center,
                                 ),
                               )
@@ -335,7 +336,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                       'ذخیره',
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: AppConfig.calFontSize(context, 3)),
+                          fontSize: AppConfig.calFontSize(context, 4.2)),
                     ),
                   ),
                 ),
@@ -378,7 +379,7 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: label,
 
-          hintStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 3.2)),
+          hintStyle: TextStyle(fontSize: AppConfig.calFontSize(context, 4)),
           filled: true,
           fillColor: Colors.grey[100],
           errorStyle: TextStyle(
@@ -402,41 +403,3 @@ class CustomTextField extends StatelessWidget {
   }
 }
 
-class IconChooser extends StatelessWidget {
-  final String label;
-  final TextEditingController controller;
-  final TextInputType? keyboardType;
-  final TextInputFormatter? inputFormatter;
-  final String? Function(String?)? validator;
-
-  const IconChooser({
-    required this.label,
-    required this.controller,
-    this.keyboardType,
-    this.inputFormatter,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Container(
-            width: AppConfig.calWidth(context, 30),
-            height: AppConfig.calHeight(context, 10),
-            color: Colors.grey,
-            child: Text('انتخاب آیکون از گالری'),
-          ),
-          Container(
-            width: AppConfig.calWidth(context, 30),
-            height: AppConfig.calHeight(context, 10),
-            color: Colors.grey,
-            child: Text('انتخاب آیک.ن از گالری'),
-          )
-        ],
-      ),
-    );
-  }
-}

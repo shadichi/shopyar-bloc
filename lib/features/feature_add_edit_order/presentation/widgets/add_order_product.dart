@@ -141,7 +141,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
             style: TextStyle(
                 fontSize: AppConfig.calWidth(context, 3), color: Colors.black),
             maxLines: 1,
-            minFontSize: 7,
+            minFontSize: 11,
             overflow: TextOverflow.ellipsis,
           );
         },
@@ -171,40 +171,43 @@ class _AddOrderProductState extends State<AddOrderProduct> {
           padding:
               EdgeInsets.symmetric(vertical: AppConfig.calWidth(context, 1)),
           alignment: Alignment.center,
-          width: AppConfig.calWidth(context, 40),
+          width: AppConfig.calWidth(context, 53),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (isChild)
-                Container(
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+
+                    child: AutoSizeText(
+                      widget.product.childes![index].variable,
+                      style: TextStyle(
+                          fontSize: AppConfig.calWidth(context, 4),
+                          color: Colors.black),
+                      maxLines: 1,
+                      minFontSize: 12,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Container(
+                  //color: AppConfig.topOrderColor,
                   alignment: Alignment.center,
                   height: AppConfig.calHeight(context, 4),
                   width: AppConfig.calWidth(context, 20),
                   child: AutoSizeText(
-                    widget.product.childes![index].variable,
+                    isChild
+                        ? '${widget.product.childes![index].price} ریال'
+                        : '${widget.product.price} ریال',
                     style: TextStyle(
-                        fontSize: AppConfig.calWidth(context, 4),
-                        color: Colors.black),
+                        fontSize: AppConfig.calWidth(context,4),
+                        color: Colors.black,fontWeight: FontWeight.bold),
                     maxLines: 1,
                     minFontSize: 7,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              Container(
-                //color: Colors.red,
-                alignment: Alignment.center,
-                height: AppConfig.calHeight(context, 4),
-                width: AppConfig.calWidth(context, 20),
-                child: AutoSizeText(
-                  isChild
-                      ? '${widget.product.childes![index].price} ریال'
-                      : '${widget.product.price} ریال',
-                  style: TextStyle(
-                      fontSize: AppConfig.calWidth(context,4),
-                      color: Colors.black,fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  minFontSize: 7,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -276,7 +279,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
   Widget _buildAddButton(BuildContext context, Size size, ThemeData theme,
       bool isChild, int index) {
     return SizedBox(
-      width: size.width * 0.3,
+      width: size.width * 0.25,
       height: size.height * 0.04,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(

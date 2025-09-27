@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shapyar_bloc/core/utils/static_values.dart';
 import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
+import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/screens/setting.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,9 +11,11 @@ import 'package:shapyar_bloc/features/feature_orders/presentation/screens/enter_
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
+import '../../../feature_orders/data/models/store_info.dart';
 import '../../../feature_orders/presentation/widgets/show_post_label.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:hive/hive.dart';
 
 class HomeDrawer extends StatefulWidget {
   @override
@@ -20,6 +25,8 @@ class HomeDrawer extends StatefulWidget {
 class _HomeDrawerState extends State<HomeDrawer> {
 
   String _version = "";
+  StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '',storeSenderName: '',storeNote: '');
+
 
   final List<String> icons = [
     'assets/images/icons/setting.svg',
@@ -43,12 +50,36 @@ class _HomeDrawerState extends State<HomeDrawer> {
       // info.buildNumber => همون versionCode
     });
   }
+  Future<void> getHiveData() async {
+    final box = await Hive.openBox<StoreInfo>('storeBox');
+    final stored = box.get('storeInfo');
+    if (stored != null) {
+      storeInfo = stored;
+    } else {
+      // اگر انتظار داشتی حتما داده باشه، اینجا می‌تونی مقدار پیش‌فرض یا لاگ بذاری
+      storeInfo = StoreInfo(
+          storeName: '',
+          storeAddress: '',
+          phoneNumber: '',
+          instagram: '',
+          postalCode: '',
+          website: '',
+          storeIcon: '',
+          storeSenderName: '',
+          storeNote: ''
+      );
+    }
+    //  await box.close();
+    setState(() {}); // اگه می‌خوای UI تغییر کنه
+  }
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _loadVersion();
+    getHiveData();
   }
 
   @override
@@ -105,31 +136,63 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   SizedBox(
-                    width: width * 0.1,
-                    child: Image.asset('assets/images/icons/shopyar-icon.png'),
-                  ),
+                    width: width * 0.15,
+                    child: Builder(
+                      builder: (context) {
+                        // اگر خالی بود → بزار روی shopyar-icon.svg
+                        if (storeInfo.storeIcon.isEmpty) {
+                          return SvgPicture.asset(
+                            'assets/images/icons/shopyar-icon.svg',
+                            fit: BoxFit.contain,
+                          );
+                        }
+
+                        final iconPath = storeInfo.storeIcon;
+
+                        if (iconPath.startsWith('assets/')) {
+                          if (iconPath.toLowerCase().endsWith('.svg')) {
+                            return SvgPicture.asset(iconPath, fit: BoxFit.contain);
+                          } else {
+                            return Image.asset(iconPath, fit: BoxFit.contain);
+                          }
+                        }
+
+                        // اگر فایل از حافظه لوکال باشه
+                        if (iconPath.toLowerCase().endsWith('.svg')) {
+                          return SvgPicture.file(File(iconPath), fit: BoxFit.contain);
+                        } else {
+                          return Image.file(File(iconPath), fit: BoxFit.contain);
+                        }
+                      },
+                    ),
+                  )
+                  ,
                   Container(
                     width: width * 0.3,
-                    height: height*0.08,
+                    height: height*0.1,
                     child: Column(
+                      spacing: 0,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Container(
-                          width: width * 0.3,
-                          alignment: Alignment.center,
-                          child: Text(
-                            StaticValues.shopName,maxLines: 1,
-                            style: TextStyle(
-                                color: Colors.white, fontSize: width * 0.06),
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              StaticValues.shopName,maxLines: 1,
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: width * 0.06),
+                            ),
                           ),
                         ),
-                        Container(
-                          width: width * 0.3,
-                          alignment: Alignment.center,
-                          child: Text(
-                            StaticValues.userName,maxLines: 1,
-                            style: TextStyle(
-                                color: Colors.grey, fontSize: width * 0.055),
+                        SizedBox(height: height*0.003,),
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              StaticValues.userName,maxLines: 1,
+                              style: TextStyle(
+                                  color: Colors.grey, fontSize: width * 0.055),
+                            ),
                           ),
                         ),
                       ],
@@ -161,7 +224,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             Padding(
               padding:  EdgeInsets.symmetric(vertical: width*0.02),
               child: Text(
-                'ورژن $_version',
+                'ورژن ${_version.toString().stringToPersianDigits()}',
                 style: TextStyle(
                   color: AppConfig.progressBarColor,
                   fontSize: AppConfig.calWidth(context, 3.2),

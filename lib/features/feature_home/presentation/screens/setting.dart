@@ -73,7 +73,7 @@ class _SettingPageState extends State<SettingPage> {
           title: Text(
             'تنظیمات نمایش فاکتور',
             style: TextStyle(
-                fontSize: AppConfig.calFontSize(context, 4),
+                fontSize: AppConfig.calTitleFontSize(context),
                 color: Colors.white),
           ),
         ),
@@ -87,8 +87,9 @@ class _SettingPageState extends State<SettingPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
+                      Container(
                         height: AppConfig.calHeight(context, 68),
+                        alignment: Alignment.center,
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -104,7 +105,9 @@ class _SettingPageState extends State<SettingPage> {
                           ),
                         ),
                       ),
-                      Container(width: AppConfig.calWidth(context, 40),height: AppConfig.calHeight(context, 8),
+                      Container(
+                        width: AppConfig.calWidth(context, 73),
+                        height: AppConfig.calHeight(context, 6),
                         child: ElevatedButton(
                             onPressed: () async {
                               SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -120,7 +123,7 @@ class _SettingPageState extends State<SettingPage> {
                                     BorderRadius.all(Radius.circular(5)), side: BorderSide(width: 1, color: Colors.grey[300]!),)),
                             child: Text(
                               'ذخیره',
-                              style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+                              style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4.2)),
                             )),
                       )
                     ],
@@ -136,21 +139,25 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget makeRow(context, String text, isShowDivider, controller, index, bool initialValue) {
     return Container(
+      alignment: Alignment.center,
       height: AppConfig.calHeight(context, 12),
+      width: AppConfig.calWidth(context, 82),
       padding: EdgeInsets.symmetric(vertical: AppConfig.calHeight(context, 1)),
-      child: Column(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                width: AppConfig.calWidth(context, 40),
-                child: Text(
-                  text,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: AppConfig.calFontSize(context, 3.3)),
+              Expanded(
+                child: Container(
+                //  width: AppConfig.calWidth(context, 50),
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppConfig.calFontSize(context, 4.2)),
+                  ),
                 ),
               ),
               Container(

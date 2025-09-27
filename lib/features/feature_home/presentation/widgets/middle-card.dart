@@ -17,7 +17,7 @@ class MiddleCard extends StatelessWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Container(
-      height: height * 0.17,
+     // height: height * 0.17,
       width: width,
       decoration: BoxDecoration(
           border: Border.all(color: AppConfig.borderColor, width: 0.4),

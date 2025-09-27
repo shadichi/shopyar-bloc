@@ -81,6 +81,10 @@ class _AddOrderBillState extends State<AddOrderBill> {
       widget.textEditing[6].text = e.billing!.phone;
       widget.textEditing[7].text = e.shippingPrice ?? '';
 
+      print('e.billing!.email');
+      print(e.billing!.email);
+      print(e.billing!.postcode);
+
       // 🔔 اینجا کال‌بک‌های پدر رو هم صدا بزن
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onTextChange[1](widget.textEditing[0].text); // FN
@@ -132,25 +136,23 @@ class _AddOrderBillState extends State<AddOrderBill> {
             spacing: 20,
             children: [
               // نام و نام‌خانوادگی
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
-                    widget.textEditing[0], 'نام', height, context,
-                    onChanged: widget.onTextChange[1], // FN
-                  ),
-                  textField(
+              MakeRow( Expanded(
+                child: textField(
+                  widget.textEditing[0], 'نام', height, context,
+                  onChanged: widget.onTextChange[1], // FN
+                ),
+              ),
+                Expanded(
+                  child: textField(
                     widget.textEditing[1], ' نام خانوادگی', height, context,
                     onChanged: widget.onTextChange[0], // LN
                   ),
-                ],
-              ),
+                ),),
 
 // استان + شهر
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ProvinceDropdownMenu(
+              MakeRow(
+                Expanded(
+                  child: ProvinceDropdownMenu(
                     itemList: provinceList,
                     key1: 'استان',
                     onTextChange: widget.onTextChange[3],
@@ -159,39 +161,43 @@ class _AddOrderBillState extends State<AddOrderBill> {
                         : '',
                     mode: widget.isEditMode,
                   ),
-                  textField(
+                ),
+                Expanded(
+                  child: textField(
                     widget.textEditing[3], 'شهر محل زندگی', height, context,
                     onChanged: widget.onTextChange[2], // City
                   ),
-                ],
+                ),
               ),
 
 // آدرس
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  textField(
-                    widget.textEditing[2], 'آدرس خریدار', height, context,
-                    isOnlyChild: true,
-                    onChanged: widget.onTextChange[4], // Address
+                  Expanded(
+                    child: textField(
+                      widget.textEditing[2], 'آدرس خریدار', height, context,
+                      isOnlyChild: true,
+                      onChanged: widget.onTextChange[4], // Address
+                    ),
                   ),
                 ],
               ),
 
 // کد پستی + ایمیل
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
-                    widget.textEditing[4], 'کد پستی خریدار', height, context,
-                    onChanged: widget.onTextChange[5], // Postal
-                  ),
-                  textField(
+              MakeRow(
+                Expanded(
+                child: textField(
+                  widget.textEditing[4], 'کد پستی خریدار', height, context,
+                  onChanged: widget.onTextChange[5], // Postal
+                ),
+              ),
+                Expanded(
+                  child: textField(
                     widget.textEditing[5], 'ایمیل خریدار', height, context,
                     onChanged: widget.onTextChange[6], // Email
                   ),
-                ],
-              ),
+                ),),
 
 
               PaymentDropdownMenu(
@@ -214,21 +220,22 @@ class _AddOrderBillState extends State<AddOrderBill> {
               ),
 
 // هزینه حمل
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textField(
+              MakeRow(
+                Expanded(
+                  child: textField(
                     widget.textEditing[7], 'هزینه حمل ونقل', height, context,
-                   // isOnlyChild: true,
+                    // isOnlyChild: true,
                     onChanged: widget.onTextChange[10], // ShipPrice
                   ),
-                  textField(
+                ),
+                Expanded(
+                  child: textField(
                     widget.textEditing[6], 'شماره همراه خریدار', height, context,
                     //isOnlyChild: true,
                     onChanged: widget.onTextChange[7], // Phone
                   ),
-                ],
-              ),
+                ),
+              )
 
             ],
           ),
@@ -245,8 +252,10 @@ class _AddOrderBillState extends State<AddOrderBill> {
         bool isOnlyChild = false,
         required ValueChanged<String> onChanged,
       }) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return SizedBox(
-      width: isOnlyChild ? 310 : 150,
+      //width: double.infinity,
       height: height * 0.05,
       child: TextFormField(
         controller: controller,
@@ -312,8 +321,10 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
         : widget.itemList!.first; // ✅
 
     return SizedBox(
-      width: width * 0.4,
-      child: Column(children: [
+    //  width: width * 0.4,
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
         Container(
           height: height * 0.05,
           child: DropdownButtonFormField2(
@@ -401,7 +412,7 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
         : widget.itemList!.first.methodTitle; // ✅
 
     return SizedBox(
-      width: width * 0.85,
+     // width: width * 0.85,
       child: Column(children: [
         Container(
           height: height * 0.05,
@@ -496,7 +507,7 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
    /* print('selectedItem');
     print(selectedItem);*/
     return SizedBox(
-      width: width * 0.85,
+     // width: width * 0.85,
       child: Column(
         children: [
           Container(
@@ -565,4 +576,13 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
       ),
     );
   }
+}
+
+Widget MakeRow(Widget firstWidget, Widget secWidget){
+  return  Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      firstWidget,SizedBox(width: 2,),secWidget
+    ],
+  );
 }

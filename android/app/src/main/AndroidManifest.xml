@@ -6,7 +6,7 @@
 
 
     <application
-        android:label="shapyar_bloc"
+        android:label="شاپ یار"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

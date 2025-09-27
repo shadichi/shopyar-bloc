@@ -85,7 +85,7 @@ void showFilterBottomSheet(BuildContext context,
                       child: Text(
                         "جهت تغییر وضعیت سفارش انتخاب کنید:",
                         style: TextStyle(
-                            fontSize: AppConfig.calFontSize(context, 3.2),color: Colors.white),
+                            fontSize: AppConfig.calFontSize(context, 3.8),color: Colors.white),
                       ),
                     ),
                     SizedBox(height: AppConfig.calHeight(context, 2),),
@@ -136,7 +136,7 @@ void showFilterBottomSheet(BuildContext context,
                                       child: Text(
                                         trueValue,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 2.8)),
+                                        style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3.7)),
                                       ),
                                     ),
                                     onTap: () {

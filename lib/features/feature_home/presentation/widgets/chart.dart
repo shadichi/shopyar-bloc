@@ -61,11 +61,11 @@ class BarChartSample4State extends State<Chart> {
     // ترتیب روزهای هفته از شنبه تا جمعه
     final weekdays = [
       'شنبه',
-      'یکشنبه',
-      'دوشنبه',
-      'سه‌شنبه',
-      'چهارشنبه',
-      'پنج‌شنبه',
+      '1شنبه',
+      '2شنبه',
+      '3‌شنبه',
+      '4شنبه',
+      '5شنبه',
       'جمعه'
     ];
 
@@ -91,15 +91,15 @@ class BarChartSample4State extends State<Chart> {
       case DateTime.saturday:
         return 'شنبه';
       case DateTime.sunday:
-        return 'یکشنبه';
+        return '1کشنبه';
       case DateTime.monday:
-        return 'دوشنبه';
+        return '2شنبه';
       case DateTime.tuesday:
-        return 'سه‌شنبه';
+        return '3‌شنبه';
       case DateTime.wednesday:
-        return 'چهارشنبه';
+        return '4شنبه';
       case DateTime.thursday:
-        return 'پنج‌شنبه';
+        return '5‌شنبه';
       case DateTime.friday:
         return 'جمعه';
       default:
@@ -135,25 +135,25 @@ class BarChartSample4State extends State<Chart> {
     String text;
     switch (value.toInt()) {
       case 0:
-        text = 'شنبه';
+        text = 'شنبه'.toString().stringToPersianDigits();
         break;
       case 1:
-        text = 'یکشنبه';
+        text = '1شنبه'.toString().stringToPersianDigits();
         break;
       case 2:
-        text = 'دوشنبه';
+        text = '2شنبه'.toString().stringToPersianDigits();
         break;
       case 3:
-        text = 'سه شنبه';
+        text = '3شنبه'.toString().stringToPersianDigits();
         break;
       case 4:
-        text = 'چهارشنبه';
+        text = '4شنبه'.toString().stringToPersianDigits();
         break;
       case 5:
-        text = 'پنجشنبه';
+        text = '5شنبه'.toString().stringToPersianDigits();
         break;
       case 6:
-        text = 'جمعه';
+        text = 'جمعه'.toString().stringToPersianDigits();
         break;
       default:
         text = '';
