@@ -92,9 +92,6 @@ class _AddOrderTest extends State<ProductFormScreen> {
     // 2) محصولات رو لود کن
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
     // 3) Hydrate فقط بعد از ProductsLoaded و فقط یک بار (در listener)
-    print('widget.ordersEntity!.billing!.email');
-    print(widget.ordersEntity!.billing!.email);
-    print(widget.ordersEntity!.billing!.phone);
   }
 
 
@@ -374,7 +371,10 @@ class _AddOrderTest extends State<ProductFormScreen> {
             final payIdx = paymentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == paymentBill.trim()) ?? -1;
             final shipIdx =
                 shipmentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == shipmentBill.trim()) ?? -1;
-
+            if(!isValidEmail(emailBill)) {
+              showSnack(context, "ایمیل حتما باید به فرمت صحیح باشد!");
+              return;
+            }
             if ((_formKey.currentState?.validate() ?? false) && payIdx >= 0 && shipIdx >= 0) {
               setState(() => activeStep = 1);
             } else {
@@ -384,7 +384,6 @@ class _AddOrderTest extends State<ProductFormScreen> {
           }
 
           if (activeStep == 1) {
-            // ✅ lineItems را از state مشتق بگیر، نه از متغیر لوکال
             final st = context.read<AddOrderBloc>().state;
             final derived = _deriveLineItemsFromState(st);
 
@@ -572,4 +571,12 @@ class _AddOrderTest extends State<ProductFormScreen> {
       ],
     );
   }
+}
+bool isValidEmail(String email) {
+  final RegExp regex = RegExp(
+    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+  );
+
+  if (email.isEmpty) return false;
+  return regex.hasMatch(email);
 }

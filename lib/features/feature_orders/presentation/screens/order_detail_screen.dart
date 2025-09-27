@@ -285,7 +285,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                ordersData.shipping!.phone,
+                                ordersData.shipping!.phone.stringToPersianDigits(),
                                 style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                               Text(

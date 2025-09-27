@@ -30,7 +30,7 @@ Future<bool?> alertDialogScreen(
           child: Center(
             child: Text(
               text,textAlign: TextAlign.center,
-              style: TextStyle(fontSize: AppConfig.calWidth(context, 3.2),),
+              style: TextStyle(fontSize: AppConfig.calWidth(context, 4),),
             ),
           ),
         ),
@@ -44,7 +44,7 @@ Future<bool?> alertDialogScreen(
                  isExit ? 'بله' : 'باشه',
                  style: TextStyle(
                    color: AppConfig.backgroundColor,
-                   fontSize: AppConfig.calWidth(context, 3),
+                   fontSize: AppConfig.calWidth(context, 4),
                  ),
                ),
                onPressed: () {
@@ -57,7 +57,7 @@ Future<bool?> alertDialogScreen(
                    'خیر',
                    style: TextStyle(
                      color: AppConfig.backgroundColor,
-                     fontSize: AppConfig.calWidth(context, 3),
+                     fontSize: AppConfig.calWidth(context, 4),
                    ),
                  ),
                  onPressed: () {

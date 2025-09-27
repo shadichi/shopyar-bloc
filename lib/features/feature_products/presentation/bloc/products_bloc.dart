@@ -22,7 +22,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       : super(ProductsState(productsStatus: ProductsLoadingStatus(), isLoadingMore: false)) {
 
     on<LoadProductsData>((event, emit) async {
-      final isInitial = StaticValues.staticOrders.isEmpty && !event.productsParams.isLoadMore;
+      final isInitial = StaticValues.staticProducts.isEmpty && !event.productsParams.isLoadMore;
 
       if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch || event.productsParams.isLoadMore) {
         print('1');
