@@ -335,7 +335,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
                               ),
                               Text(
-                                ordersData.shippingPrice.toString().stringToPersianDigits(),
+                                formatFaThousands(ordersData.shippingPrice.toString().stringToPersianDigits()),
                                 style: TextStyle(color:AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
                               ),
                             ],

@@ -13,6 +13,9 @@ import 'order_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shapyar_bloc/extension/persian_digits.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:flutter/material.dart';
+
 
 class ShowPDF extends StatefulWidget {
   static String routeName = 'ShowPDF';
@@ -38,7 +41,7 @@ class _ShowPDFState extends State<ShowPDF> {
   void initState() {
     super.initState();
     getFactorData();
-    _generatePdf();
+   // _generatePdf();
   }
 
   Future<bool> getFactorData() async {
@@ -65,7 +68,7 @@ class _ShowPDFState extends State<ShowPDF> {
     if (_inited) return;
     _inited = true;
     args = ModalRoute.of(context)!.settings.arguments as PdfData;
-    _prepare(); // ترتیب: prefs -> pdf
+    _prepare();
   }
   Future<void> _prepare() async {
     await _getFactorData();
@@ -90,7 +93,7 @@ class _ShowPDFState extends State<ShowPDF> {
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
 
-    final ttfData = await rootBundle.load("assets/fonts/IRANSansWeb.ttf");
+    final ttfData = await rootBundle.load("assets/fonts/Vazir.ttf");
     final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
     final b = args.ordersEntity.billing;
@@ -111,8 +114,7 @@ class _ShowPDFState extends State<ShowPDF> {
                     pw.Container(
                         padding: pw.EdgeInsets.all(width * 0.02),
                         child: pw.Text(
-                          /*mainPage.shopName.toString()*/
-                          StaticValues.shopName ?? "",
+                          StaticValues.shopName,
                           textDirection: pw.TextDirection.rtl,
                           style: pw.TextStyle(fontSize: 10, font: ttf),
                           overflow: pw.TextOverflow.clip,
@@ -449,22 +451,43 @@ class _ShowPDFState extends State<ShowPDF> {
 
   }
 
+
+/*
   Future<void> _savePdf() async {
     if (pdfPath == null) return;
-    final output = await getExternalStorageDirectory();
-    final savedFile = File('${output!.path}/factor.pdf');
-    await File(pdfPath!).copy(savedFile.path);
+    try {
+      final bytes = await File(pdfPath!).readAsBytes();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("PDF ذخیره شد! ✅ در: ${savedFile.path}")),
-    );
-    print("args.ordersEntity.status");
-    print(args.ordersEntity.status);
-    print(args.item);
+      // روی Android 10+ از MediaStore استفاده می‌کند و در Downloads ذخیره می‌شود
+      final savedUriOrPath = await FileSaver.instance.saveFile(
+        name: 'factor',           // نام فایل بدون پسوند
+        bytes: bytes,             // محتوای PDF
+        fileExtension: 'pdf',               // پسوند
+        mimeType: MimeType.pdf,   // MIME
+      );
+
+      print(savedUriOrPath);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('PDF ذخیره شد ✅\n$savedUriOrPath')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطا در ذخیره: $e')),
+      );
+    }
   }
+*/
+
 
   @override
   Widget build(BuildContext context) {
+    print('pdfPath');
+    print(pdfPath);
+    print(_loading);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -485,17 +508,32 @@ class _ShowPDFState extends State<ShowPDF> {
       ),
      body: (_loading || pdfPath == null)
         ?  Center(child: ProgressBar())
-        : PDFView(
-      filePath: pdfPath!,
-      enableSwipe: true,
-      swipeHorizontal: false,
-      autoSpacing: true,
-      pageSnap: true,
-      fitPolicy: FitPolicy.BOTH,
-    ),
+        : SizedBox.expand(
+          child: PDFView(
+                 filePath: pdfPath,
+                 enableSwipe: true,
+                 swipeHorizontal: false,
+                 autoSpacing: true,
+                 pageSnap: true,
+                 fitPolicy: FitPolicy.BOTH,
+                 onRender: (pages) {
+           debugPrint('PDF rendered with $pages pages');
+                 },
+                 onError: (error) {
+           debugPrint('PDFView onError: $error');
+           ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(content: Text('خطا در نمایش PDF: $error')),
+           );
+                 },
+                 onPageError: (page, error) {
+           debugPrint('PDFView onPageError: $page, $error');
+                 },
+               ),
+        )
+      ,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppConfig.backgroundColor,
-        onPressed: _savePdf,
+        onPressed: (){},
         tooltip: "ذخیره PDF",
         child: Icon(
           Icons.save,

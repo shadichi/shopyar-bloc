@@ -140,12 +140,14 @@ class _AddOrderBillState extends State<AddOrderBill> {
                 child: textField(
                   widget.textEditing[0], 'نام', height, context,
                   onChanged: widget.onTextChange[1], // FN
+                  isNec: true
                 ),
               ),
                 Expanded(
                   child: textField(
                     widget.textEditing[1], ' نام خانوادگی', height, context,
                     onChanged: widget.onTextChange[0], // LN
+                      isNec: true
                   ),
                 ),),
 
@@ -190,6 +192,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
                 child: textField(
                   widget.textEditing[4], 'کد پستی خریدار', height, context,
                   onChanged: widget.onTextChange[5], // Postal
+                  isDigit: true
                 ),
               ),
                 Expanded(
@@ -226,6 +229,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
                     widget.textEditing[7], 'هزینه حمل ونقل', height, context,
                     // isOnlyChild: true,
                     onChanged: widget.onTextChange[10], // ShipPrice
+                      isDigit: true
                   ),
                 ),
                 Expanded(
@@ -233,6 +237,8 @@ class _AddOrderBillState extends State<AddOrderBill> {
                     widget.textEditing[6], 'شماره همراه خریدار', height, context,
                     //isOnlyChild: true,
                     onChanged: widget.onTextChange[7], // Phone
+                      isNec: true,
+                      isDigit: true
                   ),
                 ),
               )
@@ -251,14 +257,18 @@ class _AddOrderBillState extends State<AddOrderBill> {
       BuildContext context, {
         bool isOnlyChild = false,
         required ValueChanged<String> onChanged,
+        bool isNec = false,
+        bool isDigit = false
       }) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return SizedBox(
       //width: double.infinity,
       height: height * 0.05,
+
       child: TextFormField(
         controller: controller,
+        keyboardType: isDigit?TextInputType.number:null,
         style: TextStyle(
           fontSize: AppConfig.calFontSize(context, 3),
           color: Colors.black87,
@@ -280,7 +290,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
             borderSide: const BorderSide(color: Colors.red, width: 1.5),
           ),
         ),
-        validator: (value) => (value == null || value.trim().isEmpty) ? ' ' : null,
+        validator: isNec?(value) => (value == null || value.trim().isEmpty) ? ' ' : null:null,
         onChanged: onChanged, // 👈 اینجا کال‌بک پِرِنت صدا می‌خوره
       ),
     );

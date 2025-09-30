@@ -10,7 +10,10 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../widgets/show_post_label.dart';
 
 class EnterInfData extends StatefulWidget {
@@ -100,6 +103,14 @@ class _EnterInfDataState extends State<EnterInfData> {
     if (!context.mounted) return;
   }
 
+  Future<String> persistIcon(Uint8List bytes, {String originalName = 'icon.png'}) async {
+    final dir = await getApplicationDocumentsDirectory(); // مسیر داخلی اپ
+    final ext = p.extension(originalName.isEmpty ? 'icon.png' : originalName);
+    final file = File(p.join(dir.path, 'store_icon$ext')); // مثلا .../app_flutter/store_icon.png
+    await file.writeAsBytes(bytes, flush: true);
+    return file.path; // این مسیر رو تو Hive ذخیره کن
+  }
+
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
    path = prefs.getString(_kSavedPathKey).toString();
@@ -126,17 +137,24 @@ class _EnterInfDataState extends State<EnterInfData> {
     final xfile = await _picker.pickImage(source: ImageSource.gallery);
     if (xfile == null) return;
 
-    // Copy to app directory so you own the file and it won’t get GC’d by the OS.
     final appDir = await getApplicationDocumentsDirectory();
-    final saved = File(
-        '${appDir.path}/${DateTime.now().millisecondsSinceEpoch}_${xfile.name}');
-    await File(xfile.path).copy(saved.path);
+    final ext = p.extension(xfile.name);
+    final file = File(p.join(appDir.path, 'store_icon${ext.isEmpty ? '.png' : ext}'));
 
-    // Persist path for later
+// مستقیم کپی کن (کم‌مصرف‌تر از readAsBytes)
+    await xfile.saveTo(file.path);
+
+    print('file.path');
+    print(file.path);
+
+    path = file.path;
+
+// ذخیره مسیر
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kSavedPathKey, saved.path);
+    await prefs.setString(_kSavedPathKey, file.path);
 
-    setState(() => _imageFile = saved);
+    setState(() => _imageFile = file);
+
   }
 
   Future<void> _clearImage() async {

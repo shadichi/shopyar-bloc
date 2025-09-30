@@ -371,14 +371,17 @@ class _AddOrderTest extends State<ProductFormScreen> {
             final payIdx = paymentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == paymentBill.trim()) ?? -1;
             final shipIdx =
                 shipmentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == shipmentBill.trim()) ?? -1;
-            if(!isValidEmail(emailBill)) {
-              showSnack(context, "ایمیل حتما باید به فرمت صحیح باشد!");
-              return;
+            if(emailBill.isNotEmpty){
+              if(!isValidEmail(emailBill)) {
+                showSnack(context, "ایمیل حتما باید به فرمت صحیح باشد!");
+                return;
+              }
             }
+
             if ((_formKey.currentState?.validate() ?? false) && payIdx >= 0 && shipIdx >= 0) {
               setState(() => activeStep = 1);
             } else {
-              showSnack(context, "لطفاً همه فیلدهای مورد نیاز را پر کنید!");
+              showSnack(context, "لطفاً فیلدهای مورد نیاز را پر کنید!");
             }
             return;
           }

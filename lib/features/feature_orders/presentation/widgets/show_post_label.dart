@@ -13,6 +13,8 @@ import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_enti
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../data/models/store_info.dart';
+import 'dart:typed_data';
+
 
 class PdfViewerScreen extends StatefulWidget {
   static String routeName = 'PdfViewerScreen';
@@ -34,15 +36,14 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   void initState() {
     super.initState();
-    getHiveData();
+    //getHiveData();
     _init(); // تولید PDF در لحظه ورود
   }
   Future<void> _init() async {
     try {
-      await getHiveData();      // اینجا تا گرفتن دیتا صبر می‌کنه
-      await _generatePdf();    // حالا که دیتا هست، PDF بساز
+      await getHiveData();
+      await _generatePdf();
     } catch (e) {
-      // هندل خطا (مثلاً SnackBar یا لاگ)
       print('Error in init: $e');
     }
   }
@@ -77,6 +78,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   }*/
 
   Future<void> _generatePdf() async {
+    print('1');
     final pdf = pw.Document();
 
     final ByteData imageData =
@@ -88,11 +90,16 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     final Uint8List instaIconImageBytes = instaIcon.buffer.asUint8List();
     final instaImage = pw.MemoryImage(instaIconImageBytes);
 
+    debugPrint('storeIcon raw: "${storeInfo.storeIcon}"');
+    if (storeInfo.storeIcon.isNotEmpty && storeInfo.storeIcon != 'null') {
+      debugPrint('icon exists? ${await File(storeInfo.storeIcon).exists()}');
+    }
+
     final File storeIconFile = File(storeInfo.storeIcon);
     final Uint8List storeIconBytes = await storeIconFile.readAsBytes();
     final storeIconImage = pw.MemoryImage(storeIconBytes);
 
-    final ttfData = await rootBundle.load("assets/fonts/IRANSansWeb.ttf");
+    final ttfData = await rootBundle.load("assets/fonts/Vazir.ttf");
     final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
    // await Hive.openBox<StoreInfo>('storeBox');
@@ -102,7 +109,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
 
     pdf.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4,
+       // pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           final width = PdfPageFormat.a4.width;
           final height = PdfPageFormat.a4.height;
@@ -146,7 +153,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                                 maxLine: 1),
                           ]))),
               positionedTextWidget(
-                  text: widget.ordersEntity.billing!.firstName.toString() + widget.ordersEntity.billing!.lastName.toString() ,//نام گیرنده
+                  text:"${widget.ordersEntity.billing!.lastName} ${widget.ordersEntity.billing!.firstName}",//نام گیرنده
                   heightContainer: height * 0.02,
                   widthContainer: width * 0.28,
                   leftPositioned: width * 0.445,
@@ -266,20 +273,55 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     await file.writeAsBytes(await pdf.save());
 
     setState(() {
+      print('pdfPath');
+      print(pdfPath);
       pdfPath = file.path; // مسیر PDF در متغیر ذخیره می‌شود
+      print(pdfPath);
+
     });
   }
 
-  Future<void> _savePdf() async {
+  Future<void> _savePdf(BuildContext context) async {
     if (pdfPath == null) return;
-    final output = await getExternalStorageDirectory();
-    final savedFile = File('${output!.path}/final_output.pdf');
-    await File(pdfPath!).copy(savedFile.path);
+    try {
+      final baseDir = await getApplicationDocumentsDirectory(); // app-specific
+      final downloadsDir = Directory('${baseDir!.path}/downloads');
+      if (!await downloadsDir.exists()) {
+        await downloadsDir.create(recursive: true);
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("PDF ذخیره شد! ✅ در: ${savedFile.path}")),
-    );
+      final savedFile = File('${downloadsDir.path}/final_output.pdf');
+      final copied = await File(pdfPath!).copy(savedFile.path);
+
+      final exists = await copied.exists();
+      final size = await copied.length();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(exists
+            ? "PDF ذخیره شد ✅ (app-specific): ${copied.path} — ${size} bytes"
+            : "کپی ناموفق بود ❌")),
+      );
+
+      print("PDF ذخیره شد ✅ (app-specific): ${copied.path} — ${size} bytes");
+    } catch (e, st) {
+      debugPrint('Save error: $e\n$st');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("خطا در ذخیره‌سازی PDF")),
+      );
+    }
   }
+/*  Future<void> _savePdf() async {
+    // .pdf extension tells Android it’s a PDF and places it under Downloads
+    final pathOrUri = await FileSaver.instance.saveFile(
+      name: 'my_report',
+      filePath: pdfPath,
+      fileExtension: 'pdf',
+      mimeType: MimeType.pdf,
+    );
+    print('Saved to: $pathOrUri');
+    // On Android this returns a content URI (e.g. content://...), which you can pass to open_filex
+    // print('Saved to: $pathOrUri');
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +337,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       body: pdfPath == null
           ? Center(child: ProgressBar())
           : PDFView(
-        filePath: pdfPath!,
+        filePath: '/data/user/0/com.example.shapyar_bloc/cache/post_label.pdf',
         enableSwipe: true,
         swipeHorizontal: false,
         autoSpacing: true,
@@ -304,7 +346,9 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppConfig.backgroundColor,
-        onPressed: _savePdf,
+        onPressed: (){
+          _savePdf(context);
+        },
         tooltip: "ذخیره PDF",
         child: Icon(Icons.save,color: AppConfig.white,),
       ),
