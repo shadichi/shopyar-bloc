@@ -56,18 +56,18 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     } else {
       // اگر انتظار داشتی حتما داده باشه، اینجا می‌تونی مقدار پیش‌فرض یا لاگ بذاری
       storeInfo = StoreInfo(
-        storeName: '',
-        storeAddress: '',
-        phoneNumber: '',
-        instagram: '',
-        postalCode: '',
-        website: '',
-        storeIcon: '',
-        storeSenderName: '',
-        storeNote: ''
+          storeName: '',
+          storeAddress: '',
+          phoneNumber: '',
+          instagram: '',
+          postalCode: '',
+          website: '',
+          storeIcon: '',
+          storeSenderName: '',
+          storeNote: ''
       );
     }
-  //  await box.close();
+    //  await box.close();
     setState(() {}); // اگه می‌خوای UI تغییر کنه
   }
 
@@ -102,14 +102,14 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
     final ttfData = await rootBundle.load("assets/fonts/Vazir.ttf");
     final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
-   // await Hive.openBox<StoreInfo>('storeBox');
-   // var storeBox = Hive.box<StoreInfo>('storeBox');
-   // var store = storeBox.get('storeInfo') ?? StoreInfo(instagram: '',phoneNumber: '',postalCode: '',storeAddress: '',storeIcon: '',storeName: '',website: '');
+    // await Hive.openBox<StoreInfo>('storeBox');
+    // var storeBox = Hive.box<StoreInfo>('storeBox');
+    // var store = storeBox.get('storeInfo') ?? StoreInfo(instagram: '',phoneNumber: '',postalCode: '',storeAddress: '',storeIcon: '',storeName: '',website: '');
 
 
     pdf.addPage(
       pw.Page(
-       // pageFormat: PdfPageFormat.a4,
+        // pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           final width = PdfPageFormat.a4.width;
           final height = PdfPageFormat.a4.height;
@@ -329,7 +329,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       appBar: AppBar(
         title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.8)),),leading: IconButton(
         icon: Icon(Icons.arrow_back, color: AppConfig.white,),
-          onPressed: () {
+        onPressed: () {
 
           Navigator.pop(context);
         },
@@ -372,7 +372,7 @@ pw.Widget positionedTextWidget({
       left: leftPositioned,
       top: topPositioned,
       child: pw.Container(
-       // color: PdfColors.red,
+        // color: PdfColors.red,
 
           alignment: alignment,
           width: widthContainer,

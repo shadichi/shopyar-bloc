@@ -25,6 +25,8 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'features/feature_start/presentation/widgets/no_connection_screen.dart';
 import 'locator.dart';
+import 'package:media_store_plus/media_store_plus.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +44,8 @@ void main() async {
     // اگر می‌خواید حالت برعکس هم مجاز باشه (سر-پا وارونه) این خط رو باز کنید:
     // DeviceOrientation.portraitDown,
   ]);
+
+  MediaStore.appFolder = "IMO";
 
   runApp(const MyApp());
 }

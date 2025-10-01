@@ -150,7 +150,7 @@ Widget header(context) {
           'ورود به اپلیکیشن شاپ‌یار',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: AppConfig.calFontSize(context, 4.5),
+            fontSize: AppConfig.calFontSize(context, 5),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -185,7 +185,7 @@ Widget loginForm(context, formKey, webServiceController, tokenController) {
 }
 
 Widget loginButton(context, onPressed) {
-  final buttonWidth = AppConfig.calWidth(context, 40);
+  final buttonWidth = AppConfig.calWidth(context, 80);
   final buttonHeight = AppConfig.calHeight(context, 8);
 
   return SizedBox(
@@ -213,14 +213,14 @@ Widget loginButton(context, onPressed) {
                   width: buttonWidth * 0.12,
                   height: buttonHeight * 0.25,
                   child: ProgressBar(
-                    size: 2,
+                    size: 5,
                   ), // رنگش اگر خواستی بده: ProgressBar(color: Colors.white)
                 )
               :  Text(
                   'ورود',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: AppConfig.calFontSize(context, 4),
+                    fontSize: AppConfig.calFontSize(context, 4.7),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -251,7 +251,7 @@ Widget helpButton(context) {
             'راهنمایی',
             style: TextStyle(
               color: AppConfig.progressBarColor,
-              fontSize: AppConfig.calWidth(context, 3.2),
+              fontSize: AppConfig.calWidth(context, 4),
             ),
           ),
           SizedBox(width: AppConfig.calWidth(context, 2)),
@@ -277,7 +277,7 @@ Widget versionText(context, version) {
           'ورژن ${"1.0.2".toString().stringToPersianDigits()}',
           style: TextStyle(
             color: AppConfig.progressBarColor,
-            fontSize: AppConfig.calWidth(context, 3.2),
+            fontSize: AppConfig.calWidth(context, 3.4),
           ),
         ),
         SizedBox(width: AppConfig.calWidth(context, 2)),

@@ -70,16 +70,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           StaticValues.paymentMethods =
               homeUserDataParams.response['payment_methods'] ?? [];
           StaticValues.status = homeUserDataParams.response['status'] ?? {};
+          StaticValues.versionNo = homeUserDataParams.response['version'] ?? "";
 
-          print('StaticValues.webService');
-          print(StaticValues.webService);
-          print(StaticValues.passWord);
-          print(StaticValues.shopName);
-          print(StaticValues.shippingMethods);
-          print(StaticValues.shippingMethods);
-          print(StaticValues.paymentMethods);
-          print(StaticValues.status);
-          print(StaticValues.staticHomeDataEntity);
 
           if (StaticValues.webService != '' &&
               StaticValues.passWord != '' &&
@@ -136,6 +128,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           StaticValues.shippingMethods = homeUserDataParams.response['shipping_methods'] ?? [];
           StaticValues.paymentMethods = homeUserDataParams.response['payment_methods'] ?? [];
           StaticValues.status = homeUserDataParams.response['status'] ?? {};
+          StaticValues.versionNo = homeUserDataParams.response['version'] ?? "";
 
           emit(state.copyWith(newHomeStatus: HomeLoadedStatus()));
         } else {

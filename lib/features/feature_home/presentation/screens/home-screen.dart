@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shapyar_bloc/features/feature_home/presentation/widgets/middle-card.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
 import '../../../../core/config/app-colors.dart';
+import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
+import '../../../../core/widgets/snackBar.dart';
 import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
 import '../../../feature_orders/data/models/store_info.dart';
 import '../widgets/chart.dart';
@@ -41,9 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _onRefresh() {
     final c = Completer<void>();
-    context
-        .read<HomeBloc>()
-        .add(RefreshHomeData(c));
+    context.read<HomeBloc>().add(RefreshHomeData(c));
     return c.future;
   }
 
@@ -55,9 +55,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
 
-    return BlocConsumer<HomeBloc, HomeState>(listener: (context, state) {
+    return BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state) {
       if (state.homeStatus is HomeAccountExitStatus) {
         Navigator.pushReplacementNamed(context, LogInScreen.routeName);
+      }
+      if (state.homeStatus is HomeLoadedStatus) {
+        print('StaticValues.versionNo');
+        print(StaticValues.versionNo);
+        if(StaticValues.versionNo!="1.0.2"){
+          alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
+
+        }
       }
     }, builder: (context, state) {
       if (state.homeStatus is HomeLoading) {
@@ -119,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           body: Center(
             child: RefreshIndicator(
-              onRefresh: ()=>_onRefresh(),
+              onRefresh: () => _onRefresh(),
               child: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.all(width * 0.03),
@@ -127,14 +136,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     spacing: height * 0.02,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCompleted ==
+                      StaticValues
+                                      .staticHomeDataEntity!.statusCounts!.wcCompleted ==
                                   0 &&
                               StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcOnHold ==
                                   0 &&
-                              StaticValues
-                                      .staticHomeDataEntity!.statusCounts!.wcPending ==
+                              StaticValues.staticHomeDataEntity!.statusCounts!
+                                      .wcPending ==
                                   0 &&
                               StaticValues.staticHomeDataEntity!.statusCounts!
                                       .wcProcessing ==
@@ -149,35 +158,41 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Text(
                                   'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
                                   style: TextStyle(
-                                      fontSize: AppConfig.calFontSize(context, 3),
+                                      fontSize:
+                                          AppConfig.calFontSize(context, 3),
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
                               ),
                             )
                           : Padding(
-                        padding: EdgeInsets.only(top: AppConfig.calHeight(context, 5),bottom: AppConfig.calHeight(context, 1.2)),
-                            child: HomeScreenPieChart(
+                              padding: EdgeInsets.only(
+                                  top: AppConfig.calHeight(context, 5),
+                                  bottom: AppConfig.calHeight(context, 1.2)),
+                              child: HomeScreenPieChart(
                                 items: [
-                                  StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCompleted,
-                                  StaticValues
-                                      .staticHomeDataEntity!.statusCounts!.wcOnHold,
-                                  StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcPending,
-                                  StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcProcessing,
-                                  StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCancelled
+                                  StaticValues.staticHomeDataEntity!
+                                      .statusCounts!.wcCompleted,
+                                  StaticValues.staticHomeDataEntity!
+                                      .statusCounts!.wcOnHold,
+                                  StaticValues.staticHomeDataEntity!
+                                      .statusCounts!.wcPending,
+                                  StaticValues.staticHomeDataEntity!
+                                      .statusCounts!.wcProcessing,
+                                  StaticValues.staticHomeDataEntity!
+                                      .statusCounts!.wcCancelled
                                 ],
                               ),
-                          ),
-                      SizedBox(height: AppConfig.calHeight(context, 2.5),),
+                            ),
+                      SizedBox(
+                        height: AppConfig.calHeight(context, 2.5),
+                      ),
                       MiddleCard(
                         statusCounts: StaticValues.staticHomeDataEntity,
                       ),
                       Container(
-                        padding: EdgeInsets.only(right: AppConfig.calWidth(context, 2)),
+                        padding: EdgeInsets.only(
+                            right: AppConfig.calWidth(context, 2)),
                         alignment: Alignment.centerRight,
                         child: Text(
                           "تعداد سفارشات هفته اخیر",
@@ -188,10 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         width: width,
                         height: height * 0.3,
-                        margin: EdgeInsets.only(right: AppConfig.calWidth(context, 6)),
-
+                        margin: EdgeInsets.only(
+                            right: AppConfig.calWidth(context, 6)),
                         decoration: BoxDecoration(
-                        //    color: Colors.red,
+                            //    color: Colors.red,
                             borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(width * 0.07),
                                 topRight: Radius.circular(width * 0.07))),
@@ -207,17 +222,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         );
-      }
-      else if (state.homeStatus is HomeErrorStatus) {
+      } else if (state.homeStatus is HomeErrorStatus) {
         return Center(
             child: Text(
-              'خطا در بارگیری اطلاعات صفحه اصلی!',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: AppConfig.calFontSize(context, 4)),
-            ));
-      }
-      else if (state.homeStatus is HomeLoadedStatus) {
+          'خطا در بارگیری اطلاعات صفحه اصلی!',
+          style: TextStyle(
+              color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
+        ));
+      } else if (state.homeStatus is HomeLoadedStatus) {
         final HomeLoadedStatus ordersLoadedStatus =
             state.homeStatus as HomeLoadedStatus;
         return Scaffold(

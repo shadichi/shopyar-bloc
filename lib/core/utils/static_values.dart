@@ -17,6 +17,8 @@ class StaticValues{
 
   static bool isDrawerOpen = false;
 
+  static String versionNo = '';
+
   ///order, product
   static List<OrdersEntity> staticOrders = [];
   static List<ProductEntity> staticProducts = [];
