@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:shapyar_bloc/features/feature_orders/data/models/orders_model.dart';
 import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/show_pdf.dart';
 import '../../../../core/config/app-colors.dart';
+import '../../../../pdf_test.dart';
 import '../../../feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import '../../domain/entities/orders_entity.dart';
 import '../../functions/OrderBottomSheet.dart';
@@ -54,7 +55,7 @@ void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? 
               _buildListTile(
                 icon: Icons.local_post_office,
                 title: 'ایجاد برچسب پستی',
-                onTap: () => _handleStoreInfo(context, ordersEntity),
+                onTap: () => pdfExport("shopyar"),
                   context: context
               ),
               _buildDivider(context),
