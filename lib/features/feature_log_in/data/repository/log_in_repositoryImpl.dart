@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:shapyar_bloc/core/params/whole_user_data_params.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_log_in/data/models/login_model.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/repository/log_in_repository.dart';
+import 'package:shopyar/core/params/whole_user_data_params.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/features/feature_log_in/data/models/login_model.dart';
+import 'package:shopyar/features/feature_log_in/domain/repository/log_in_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import '../../../../core/resources/data_state.dart';

@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:shapyar_bloc/core/params/whole_user_data_params.dart';
+import 'package:shopyar/core/params/whole_user_data_params.dart';
 import 'package:http/http.dart' as http;
 
 class ApiProvider{

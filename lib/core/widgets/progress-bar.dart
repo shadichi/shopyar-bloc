@@ -1,6 +1,6 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 
 class ProgressBar extends StatelessWidget {
   final Color color;

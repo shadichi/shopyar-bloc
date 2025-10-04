@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 List<OrdersModel> ordersFromJson(dynamic json) =>
@@ -127,6 +127,7 @@ class LineItem {
     required this.total,
     this.totalTax,
     this.sku,
+    this.image
   });
 
   int? id;
@@ -143,6 +144,7 @@ class LineItem {
   String? totalTax;
   String? sku;
   String? img;
+  Map<String,  dynamic>? image;
 
   factory LineItem.fromJson(Map<String, dynamic> json) => LineItem(
         id: json["id"],
@@ -158,6 +160,7 @@ class LineItem {
         total: json["total"],
         totalTax: json["total_tax"],
         sku: json["sku"],
+    image: json["image"],
       );
 
   Map<String, dynamic> toJson() => {

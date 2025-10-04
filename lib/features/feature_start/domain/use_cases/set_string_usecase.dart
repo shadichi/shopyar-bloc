@@ -1,6 +1,6 @@
 
-import 'package:shapyar_bloc/features/feature_log_in/domain/entities/login_entity.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/repository/log_in_repository.dart';
+import 'package:shopyar/features/feature_log_in/domain/entities/login_entity.dart';
+import 'package:shopyar/features/feature_log_in/domain/repository/log_in_repository.dart';
 
 import '../../../../core/usecases/set_data_use_case.dart';
 

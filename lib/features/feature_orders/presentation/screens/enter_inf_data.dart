@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/core/widgets/alert_dialog.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../data/models/store_info.dart';
@@ -118,17 +118,20 @@ class _EnterInfDataState extends State<EnterInfData> {
       setState(() => _imageFile = File(path));
     }
     var box = await Hive.openBox<StoreInfo>('storeBox');
-    storeInfo = box.get('storeInfo')!;
-    if(storeInfo.storeName.isNotEmpty){
-      _storeNameController.text =storeInfo.storeName;
-      _storeAddressController.text = storeInfo.storeAddress;
-      _phoneNumberController.text = storeInfo.phoneNumber;
-      _instagramController.text = storeInfo.instagram;
-      _postalCodeController.text = storeInfo.postalCode;
-      _websiteController.text = storeInfo.website;
-      path = storeInfo.storeIcon;
-      _storeSenderNameController.text = storeInfo.storeSenderName!;
-      _noteController.text = storeInfo.storeNote!;
+    var tempStoreInfo = box.get('storeInfo');
+    if (tempStoreInfo != null) {
+      storeInfo = tempStoreInfo;
+      if (storeInfo.storeName.isNotEmpty) {
+        _storeNameController.text = storeInfo.storeName;
+        _storeAddressController.text = storeInfo.storeAddress;
+        _phoneNumberController.text = storeInfo.phoneNumber;
+        _instagramController.text = storeInfo.instagram;
+        _postalCodeController.text = storeInfo.postalCode;
+        _websiteController.text = storeInfo.website;
+        path = storeInfo.storeIcon;
+        _storeSenderNameController.text = storeInfo.storeSenderName ?? '';
+        _noteController.text = storeInfo.storeNote ?? '';
+      }
     }
 
   }
@@ -221,9 +224,7 @@ class _EnterInfDataState extends State<EnterInfData> {
                 CustomTextField(
                   label: "اینستاگرام",
                   controller: _instagramController,
-                  validator: (value) => value!.isEmpty
-                      ? "لطفاً نام کاربری اینستاگرام را وارد کنید"
-                      : null,
+                  validator:  null,
                 ),
                 CustomTextField(
                   label: "کد پستی",
@@ -238,16 +239,14 @@ class _EnterInfDataState extends State<EnterInfData> {
                   controller: _websiteController,
                   inputFormatter:
                       FilteringTextInputFormatter.allow(RegExp(r'[a-z ,0-9.,آ-ی]')),
-                  validator: (value) =>
-                      value!.isEmpty ? "وبسایت را وارد کنید" : null,
+                  validator:  null,
                 ),
                 CustomTextField(
                   label: "یادداشت",
                   controller: _noteController,
                   inputFormatter:
                   FilteringTextInputFormatter.allow(RegExp(r'[a-z ,0-9.,آ-ی]')),
-                  validator: (value) =>
-                  value!.isEmpty ? "یادداشت را وارد کنید" : null,
+                  validator: null,
                 ),
 
 
@@ -332,9 +331,9 @@ class _EnterInfDataState extends State<EnterInfData> {
                         if(_imageFile != null){
                           _saveData();
                           if(!widget.isFromDrawer){
-                            Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return PdfViewerScreen(widget.ordersEntity);
-                            }));
+                            orderPostLabelPDF(
+                              widget.ordersEntity!,
+                            );
                           }
 
                         }else{
@@ -405,7 +404,6 @@ class CustomTextField extends StatelessWidget {
               fontWeight: FontWeight.bold),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.blueAccent),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -413,7 +411,7 @@ class CustomTextField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide: BorderSide(color: AppConfig.firstLinearColor, width: 2),
           ),
         ),
       ),

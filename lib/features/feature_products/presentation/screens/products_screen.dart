@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:shapyar_bloc/core/params/products_params.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
+import 'package:shopyar/core/params/products_params.dart';
+import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/widgets/product.dart';
+import 'package:shopyar/features/feature_products/presentation/widgets/product.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';

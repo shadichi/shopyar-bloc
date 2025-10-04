@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:shapyar_bloc/core/params/report_data_params.dart';
-import 'package:shapyar_bloc/core/params/whole_user_data_params.dart';
+import 'package:shopyar/core/params/report_data_params.dart';
+import 'package:shopyar/core/params/whole_user_data_params.dart';
 import 'package:http/http.dart' as http;
-import 'package:shapyar_bloc/core/utils/static_values.dart';
+import 'package:shopyar/core/utils/static_values.dart';
 
 import '../../../../../core/params/orders_edit_status.dart';
 import '../../../../../core/params/orders_params.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:jdate/jdate.dart';
 import '../../../../core/config/app-colors.dart';
@@ -17,6 +17,7 @@ class OrderDetailScreen extends StatelessWidget {
   OrderDetailScreen(this.ordersLoadedStatus, this.item);
 
   String selectedStatus = '';
+  String chosenProductUrl = '';
 
   String formatFaThousands(dynamic value) {
     final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
@@ -167,12 +168,10 @@ class OrderDetailScreen extends StatelessWidget {
                                       width: width * 0.2,
                                       height: height * 0.2,
                                       padding: EdgeInsets.all(width * 0.013),
-                                      child: ordersData.lineItems![index].img
-                                                  .toString() ==
-                                              null
-                                          ? Image.network(ordersData
-                                              .lineItems![index].img
-                                              .toString())
+                                      child: ordersData.lineItems![index].image!["full"]
+                                          .toString().isNotEmpty
+                                          ? Image.network(ordersData.lineItems![index].image!["full"]
+                                          .toString())
                                           : Image.asset("assets/images/index.png"),
                                     ),
 

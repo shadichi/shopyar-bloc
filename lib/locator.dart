@@ -1,18 +1,18 @@
 import 'package:get_it/get_it.dart';
-import 'package:shapyar_bloc/features/feature_home/data/repository/home_repositoryImpl.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
-import 'package:shapyar_bloc/features/feature_log_in/data/data_source/remote/api_provider.dart';
-import 'package:shapyar_bloc/features/feature_log_in/data/repository/log_in_repositoryImpl.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/repository/log_in_repository.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/use_cases/get_login_data.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/use_cases/set_string_usecase.dart';
-import 'package:shapyar_bloc/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/use_cases/get_orders_use_case.dart';
-import 'package:shapyar_bloc/features/feature_home/domain/use_cases/get_user_data_use_case.dart';
-import 'package:shapyar_bloc/features/feature_products/data/repository/product_repositoryImpl.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
-import 'package:shapyar_bloc/features/feature_start/domain/use_cases/check-connectivity-use-case.dart';
-import 'package:shapyar_bloc/features/feature_start/presentation/bloc/start_bloc.dart';
+import 'package:shopyar/features/feature_home/data/repository/home_repositoryImpl.dart';
+import 'package:shopyar/features/feature_home/presentation/bloc/home_bloc.dart';
+import 'package:shopyar/features/feature_log_in/data/data_source/remote/api_provider.dart';
+import 'package:shopyar/features/feature_log_in/data/repository/log_in_repositoryImpl.dart';
+import 'package:shopyar/features/feature_log_in/domain/repository/log_in_repository.dart';
+import 'package:shopyar/features/feature_log_in/domain/use_cases/get_login_data.dart';
+import 'package:shopyar/features/feature_log_in/domain/use_cases/set_string_usecase.dart';
+import 'package:shopyar/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
+import 'package:shopyar/features/feature_orders/domain/use_cases/get_orders_use_case.dart';
+import 'package:shopyar/features/feature_home/domain/use_cases/get_user_data_use_case.dart';
+import 'package:shopyar/features/feature_products/data/repository/product_repositoryImpl.dart';
+import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
+import 'package:shopyar/features/feature_start/domain/use_cases/check-connectivity-use-case.dart';
+import 'package:shopyar/features/feature_start/presentation/bloc/start_bloc.dart';
 
 import 'features/feature_add_edit_order/data/data_source/remote/add_order_products_api_provider.dart';
 import 'features/feature_add_edit_order/data/repository/add_order_repositoryImpl.dart';
@@ -77,7 +77,7 @@ setup() async {
  ///bloc
   locator.registerSingleton<LogInBloc>(LogInBloc(locator(), locator()));
   locator.registerSingleton<HomeBloc>(HomeBloc(locator(),locator()));
-  locator.registerSingleton<OrdersBloc>(OrdersBloc(locator(), locator()));
+  locator.registerSingleton<OrdersBloc>(OrdersBloc(locator(), locator(), locator()));
   locator.registerSingleton<ProductsBloc>(ProductsBloc(locator(), locator()));
   locator.registerSingleton<AddOrderBloc>(AddOrderBloc( locator(), locator()));
   locator.registerSingleton<StartBloc>(StartBloc( locator(), locator()));

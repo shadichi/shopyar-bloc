@@ -2,14 +2,15 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:shapyar_bloc/core/params/products_params.dart';
-import 'package:shapyar_bloc/features/feature_products/domain/entities/product_entity.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_status.dart';
+import 'package:shopyar/core/params/products_params.dart';
+import 'package:shopyar/features/feature_products/domain/entities/product_entity.dart';
+import 'package:shopyar/features/feature_products/presentation/bloc/products_status.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../domain/use_cases/get_products_use_case.dart';
 import '../../domain/use_cases/products_get_user_data_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 part 'products_event.dart';
 
 part 'products_state.dart';
@@ -18,13 +19,16 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   final ProductsGetStringDataUseCase productsGetStringDataUseCase;
   final GetProductsUseCase getProductsUseCase;
 
-  ProductsBloc(this.productsGetStringDataUseCase,this.getProductsUseCase)
-      : super(ProductsState(productsStatus: ProductsLoadingStatus(), isLoadingMore: false)) {
-
+  ProductsBloc(this.productsGetStringDataUseCase, this.getProductsUseCase)
+      : super(ProductsState(
+            productsStatus: ProductsLoadingStatus(), isLoadingMore: false)) {
     on<LoadProductsData>((event, emit) async {
-      final isInitial = StaticValues.staticProducts.isEmpty && !event.productsParams.isLoadMore;
+      final isInitial = StaticValues.staticProducts.isEmpty &&
+          !event.productsParams.isLoadMore;
 
-      if (StaticValues.staticProducts.isEmpty || event.productsParams.isSearch || event.productsParams.isLoadMore) {
+      if (StaticValues.staticProducts.isEmpty ||
+          event.productsParams.isSearch ||
+          event.productsParams.isLoadMore) {
         print('1');
 
         if (event.productsParams.isSearch || event.productsParams.isRefresh) {
@@ -38,27 +42,26 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
         }
 
-        try{
+        try {
           String perPage = '10';
-          if (event.productsParams.productCount.isNotEmpty) perPage = event.productsParams.productCount;
+          if (event.productsParams.productCount.isNotEmpty) {
+            perPage = event.productsParams.productCount;
+          }
           final dataState = await getProductsUseCase(event.productsParams);
           if (dataState is OrderDataSuccess) {
             final fetched = dataState.data!.cast<ProductEntity>();
 
-            if (event.productsParams.isLoadMore && StaticValues.staticProducts.isNotEmpty){
+            if (event.productsParams.isLoadMore &&
+                StaticValues.staticProducts.isNotEmpty) {
               StaticValues.staticProducts = fetched;
-            }else{
+            } else {
               StaticValues.staticProducts = fetched;
             }
             emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
-
-
-
-          }else{
+          } else {
             emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
           }
-
-        }catch(e){
+        } catch (e) {
           emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
         } finally {
           // 👇 حتماً خاموش کن تا دکمه از لودینگ خارج شه
@@ -98,7 +101,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       } else {
         emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
       */
-    }});
+      }
+    });
 
     on<RefreshProductsData>((event, emit) async {
       // اختیاری: دوست داری حین رفرش اسپینر هم داشته باشی
@@ -110,7 +114,12 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
         // ❗️ مهم: perPage را '10' بده (مثل لود اولیه)
         final dataState = await getProductsUseCase(
-          ProductsParams('10', false, '', false,),
+          ProductsParams(
+            '10',
+            false,
+            '',
+            false,
+          ),
         );
 
         if (dataState is OrderDataSuccess) {
@@ -128,9 +137,5 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         event.completer?.complete();
       }
     });
-
-
-
-
   }
 }

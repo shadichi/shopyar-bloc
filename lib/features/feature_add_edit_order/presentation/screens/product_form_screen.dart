@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/order.dart';
+import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
+import 'package:shopyar/features/feature_orders/presentation/widgets/order.dart';
 import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';

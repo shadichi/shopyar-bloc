@@ -1,4 +1,4 @@
-package com.example.shapyar_bloc
+package com.example.shopyar
 
 import io.flutter.embedding.android.FlutterActivity
 

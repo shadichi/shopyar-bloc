@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
-import 'package:shapyar_bloc/core/widgets/main_wrapper.dart';
+import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/core/widgets/main_wrapper.dart';
 
 Future<bool?> alertDialogScreen(
     BuildContext context,

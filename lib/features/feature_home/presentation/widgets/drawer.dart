@@ -1,20 +1,18 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_bloc.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/screens/setting.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/core/widgets/alert_dialog.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shopyar/features/feature_home/presentation/bloc/home_bloc.dart';
+import 'package:shopyar/features/feature_home/presentation/screens/setting.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/enter_inf_data.dart';
+import 'package:shopyar/features/feature_orders/presentation/screens/enter_inf_data.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../feature_orders/data/models/store_info.dart';
 import '../../../feature_orders/presentation/widgets/show_post_label.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:hive/hive.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -40,16 +38,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
     'خروج از حساب',
   ];
 
-  Future<void> _loadVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _version = info.version;
-      print('info.version');
-      print(info.version);
-      // info.version => همون versionName
-      // info.buildNumber => همون versionCode
-    });
-  }
   Future<void> getHiveData() async {
     final box = await Hive.openBox<StoreInfo>('storeBox');
     final stored = box.get('storeInfo');
@@ -78,7 +66,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _loadVersion();
     getHiveData();
   }
 

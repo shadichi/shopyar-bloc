@@ -1,4 +1,4 @@
-import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
+import 'package:shopyar/features/feature_home/domain/entities/home_data_entity.dart';
 
 import '../../features/feature_add_edit_order/domain/entities/add_order_product_entity.dart';
 import '../../features/feature_orders/domain/entities/orders_entity.dart';

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
-import 'package:shapyar_bloc/features/feature_log_in/presentation/screens/log_in_screen.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
-import 'package:shapyar_bloc/features/feature_products/presentation/bloc/products_bloc.dart';
-import 'package:shapyar_bloc/features/feature_start/presentation/bloc/start_bloc.dart';
-import 'package:shapyar_bloc/features/feature_start/presentation/screens/start_screen.dart';
+import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/features/feature_home/presentation/screens/home-screen.dart';
+import 'package:shopyar/features/feature_log_in/presentation/screens/log_in_screen.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
+import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
+import 'package:shopyar/features/feature_start/presentation/bloc/start_bloc.dart';
+import 'package:shopyar/features/feature_start/presentation/screens/start_screen.dart';
 import 'features/feature_add_edit_order/presentation/screens/product_form_screen.dart';
-import 'features/feature_orders/presentation/screens/order_detail_screen.dart';
-import 'features/feature_orders/presentation/widgets/show_pdf.dart';
-import 'features/feature_orders/presentation/widgets/show_post_label.dart';
 import 'features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
 import 'features/feature_home/presentation/bloc/home_bloc.dart';
 import 'features/feature_log_in/presentation/bloc/log_in_bloc.dart';
@@ -23,9 +20,7 @@ import 'features/feature_products/presentation/screens/products_screen.dart';
 import 'features/feature_orders/data/models/store_info.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'features/feature_start/presentation/widgets/no_connection_screen.dart';
 import 'locator.dart';
-import 'package:media_store_plus/media_store_plus.dart';
 
 
 void main() async {
@@ -45,7 +40,6 @@ void main() async {
     // DeviceOrientation.portraitDown,
   ]);
 
-  MediaStore.appFolder = "IMO";
 
   runApp(const MyApp());
 }
@@ -111,7 +105,6 @@ class MyApp extends StatelessWidget {
           ProductsScreen.routeName: (context) => ProductsScreen(),
           EnterInfData.routeName: (context) => EnterInfData(),
          // PdfViewerScreen.routeName: (context) => PdfViewerScreen(),
-          ShowPDF.routeName: (context) => ShowPDF(),
         },
         onGenerateRoute: (settings) {
           switch (settings.name) {

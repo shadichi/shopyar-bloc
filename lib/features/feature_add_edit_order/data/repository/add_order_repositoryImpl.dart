@@ -1,11 +1,11 @@
-import 'package:shapyar_bloc/core/params/products_params.dart';
+import 'package:shopyar/core/params/products_params.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:shapyar_bloc/core/usecases/get_string_use_case.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_add_edit_order/data/models/add_order_orders_model.dart';
-import 'package:shapyar_bloc/features/feature_add_edit_order/domain/entities/add_order_data_entity.dart';
-import 'package:shapyar_bloc/features/feature_products/domain/entities/product_entity.dart';
+import 'package:shopyar/core/usecases/get_string_use_case.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/features/feature_add_edit_order/data/models/add_order_orders_model.dart';
+import 'package:shopyar/features/feature_add_edit_order/domain/entities/add_order_data_entity.dart';
+import 'package:shopyar/features/feature_products/domain/entities/product_entity.dart';
 import '../../../../core/params/add_order_data_state.dart';
 import '../../../../core/params/add_order_get_selected_products_params.dart';
 import '../../../../core/params/add_order_products_card.dart';

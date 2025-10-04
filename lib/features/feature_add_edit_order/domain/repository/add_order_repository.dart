@@ -1,6 +1,6 @@
 
-import 'package:shapyar_bloc/core/params/products_params.dart';
-import 'package:shapyar_bloc/core/resources/data_state.dart';
+import 'package:shopyar/core/params/products_params.dart';
+import 'package:shopyar/core/resources/data_state.dart';
 
 import '../../../../core/params/add_order_data_state.dart';
 import '../../../../core/params/add_order_get_selected_products_params.dart';

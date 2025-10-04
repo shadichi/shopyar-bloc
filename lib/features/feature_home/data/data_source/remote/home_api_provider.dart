@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:shapyar_bloc/core/params/home_user_data_params.dart';
-import 'package:shapyar_bloc/core/params/report_data_params.dart';
-import 'package:shapyar_bloc/core/params/whole_user_data_params.dart';
+import 'package:shopyar/core/params/home_user_data_params.dart';
+import 'package:shopyar/core/params/report_data_params.dart';
+import 'package:shopyar/core/params/whole_user_data_params.dart';
 import 'package:http/http.dart' as http;
 import '../../../../../core/params/orders_params.dart';
 

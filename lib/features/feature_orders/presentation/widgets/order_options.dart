@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
-import 'package:shapyar_bloc/features/feature_orders/data/models/orders_model.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/widgets/show_pdf.dart';
+import 'package:shopyar/features/feature_orders/data/models/orders_model.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../../pdf_test.dart';
+import 'show_order_pdf.dart';
+import 'show_post_label.dart';
 import '../../../feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import '../../domain/entities/orders_entity.dart';
 import '../../functions/OrderBottomSheet.dart';
@@ -15,11 +15,26 @@ import '../screens/enter_inf_data.dart';
 void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? ordersEntity) {
   String selectedStatus = '';
 
+  checkDb() async {
+    final box = await Hive.openBox<StoreInfo>('storeBox');
+    final stored = box.get('storeInfo');
+    if (stored != null) {
+      orderPostLabelPDF(
+        ordersEntity!,
+      );
+    }else{
+      Navigator.push(context, MaterialPageRoute(builder: (context){
+        return EnterInfData(ordersEntity: ordersEntity,);
+      }));
+    }
+  }
+
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
+
     builder: (context) {
       return Container(
        decoration: BoxDecoration(
@@ -55,15 +70,21 @@ void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? 
               _buildListTile(
                 icon: Icons.local_post_office,
                 title: 'ایجاد برچسب پستی',
-                onTap: () => pdfExport("shopyar"),
-                  context: context
+                onTap: () =>  checkDb(),
+                context: context,
               ),
+
               _buildDivider(context),
               _buildListTile(
                 icon: Icons.sticky_note_2,
                 title: 'ایجاد فاکتور سفارش',
-                onTap: () => Navigator.pushNamed(context, ShowPDF.routeName,arguments: PdfData(ordersEntity: ordersData, item: item)),
-                  context: context
+                  onTap: () => orderFactorPDF(
+                    "shopyar",
+                    ordersEntity!,
+                    item,
+                    MediaQuery.of(context).size.width,
+                    MediaQuery.of(context).size.height,
+                  ),                  context: context
               ),
             ],
           ),
@@ -102,21 +123,3 @@ Widget _buildDivider(context) {
 }
 
 
-Future<void> _handleStoreInfo(BuildContext context, ordersEntity) async {
-  await Hive.openBox<StoreInfo>('storeBox');
-  var storeBox = Hive.box<StoreInfo>('storeBox');
-  var store = storeBox.get('storeInfo');
-
-  if (store == null || store.storeName.isEmpty) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-      return EnterInfData(isFirstTime: true,ordersEntity: ordersEntity,);
-    }));
-  } else {
-    Navigator.push(context, MaterialPageRoute(builder: (context){
-      return PdfViewerScreen(ordersEntity);
-    }));
-  }
-
- // await storeBox.close();
- // Navigator.pop(context);
-}

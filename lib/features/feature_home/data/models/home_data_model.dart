@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
+import 'package:shopyar/features/feature_home/domain/entities/home_data_entity.dart';
 
 List<HomeDataModel> homeDataFromJson(dynamic json) =>
     List<HomeDataModel>.from(json.map((x) => HomeDataModel.fromJson(x)));

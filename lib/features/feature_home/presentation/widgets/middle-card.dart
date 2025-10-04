@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
-import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shopyar/features/feature_home/domain/entities/home_data_entity.dart';
 
 import '../../../../core/colors/app-colors.dart';
 import '../../../../core/config/app-colors.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
-import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
-import 'package:shapyar_bloc/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
+import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/core/widgets/alert_dialog.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shopyar/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/widgets/main_wrapper.dart';
 import '../../../../core/widgets/progress-bar.dart';
@@ -12,7 +12,6 @@ import '../bloc/log_in_status.dart';
 import '../widgets/cusrom_clippath_login.dart';
 import 'package:shimmer/shimmer.dart';
 import '../widgets/log_in_text_form_widget.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class LogInScreen extends StatefulWidget {
   static const routeName = '/login_widget';
@@ -33,20 +32,8 @@ class _LogInScreenState extends State<LogInScreen> {
   @override
   void initState() {
     super.initState();
-    _loadVersion();
     _webServiceController = TextEditingController();
     _tokenController = TextEditingController();
-  }
-
-  Future<void> _loadVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _version = info.version;
-      print('info.version');
-      print(info.version);
-      // info.version => همون versionName
-      // info.buildNumber => همون versionCode
-    });
   }
 
   @override
@@ -78,6 +65,7 @@ class _LogInScreenState extends State<LogInScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: BlocListener<LogInBloc, LogInState>(
           listener: (context, state) {
             final status = state.logInStatus;
@@ -103,31 +91,40 @@ class _LogInScreenState extends State<LogInScreen> {
               );
             }
           },
-          child: SingleChildScrollView(
-            // padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              children: [
-                header(context),
-                SizedBox(height: AppConfig.calHeight(context, 4)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: loginForm(
-                    context,
-                    _formKey,
-                    _webServiceController,
-                    _tokenController,
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, // 👈 با اسکرول کیبورد بسته میشه
+
+              // padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                children: [
+                  header(context),
+                  SizedBox(height: AppConfig.calHeight(context, 4)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: loginForm(
+                      context,
+                      _formKey,
+                      _webServiceController,
+                      _tokenController,
+                    ),
                   ),
-                ),
-                SizedBox(height: AppConfig.calHeight(context, 2)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: loginButton(context, () => _submit(context)),
-                ),
-                SizedBox(height: AppConfig.calHeight(context, 4)),
-                helpButton(context),
-                SizedBox(height: AppConfig.calHeight(context, 4)),
-                versionText(context, _version),
-              ],
+                  SizedBox(height: AppConfig.calHeight(context, 2)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: loginButton(context, () => _submit(context)),
+                  ),
+                  SizedBox(height: AppConfig.calHeight(context, 4)),
+                  helpButton(context),
+                  SizedBox(height: AppConfig.calHeight(context, 4)),
+                  versionText(context, _version),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
+import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/core/utils/static_values.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/core/widgets/alert_dialog.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
+import 'package:shopyar/core/widgets/alert_dialog.dart';
+import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
 
 import '../../../core/params/orders_edit_status.dart';
 import '../../../core/widgets/progress-bar.dart';

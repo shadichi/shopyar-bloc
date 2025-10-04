@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:shapyar_bloc/features/feature_log_in/domain/use_cases/set_string_usecase.dart';
-import 'package:shapyar_bloc/features/feature_log_in/presentation/bloc/log_in_status.dart';
+import 'package:shopyar/features/feature_log_in/domain/use_cases/set_string_usecase.dart';
+import 'package:shopyar/features/feature_log_in/presentation/bloc/log_in_status.dart';
 
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/resources/data_state.dart';

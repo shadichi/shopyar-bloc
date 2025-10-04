@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
-import 'package:shapyar_bloc/core/widgets/progress-bar.dart';
-import 'package:shapyar_bloc/core/widgets/snackBar.dart';
+import 'package:shopyar/core/widgets/progress-bar.dart';
+import 'package:shopyar/core/widgets/snackBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPage extends StatefulWidget {

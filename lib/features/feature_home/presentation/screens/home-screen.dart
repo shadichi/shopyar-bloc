@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/bloc/home_status.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/features/feature_home/presentation/bloc/home_status.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/widgets/middle-card.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/screens/orders_screen.dart';
+import 'package:shopyar/features/feature_home/presentation/widgets/middle-card.dart';
+import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
@@ -18,7 +18,7 @@ import '../widgets/drawer.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:jdate/jdate.dart';
 import 'package:intl/intl.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
+import 'package:shopyar/extension/persian_digits.dart';
 import 'package:hive/hive.dart';
 import '../widgets/pie-chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,8 +26,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeScreen extends StatefulWidget {
   static const routeName = "/home_screen";
   final void Function(bool)? onDrawerStatusChange;
+  final VoidCallback? onReady;
 
-  const HomeScreen({Key? key, this.onDrawerStatusChange}) : super(key: key);
+
+  const HomeScreen({Key? key, this.onDrawerStatusChange,this.onReady,}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -38,8 +40,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+   // _startPollingReady();
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
   }
+
+  Timer? _pollTimer;
+
+
+  void _startPollingReady() {
+    _pollTimer = Timer.periodic(const Duration(milliseconds: 250), (t) {
+      if (StaticValues.webService.isNotEmpty) {
+        widget.onReady?.call();
+        t.cancel();
+      }
+    });
+  }
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
+  }
+
+
 
   Future<void> _onRefresh() {
     final c = Completer<void>();
@@ -63,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (state.homeStatus is HomeLoadedStatus) {
         print('StaticValues.versionNo');
         print(StaticValues.versionNo);
+        widget.onReady?.call();
         if(StaticValues.versionNo!="1.0.2"){
           alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
 
@@ -73,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Center(child: ProgressBar());
       }
       if (state.homeStatus is HomeLoadedStatus) {
+
         return Scaffold(
           drawer: HomeDrawer(),
           appBar: AppBar(

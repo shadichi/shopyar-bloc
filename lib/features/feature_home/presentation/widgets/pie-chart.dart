@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
+import 'package:shopyar/extension/persian_digits.dart';
 import '../../../../core/config/app-colors.dart';
 
 class HomeScreenPieChart extends StatefulWidget {

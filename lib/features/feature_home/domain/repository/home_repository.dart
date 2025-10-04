@@ -1,5 +1,5 @@
 
-import 'package:shapyar_bloc/core/resources/data_state.dart';
+import 'package:shopyar/core/resources/data_state.dart';
 
 import '../../../../core/params/home_user_data_params.dart';
 import '../../../../core/params/orders_params.dart';

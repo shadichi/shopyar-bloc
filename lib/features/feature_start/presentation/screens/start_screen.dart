@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shapyar_bloc/core/widgets/main_wrapper.dart';
-import 'package:shapyar_bloc/features/feature_home/presentation/screens/home-screen.dart';
-import 'package:shapyar_bloc/features/feature_log_in/presentation/screens/log_in_screen.dart';
+import 'package:shopyar/core/widgets/main_wrapper.dart';
+import 'package:shopyar/features/feature_home/presentation/screens/home-screen.dart';
+import 'package:shopyar/features/feature_log_in/presentation/screens/log_in_screen.dart';
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../../../core/widgets/progress-bar.dart';
 import '../../data/repository/start_repositoryImpl.dart';

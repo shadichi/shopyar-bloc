@@ -1,359 +1,261 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
-import 'package:shapyar_bloc/core/colors/app-colors.dart';
-import 'package:hive/hive.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
-import '../../../../core/config/app-colors.dart';
-import '../../../../core/widgets/progress-bar.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
+import 'package:jdate/jdate.dart';
+import 'package:intl/intl.dart';
+import '../../../../../../../../core/utils/static_values.dart';
 import '../../data/models/store_info.dart';
-import 'dart:typed_data';
+import '../../domain/entities/orders_entity.dart';
+import 'package:hive/hive.dart';
 
+import 'show_post_label.dart';
 
-class PdfViewerScreen extends StatefulWidget {
-  static String routeName = 'PdfViewerScreen';
-  final OrdersEntity ordersEntity;
+Future orderPostLabelPDF( OrdersEntity ordersEntity) async {
+  final dteNow = DateTimeExt(DateTime.now()).toJalali();
+  var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
 
-  const PdfViewerScreen(this.ordersEntity,{super.key});
+  List<pw.Widget> widgets = [];
+  StoreInfo storeInfo = StoreInfo(
+      storeName: '',
+      storeAddress: '',
+      phoneNumber: '',
+      instagram: '',
+      postalCode: '',
+      website: '',
+      storeIcon: '',
+      storeSenderName: '',
+      storeNote: '');
 
-  @override
-  _PdfViewerScreenState createState() => _PdfViewerScreenState();
-}
-
-class _PdfViewerScreenState extends State<PdfViewerScreen> {
-  String? pdfPath;
-  //var args = StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '');
-
-  StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '',storeSenderName: '',storeNote: '');
-
-  //StoreInfo? storeInfo;
-  @override
-  void initState() {
-    super.initState();
-    //getHiveData();
-    _init(); // تولید PDF در لحظه ورود
+  final box = await Hive.openBox<StoreInfo>('storeBox');
+  final stored = box.get('storeInfo');
+  if (stored != null) {
+    storeInfo = stored;
+  } else {
+    storeInfo = StoreInfo(
+        storeName: '',
+        storeAddress: '',
+        phoneNumber: '',
+        instagram: '',
+        postalCode: '',
+        website: '',
+        storeIcon: '',
+        storeSenderName: '',
+        storeNote: '');
   }
-  Future<void> _init() async {
-    try {
-      await getHiveData();
-      await _generatePdf();
-    } catch (e) {
-      print('Error in init: $e');
-    }
-  }
+  final ByteData imageData =
+      await rootBundle.load('assets/images/post_label.jpg');
+  final Uint8List imageBytes = imageData.buffer.asUint8List();
+  final image = pw.MemoryImage(imageBytes);
 
-  Future<void> getHiveData() async {
-    final box = await Hive.openBox<StoreInfo>('storeBox');
-    final stored = box.get('storeInfo');
-    if (stored != null) {
-      storeInfo = stored;
-    } else {
-      // اگر انتظار داشتی حتما داده باشه، اینجا می‌تونی مقدار پیش‌فرض یا لاگ بذاری
-      storeInfo = StoreInfo(
-          storeName: '',
-          storeAddress: '',
-          phoneNumber: '',
-          instagram: '',
-          postalCode: '',
-          website: '',
-          storeIcon: '',
-          storeSenderName: '',
-          storeNote: ''
-      );
-    }
-    //  await box.close();
-    setState(() {}); // اگه می‌خوای UI تغییر کنه
+  final ByteData instaIcon = await rootBundle.load('assets/images/insta.png');
+  final Uint8List instaIconImageBytes = instaIcon.buffer.asUint8List();
+  final instaImage = pw.MemoryImage(instaIconImageBytes);
+
+  debugPrint('storeIcon raw: "${storeInfo.storeIcon}"');
+  if (storeInfo.storeIcon.isNotEmpty && storeInfo.storeIcon != 'null') {
+    debugPrint('icon exists? ${await File(storeInfo.storeIcon).exists()}');
   }
 
-/*  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    args = ModalRoute.of(context)!.settings.arguments as StoreInfo;
-  }*/
+  final File storeIconFile = File(storeInfo.storeIcon);
+  final Uint8List storeIconBytes = await storeIconFile.readAsBytes();
+  final storeIconImage = pw.MemoryImage(storeIconBytes);
 
-  Future<void> _generatePdf() async {
-    print('1');
-    final pdf = pw.Document();
+  final ttfData = await rootBundle.load("assets/fonts/Vazir.ttf");
+  final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
 
-    final ByteData imageData =
-    await rootBundle.load('assets/images/post_label.jpg');
-    final Uint8List imageBytes = imageData.buffer.asUint8List();
-    final image = pw.MemoryImage(imageBytes);
+  String formatFaThousands(dynamic value) {
+    final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
+    return NumberFormat.decimalPattern('fa').format(n);
+  }
 
-    final ByteData instaIcon = await rootBundle.load('assets/images/insta.png');
-    final Uint8List instaIconImageBytes = instaIcon.buffer.asUint8List();
-    final instaImage = pw.MemoryImage(instaIconImageBytes);
-
-    debugPrint('storeIcon raw: "${storeInfo.storeIcon}"');
-    if (storeInfo.storeIcon.isNotEmpty && storeInfo.storeIcon != 'null') {
-      debugPrint('icon exists? ${await File(storeInfo.storeIcon).exists()}');
-    }
-
-    final File storeIconFile = File(storeInfo.storeIcon);
-    final Uint8List storeIconBytes = await storeIconFile.readAsBytes();
-    final storeIconImage = pw.MemoryImage(storeIconBytes);
-
-    final ttfData = await rootBundle.load("assets/fonts/Vazir.ttf");
-    final ttf = pw.Font.ttf(ttfData.buffer.asByteData());
-
-    // await Hive.openBox<StoreInfo>('storeBox');
-    // var storeBox = Hive.box<StoreInfo>('storeBox');
-    // var store = storeBox.get('storeInfo') ?? StoreInfo(instagram: '',phoneNumber: '',postalCode: '',storeAddress: '',storeIcon: '',storeName: '',website: '');
-
-
-    pdf.addPage(
-      pw.Page(
-        // pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          final width = PdfPageFormat.a4.width;
-          final height = PdfPageFormat.a4.height;
-          return pw.Stack(
-            children: [
-              pw.Image(image, fit: pw.BoxFit.fitWidth),
-              pw.Positioned(
-                  left: width * 0.47,
-                  top: height * 0.3,child: pw.Container(
-                width: width * 0.27,
-                height: height * 0.02,
-                // color: PdfColors.red,
+  final pdf = pw.Document();
+  var arabicFont =
+      Font.ttf(await rootBundle.load("assets/fonts/IRANSansWeb.ttf"));
+  pdf.addPage(
+    pw.Page(
+      theme: pw.ThemeData.withFont(
+        base: arabicFont,
+      ),
+      pageFormat: PdfPageFormat.a4,
+      build: (context) {
+        final w = context.page.pageFormat.width;
+        final h = context.page.pageFormat.height;
+      return  pw.Stack(
+          children: [
+            pw.Image(image, fit: pw.BoxFit.fitWidth),
+            pw.Positioned(
+                left: w * 0.55,
+                top: h * 0.25,
+                child: pw.Container(
+                  width: w * 0.1,
+                  height: h * 0.1,
+                  // color: PdfColors.red,
+                  alignment: pw.Alignment.center,
+                  child: pw.Image(storeIconImage,
+                      width: w * 0.1, height: h * 0.1),
+                )),
+            pw.Positioned(
+                left: w * 0.5,
+                top: h * 0.38,
+                child: pw.Container(
+                    width: w * 0.27,
+                    height: h * 0.02,
+                    //    color: PdfColors.red,
+                    alignment: pw.Alignment.center,
+                    child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.center,
+                        children: [
+                          storeInfo.instagram.isNotEmpty
+                              ? pw.Image(instaImage,
+                              width: w * 0.03, height: w * 0.03)
+                              : pw.Container(),
+                          pw.SizedBox(width: w * 0.01),
+                          storeInfo.instagram.isNotEmpty ||
+                              storeInfo.website.isNotEmpty
+                              ? positionedTextWidget(
+                              text: storeInfo.instagram.isNotEmpty
+                                  ? storeInfo.instagram
+                                  : storeInfo.website.isNotEmpty
+                                  ? storeInfo.website
+                                  : '',
+                              heightContainer: h * 0.027,
+                              widthContainer: w * 0.1,
+                              leftPositioned: w * 0.45,
+                              topPositioned: h * 0.34,
+                              fontSize: w * 0.02,
+                              alignment: pw.Alignment.center,
+                              fontWeight: pw.FontWeight.bold,
+                              maxLine: 1)
+                              : pw.Container(),
+                        ]))),
+            positionedTextWidget(
+                text:
+                "${ordersEntity.billing!.lastName} ${ordersEntity.billing!.firstName}",
+                //نام گیرنده
+                heightContainer: h * 0.02,
+                widthContainer: w * 0.28,
+                leftPositioned: w * 0.443,
+                topPositioned: h * 0.448,
+                fontSize: w * 0.018,
+                alignment: pw.Alignment.centerRight,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 1),
+            positionedTextWidget(
+                text: storeInfo.storeName,
+                heightContainer: h * 0.027,
+                widthContainer: w * 0.3,
+                leftPositioned: w * 0.45,
+                topPositioned: h * 0.34,
+                fontSize: w * 0.025,
                 alignment: pw.Alignment.center,
-                child:  pw.Image(storeIconImage,
-                    width: width * 0.09, height: width * 0.09),)
-              ),
-              pw.Positioned(
-                  left: width * 0.47,
-                  top: height * 0.39,
-                  child: pw.Container(
-                      width: width * 0.27,
-                      height: height * 0.02,
-                      //    color: PdfColors.red,
-                      alignment: pw.Alignment.center,
-                      child: pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Image(instaImage,
-                                width: width * 0.03, height: width * 0.03),
-                            pw.SizedBox(width: width * 0.01),
-                            positionedTextWidget(
-                                text: storeInfo.instagram,
-                                heightContainer: height * 0.027,
-                                widthContainer: width * 0.1,
-                                leftPositioned: width * 0.45,
-                                topPositioned: height * 0.34,
-                                font: ttf,
-                                fontSize: width * 0.015,
-                                alignment: pw.Alignment.center,
-                                fontWeight: pw.FontWeight.bold,
-                                maxLine: 1),
-                          ]))),
-              positionedTextWidget(
-                  text:"${widget.ordersEntity.billing!.lastName} ${widget.ordersEntity.billing!.firstName}",//نام گیرنده
-                  heightContainer: height * 0.02,
-                  widthContainer: width * 0.28,
-                  leftPositioned: width * 0.445,
-                  topPositioned: height * 0.449,
-                  font: ttf,
-                  fontSize: width * 0.02,
-                  alignment: pw.Alignment.centerRight,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: storeInfo.storeName,
-                  heightContainer: height * 0.027,
-                  widthContainer: width * 0.3,
-                  leftPositioned: width * 0.45,
-                  topPositioned: height * 0.34,
-                  font: ttf,
-                  fontSize: width * 0.03,
-                  alignment: pw.Alignment.center,
-                  fontWeight: pw.FontWeight.bold,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: widget.ordersEntity.billing!.address1,//ادرس گیرنده
-                  heightContainer: height * 0.059,
-                  widthContainer: width * 0.33,
-                  leftPositioned: width * 0.445,
-                  topPositioned: height * 0.495,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.topRight,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 4),
-              positionedTextWidget(
-                  text: storeInfo.storeNote.toString(),//یادداشت
-                  heightContainer: height * 0.023,
-                  widthContainer: width * 0.33,
-                  leftPositioned: width * 0.445,
-                  topPositioned: height * 0.57,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.topRight,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 2),
-              positionedTextWidget(
-                  text: widget.ordersEntity.billing!.postcode,//کد پستی گیرنده
-                  heightContainer: height * 0.017,
-                  widthContainer: width * 0.115,
-                  leftPositioned: width * 0.604,
-                  topPositioned: height * 0.595,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.center,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: widget.ordersEntity.billing!.phone,//تلفن گیرنده
-                  heightContainer: height * 0.017,
-                  widthContainer: width * 0.13,
-                  leftPositioned: width * 0.42,
-                  topPositioned: height * 0.595,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.center,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: storeInfo.storeSenderName.toString(),//نام فرستنده
-                  heightContainer: height * 0.027,
-                  widthContainer: width * 0.3,
-                  leftPositioned: width * 0.1,
-                  topPositioned: height * 0.28,
-                  font: ttf,
-                  fontSize: width * 0.02,
-                  alignment: pw.Alignment.centerRight,
-                  fontWeight: pw.FontWeight.bold,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: storeInfo.storeAddress,//ادرس فرستنده
-                  heightContainer: height * 0.077,
-                  widthContainer: width * 0.33,
-                  leftPositioned: width * 0.066,
-                  topPositioned: height * 0.34,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.topRight,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 6),
-              positionedTextWidget(
-                  text:storeInfo.postalCode,//کد پستی فرستنده
-                  heightContainer: height * 0.017,
-                  widthContainer: width * 0.115,
-                  leftPositioned: width * 0.225,
-                  topPositioned: height * 0.418,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.center,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 1),
-              positionedTextWidget(
-                  text: storeInfo.phoneNumber,
-                  heightContainer: height * 0.017,
-                  widthContainer: width * 0.13,
-                  leftPositioned: width * 0.06,
-                  topPositioned: height * 0.418,
-                  font: ttf,
-                  fontSize: width * 0.018,
-                  alignment: pw.Alignment.center,
-                  fontWeight: pw.FontWeight.normal,
-                  maxLine: 1),
-            ],
-          );
-        },
-      ),
-    );
+                fontWeight: pw.FontWeight.bold,
+                maxLine: 1),
+            positionedTextWidget(
+                text: ordersEntity.billing!.address1,
+                //ادرس گیرنده
+                heightContainer: h * 0.066,
+                widthContainer: w * 0.36,
+                leftPositioned: w * 0.42,
+                topPositioned: h * 0.49,
+                fontSize: w * 0.017,
+                alignment: pw.Alignment.topRight,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 4),
+            positionedTextWidget(
+                text: storeInfo.storeNote.toString(),
+                //یادداشت
+                heightContainer: h * 0.023,
+                widthContainer: w * 0.36,
+                leftPositioned: w * 0.42,
+                topPositioned: h * 0.57,
+                fontSize: w * 0.015,
+                alignment: pw.Alignment.topRight,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 2),
+            positionedTextWidget(
+                text: ordersEntity.billing!.postcode,
+                //کد پستی گیرنده
+                heightContainer: h * 0.017,
+                widthContainer: w * 0.115,
+                leftPositioned: w * 0.6,
+                topPositioned: h * 0.595,
+                fontSize: w * 0.018,
+                alignment: pw.Alignment.center,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 1),
+            positionedTextWidget(
+                text: ordersEntity.billing!.phone,
+                //تلفن گیرنده
+                heightContainer: h * 0.017,
+                widthContainer: w * 0.13,
+                leftPositioned: w * 0.415,
+                topPositioned: h * 0.595,
+                fontSize: w * 0.018,
+                alignment: pw.Alignment.center,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 1),
+            positionedTextWidget(
+                text: storeInfo.storeSenderName.toString(),
+                //نام فرستنده
+                heightContainer: h * 0.027,
+                widthContainer: w * 0.35,
+                leftPositioned: w * 0.05,
+                topPositioned: h * 0.28,
+                fontSize: w * 0.027,
+                alignment: pw.Alignment.centerRight,
+                fontWeight: pw.FontWeight.bold,
+                maxLine: 1),
+            positionedTextWidget(
+                text: storeInfo.storeAddress,
+                //ادرس فرستنده
+                heightContainer: h * 0.07,
+                widthContainer: w * 0.352,
+                leftPositioned: w * 0.04,
+                topPositioned: h * 0.34,
+                fontSize: w * 0.02,
+                alignment: pw.Alignment.topRight,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 6),
+            positionedTextWidget(
+                text: storeInfo.postalCode,
+                //کد پستی فرستنده
+                heightContainer: h * 0.017,
+                widthContainer: w * 0.115,
+                leftPositioned: w * 0.224,
+                topPositioned: h * 0.417,
+                fontSize: w * 0.018,
+                alignment: pw.Alignment.center,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 1),
+            positionedTextWidget(
+                text: storeInfo.phoneNumber,
+                heightContainer: h * 0.017,
+                widthContainer: w * 0.13,
+                leftPositioned: w * 0.0591,
+                topPositioned: h * 0.417,
+                fontSize: w * 0.018,
+                alignment: pw.Alignment.center,
+                fontWeight: pw.FontWeight.normal,
+                maxLine: 1),
+          ],
+        );
 
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/post_label.pdf');
-    await file.writeAsBytes(await pdf.save());
-
-    setState(() {
-      print('pdfPath');
-      print(pdfPath);
-      pdfPath = file.path; // مسیر PDF در متغیر ذخیره می‌شود
-      print(pdfPath);
-
-    });
-  }
-
-  Future<void> _savePdf(BuildContext context) async {
-    if (pdfPath == null) return;
-    try {
-      final baseDir = await getApplicationDocumentsDirectory(); // app-specific
-      final downloadsDir = Directory('${baseDir!.path}/downloads');
-      if (!await downloadsDir.exists()) {
-        await downloadsDir.create(recursive: true);
       }
-
-      final savedFile = File('${downloadsDir.path}/final_output.pdf');
-      final copied = await File(pdfPath!).copy(savedFile.path);
-
-      final exists = await copied.exists();
-      final size = await copied.length();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(exists
-            ? "PDF ذخیره شد ✅ (app-specific): ${copied.path} — ${size} bytes"
-            : "کپی ناموفق بود ❌")),
-      );
-
-      print("PDF ذخیره شد ✅ (app-specific): ${copied.path} — ${size} bytes");
-    } catch (e, st) {
-      debugPrint('Save error: $e\n$st');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("خطا در ذخیره‌سازی PDF")),
-      );
-    }
-  }
-/*  Future<void> _savePdf() async {
-    // .pdf extension tells Android it’s a PDF and places it under Downloads
-    final pathOrUri = await FileSaver.instance.saveFile(
-      name: 'my_report',
-      filePath: pdfPath,
-      fileExtension: 'pdf',
-      mimeType: MimeType.pdf,
-    );
-    print('Saved to: $pathOrUri');
-    // On Android this returns a content URI (e.g. content://...), which you can pass to open_filex
-    // print('Saved to: $pathOrUri');
-  }*/
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("برچسب چستی",style: TextStyle( color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.8)),),leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: AppConfig.white,),
-        onPressed: () {
-
-          Navigator.pop(context);
-        },
-      ),),
-      body: pdfPath == null
-          ? Center(child: ProgressBar())
-          : PDFView(
-        filePath: '/data/user/0/com.example.shapyar_bloc/cache/post_label.pdf',
-        enableSwipe: true,
-        swipeHorizontal: false,
-        autoSpacing: true,
-        pageSnap: true,
-        fitPolicy: FitPolicy.BOTH,
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppConfig.backgroundColor,
-        onPressed: (){
-          _savePdf(context);
-        },
-        tooltip: "ذخیره PDF",
-        child: Icon(Icons.save,color: AppConfig.white,),
-      ),
-    );
-  }
+    ),
+  );
+  Printing.layoutPdf(
+    onLayout: (PdfPageFormat format) async => pdf.save(),
+  );
+  /* Printing.sharePdf(bytes: await pdf.save());
+  ElevatedButton(onPressed: (){},child:w.Text("ghhggb"),);*/
 }
 
 pw.Widget positionedTextWidget({
@@ -362,7 +264,6 @@ pw.Widget positionedTextWidget({
   required double topPositioned,
   required double widthContainer,
   required double heightContainer,
-  required pw.Font font,
   required double fontSize,
   required pw.Alignment alignment,
   required pw.FontWeight fontWeight,
@@ -372,8 +273,7 @@ pw.Widget positionedTextWidget({
       left: leftPositioned,
       top: topPositioned,
       child: pw.Container(
-        // color: PdfColors.red,
-
+      //  color: PdfColors.blue,
           alignment: alignment,
           width: widthContainer,
           height: heightContainer,
@@ -383,13 +283,11 @@ pw.Widget positionedTextWidget({
               text,
               style: pw.TextStyle(
                 fontSize: fontSize,
-                font: font,
                 color: PdfColors.black,
-                fontWeight: fontWeight,
+                // fontWeight: fontWeight,
               ),
               maxLines: maxLine,
               overflow: pw.TextOverflow.clip,
             ),
-
           )));
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 
 class LogInTextFormWidget extends StatelessWidget {
   TextEditingController textEditingController;
@@ -11,6 +11,8 @@ class LogInTextFormWidget extends StatelessWidget {
       height: AppConfig.calHeight(context, 13),
       child: TextFormField(
         controller: textEditingController,
+        textInputAction: TextInputAction.next, // یا done برای آخری
+        scrollPadding: const EdgeInsets.only(bottom: 100),
         style:  TextStyle(
           color: AppConfig.backgroundColor,
           fontSize: AppConfig.calFontSize(context, 3.7),

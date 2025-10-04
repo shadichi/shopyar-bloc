@@ -3,12 +3,14 @@ import 'package:equatable/equatable.dart';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/use_cases/get_orders_use_case.dart';
-import 'package:shapyar_bloc/features/feature_orders/presentation/bloc/orders_status.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_orders/domain/use_cases/get_orders_use_case.dart';
+import 'package:shopyar/features/feature_orders/presentation/bloc/orders_status.dart';
+import 'package:shopyar/features/feature_products/domain/use_cases/get_products_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/params/orders_edit_status.dart';
 import '../../../../core/params/orders_params.dart';
+import '../../../../core/params/products_params.dart';
 import '../../../../core/resources/data_state.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../../../core/utils/static_values.dart';
@@ -21,8 +23,9 @@ part 'orders_state.dart';
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final GetOrdersUseCase getOrdersUseCase;
   final EditOrdersStatusUseCase editOrdersStatusUseCase;
+  final GetProductsUseCase getProductsUseCase;
 
-  OrdersBloc(this.getOrdersUseCase, this.editOrdersStatusUseCase)
+  OrdersBloc(this.getOrdersUseCase, this.editOrdersStatusUseCase, this.getProductsUseCase)
       : super(OrdersState(ordersStatus: OrdersLoadingStatus(), showFilter: false, editStatus: EditOrderInitialStatus(), isLoadingMore: false)) {
     on<OrdersEvent>((event, emit) {
       // TODO: implement event handler
@@ -58,6 +61,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
             event.status,
           ),
         );
+        if(StaticValues.staticProducts.isEmpty){
+          final dataState = await getProductsUseCase(ProductsParams('100',false,'',false));
+
+
+        }
 
         if (dataState is OrderDataSuccess) {
           final fetched = dataState.data!.cast<OrdersEntity>();

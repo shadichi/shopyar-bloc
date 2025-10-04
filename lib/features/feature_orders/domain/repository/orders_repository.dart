@@ -1,4 +1,4 @@
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 
 import '../../../../core/params/home_user_data_params.dart';
 import '../../../../core/params/orders_edit_status.dart';

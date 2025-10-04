@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:shapyar_bloc/features/feature_home/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_home/domain/entities/orders_entity.dart';
 
 List<OrdersModel> ordersFromJson(dynamic json) => List<OrdersModel>.from(json.map((x) => OrdersModel.fromJson(x)));
 

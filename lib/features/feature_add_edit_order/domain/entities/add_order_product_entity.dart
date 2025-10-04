@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:shapyar_bloc/features/feature_add_edit_order/data/models/add_order_product_model.dart';
+import 'package:shopyar/features/feature_add_edit_order/data/models/add_order_product_model.dart';
 
 
 class AddOrderProductEntity extends Equatable {

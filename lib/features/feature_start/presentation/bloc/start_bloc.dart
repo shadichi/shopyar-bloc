@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:shapyar_bloc/features/feature_start/domain/use_cases/get_string_use_case.dart';
+import 'package:shopyar/features/feature_start/domain/use_cases/get_string_use_case.dart';
 
-import 'package:shapyar_bloc/features/feature_start/presentation/bloc/start_status.dart';
+import 'package:shopyar/features/feature_start/presentation/bloc/start_status.dart';
 
 import '../../../../core/params/whole_user_data_params.dart';
 import '../../domain/use_cases/check-connectivity-use-case.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:shapyar_bloc/core/params/whole_user_data_params.dart';
+import 'package:shopyar/core/params/whole_user_data_params.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../domain/repository/start_repository.dart';

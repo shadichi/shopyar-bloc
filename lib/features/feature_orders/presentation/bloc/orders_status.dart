@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 
 import '../../../../core/params/orders_params.dart';
 

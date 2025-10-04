@@ -1,4 +1,4 @@
-import 'package:shapyar_bloc/features/feature_log_in/domain/entities/login_entity.dart';
+import 'package:shopyar/features/feature_log_in/domain/entities/login_entity.dart';
 
 /// version : "1.0.0"
 /// shipping_methods : [{"method_id":"free_shipping:1","method_title":"حمل و نقل رایگان"},{"method_id":"flat_rate:2","method_title":"پست پیشتاز"}]

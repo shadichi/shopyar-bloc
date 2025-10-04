@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/src/dropdown_button2.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../data/models/add_order_data_model.dart';
 import '../screens/product_form_screen.dart';

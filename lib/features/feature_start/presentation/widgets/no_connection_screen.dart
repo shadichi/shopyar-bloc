@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/start_bloc.dart';

@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:shapyar_bloc/features/feature_products/domain/entities/product_entity.dart';
+import 'package:shopyar/features/feature_products/domain/entities/product_entity.dart';
 
 List<ProductModel> productsFromJson(dynamic json) => List<ProductModel>.from(json.map((x) => ProductModel.fromJson(x)));
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
-import 'package:shapyar_bloc/features/feature_orders/domain/entities/orders_entity.dart';
+import 'package:shopyar/extension/persian_digits.dart';
+import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import '../../../../core/config/app-colors.dart';

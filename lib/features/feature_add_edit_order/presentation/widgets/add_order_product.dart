@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shapyar_bloc/core/config/app-colors.dart';
+import 'package:shopyar/core/config/app-colors.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../../feature_products/data/models/product_model.dart';

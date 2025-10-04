@@ -4,13 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shapyar_bloc/core/utils/static_values.dart';
-import 'package:shapyar_bloc/features/feature_home/data/models/home_data_model.dart';
-import 'package:shapyar_bloc/features/feature_home/domain/entities/home_data_entity.dart';
+import 'package:shopyar/core/utils/static_values.dart';
+import 'package:shopyar/features/feature_home/data/models/home_data_model.dart';
+import 'package:shopyar/features/feature_home/domain/entities/home_data_entity.dart';
 import '../../../../core/config/app-colors.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
-import 'package:shapyar_bloc/extension/persian_digits.dart';
+import 'package:shopyar/extension/persian_digits.dart';
 
 
 class Chart extends StatefulWidget {
