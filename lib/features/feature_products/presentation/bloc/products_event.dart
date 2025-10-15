@@ -6,7 +6,7 @@ abstract class ProductsEvent {}
 class LoadData extends ProductsEvent{}
 
 class LoadProductsData extends ProductsEvent{
-  final ProductsParams productsParams;
+  final InfParams productsParams;
   LoadProductsData(this.productsParams);
 }
 

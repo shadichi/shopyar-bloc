@@ -10,7 +10,7 @@ import '../../../../../core/resources/order_data_state.dart';
 class ProductsApiProvider{
   final Dio _dio = Dio();
 
-  Future<dynamic> GetProducts(ProductsParams productsParams) async {
+  Future<dynamic> GetProducts(InfParams productsParams) async {
     print('productsParams.search');
     print(productsParams.search);
     try {

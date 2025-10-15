@@ -16,13 +16,12 @@ import '../entities/add_order_data_entity.dart';
 import '../entities/add_order_orders_entity.dart';
 import '../entities/add_order_product_entity.dart';
 
-abstract class AddOrderRepository{
+abstract class AddProductRepository{
 
 
-  Future<OrderDataState<ProductEntity>> getOrderProducts(InfParams productsParams);
+  Future<OrderDataState> getProductData();
+
+  Future<OrderDataState> uploadImages();
 
 
-  Future<AddOrderProductsCard<AddOrderOrdersEntity>> getSelectedProducts(AddOrderGetSelectedProductsParams addOrderGetSelectedProductsParams);
-
-  Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams);
 }

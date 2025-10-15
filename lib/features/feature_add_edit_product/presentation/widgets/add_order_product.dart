@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopyar/core/config/app-colors.dart';
@@ -5,23 +6,19 @@ import 'package:auto_size_text/auto_size_text.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';
 import '../../../feature_products/data/models/product_model.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
-import '../bloc/add_order_bloc.dart';
+import '../bloc/add_product_bloc.dart';
 import '../bloc/add_order_card_product_status.dart';
 import '../screens/product_form_screen.dart';
 
 /// A widget that displays a product card for adding to an order
 class AddOrderProduct extends StatefulWidget {
   final ProductEntity product;
-  final AddOrderProductFormMode? isEditMode;
   final OrdersEntity? ordersEntity;
   final Function(Map<int, int>) onCartSelected;
 
   AddOrderProduct(
-      this.isEditMode, this.product, this.ordersEntity, this.onCartSelected)
-      : assert(
-          isEditMode == AddOrderProductFormMode.create || ordersEntity != null,
-          'در حالت edit باید ordersEntity مقدار داشته باشد',
-        );
+    this.product, this.ordersEntity, this.onCartSelected)
+      ;
 
   @override
   State<AddOrderProduct> createState() => _AddOrderProductState();
@@ -37,7 +34,6 @@ class _AddOrderProductState extends State<AddOrderProduct> {
     super.initState();
 
     print('widget.isEditMode');
-    print(widget.isEditMode);
 
 
   }
@@ -221,7 +217,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
   /// Builds the quantity controls (add/remove buttons and count)
   Widget _buildQuantityControls(
       BuildContext context, Size size, ThemeData theme, int index, isChild) {
-    return BlocConsumer<AddOrderBloc, AddOrderState>(
+    return BlocConsumer<AddProductBloc, AddProductState>(
       listener: (context, state) {
         final status = state.addOrderCardProductStatus;
         if (status is AddOrderCardProductLoaded) {
@@ -295,9 +291,9 @@ class _AddOrderProductState extends State<AddOrderProduct> {
               name: widget.product.childes![index].name,
               price: widget.product.childes![index].price,
             );
-            context.read<AddOrderBloc>().add(AddOrderAddProduct(productEntity));
+            context.read<AddProductBloc>().add(AddOrderAddProduct(productEntity));
           } else {
-            context.read<AddOrderBloc>().add(AddOrderAddProduct(widget.product));
+            context.read<AddProductBloc>().add(AddOrderAddProduct(widget.product));
           }
         },
         child: Text(
@@ -323,7 +319,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
           color: Colors.green,
           size: size.width * 0.07,
           onPressed: () =>
-              context.read<AddOrderBloc>().add(AddOrderAddProduct(product)),
+              context.read<AddProductBloc>().add(AddOrderAddProduct(product)),
         ),
         SizedBox(
           width: size.width * 0.1,
@@ -341,7 +337,7 @@ class _AddOrderProductState extends State<AddOrderProduct> {
           color: Colors.red,
           size: size.width * 0.07,
           onPressed: () =>
-              context.read<AddOrderBloc>().add(DecreaseProductCount(product)),
+              context.read<AddProductBloc>().add(DecreaseProductCount(product)),
         ),
       ],
     );
@@ -368,3 +364,4 @@ class _AddOrderProductState extends State<AddOrderProduct> {
     return 11.0;
   }
 }
+*/

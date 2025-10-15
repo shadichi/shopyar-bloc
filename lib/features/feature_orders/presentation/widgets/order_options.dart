@@ -51,7 +51,7 @@ void OrderOptions(BuildContext context, dynamic ordersData, item, OrdersEntity? 
                 title: 'ویرایش سفارش',
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => ProductFormScreen.edit(ordersEntity: ordersEntity!)));
+                        MaterialPageRoute(builder: (_) => AddOrderProductFormScreen.edit(ordersEntity: ordersEntity!)));
 
                   }, context: context
               ),

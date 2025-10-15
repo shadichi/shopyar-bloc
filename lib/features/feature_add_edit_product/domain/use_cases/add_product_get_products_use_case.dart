@@ -8,15 +8,15 @@ import '../../../../core/usecases/use_case.dart';
 import '../../../feature_log_in/domain/entities/login_entity.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
 import '../entities/add_order_product_entity.dart';
-import '../repository/add_order_repository.dart';
+import '../repository/add_product_repository.dart';
 
-class AddProductGetDataUseCase implements UseCase<OrderDataState<ProductEntity>, InfParams>{
-  final AddOrderRepository _productRepository;
-  AddProductGetDataUseCase(this._productRepository);
+class AddProductGetDataNeededUseCase implements UseCase<OrderDataState, InfParams>{
+  final AddProductRepository _productRepository;
+  AddProductGetDataNeededUseCase(this._productRepository);
 
   @override
-  Future<OrderDataState<ProductEntity>> call(InfParams productsParams) {
-    return _productRepository.getOrderProducts(productsParams);
+  Future<OrderDataState> call(InfParams productsParams) {
+    return _productRepository.getProductData();
   }
 
 }

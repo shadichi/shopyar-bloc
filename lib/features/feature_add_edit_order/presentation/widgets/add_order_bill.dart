@@ -11,7 +11,7 @@ class AddOrderBill extends StatefulWidget {
   final List<Function(String)> onTextChange;
   final GlobalKey<FormState> formKey;
   final List<TextEditingController> textEditing;
-  final ProductFormMode isEditMode;
+  final AddOrderProductFormMode isEditMode;
   final OrdersEntity? ordersEntity;
 
   AddOrderBill(
@@ -23,7 +23,7 @@ class AddOrderBill extends StatefulWidget {
       this.isEditMode, {
         this.ordersEntity, // 👈 اختیاری
       }) : assert(
-  isEditMode == ProductFormMode.create || ordersEntity != null,
+  isEditMode == AddOrderProductFormMode.create || ordersEntity != null,
   'در حالت edit باید ordersEntity مقدار داشته باشد',
   );
 
@@ -70,7 +70,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
   void initState() {
     super.initState();
 
-    if (widget.isEditMode == ProductFormMode.edit) {
+    if (widget.isEditMode == AddOrderProductFormMode.edit) {
       final e = widget.ordersEntity!;
       widget.textEditing[0].text = e.billing!.firstName;  // نام
       widget.textEditing[1].text = e.billing!.lastName;   // نام خانوادگی
@@ -158,7 +158,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
                     itemList: provinceList,
                     key1: 'استان',
                     onTextChange: widget.onTextChange[3],
-                    selectedValue: widget.isEditMode == ProductFormMode.edit
+                    selectedValue: widget.isEditMode == AddOrderProductFormMode.edit
                         ? widget.ordersEntity!.billing!.state
                         : '',
                     mode: widget.isEditMode,
@@ -206,7 +206,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
               PaymentDropdownMenu(
                 itemList: widget.paymentMethod!.toList(),
                 key1: "روش پرداخت",
-                selectedValue: widget.isEditMode == ProductFormMode.edit
+                selectedValue: widget.isEditMode == AddOrderProductFormMode.edit
                     ? widget.ordersEntity!.paymentMethodTitle.toString()
                     : '',
                 onTextChange: widget.onTextChange[9], // Payment
@@ -215,7 +215,7 @@ class _AddOrderBillState extends State<AddOrderBill> {
               ShipmentDropdownMenu(
                 itemList: widget.shipmentMethod!.toList(),
                 key1: "روش حمل و نقل",
-                selectedValue: widget.isEditMode == ProductFormMode.edit
+                selectedValue: widget.isEditMode == AddOrderProductFormMode.edit
                     ? widget.ordersEntity!.shippingLines![0].methodTitle.toString()
                     : '',
                 onTextChange: widget.onTextChange[8], // Shipment
@@ -303,7 +303,7 @@ class ProvinceDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
-  ProductFormMode mode;
+  AddOrderProductFormMode mode;
 
   ProvinceDropdownMenu(
       {required this.itemList,
@@ -326,7 +326,7 @@ class _ProvinceDropdownMenuState extends State<ProvinceDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.mode == ProductFormMode.edit
+    String? selectedItem = widget.mode == AddOrderProductFormMode.edit
         ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue) // اگر خالی بود => null
         : widget.itemList!.first; // ✅
 
@@ -397,7 +397,7 @@ class ShipmentDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
-  ProductFormMode mode;
+  AddOrderProductFormMode mode;
 
   ShipmentDropdownMenu(
       {required this.itemList,
@@ -417,7 +417,7 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.mode == ProductFormMode.edit
+    String? selectedItem = widget.mode == AddOrderProductFormMode.edit
         ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue) // اگر خالی بود => null
         : widget.itemList!.first.methodTitle; // ✅
 
@@ -455,7 +455,8 @@ class _ShipmentDropdownMenuState extends State<ShipmentDropdownMenu> {
               'Choose',
               textAlign: TextAlign.right, // Right align hint text
             ),
-            // Check for duplicates before passing to DropdownButtonFormField2
+            // Check for duplicates before passing to DropdownButt
+            // onFormField2
             items: widget.itemList!
                 .map((item) => DropdownMenuItem(
                 value: item.methodTitle,
@@ -492,7 +493,7 @@ class PaymentDropdownMenu extends StatefulWidget {
   String selectedValue;
   final String key1;
   final Function(String) onTextChange;
-  final ProductFormMode mode;
+  final AddOrderProductFormMode mode;
 
   PaymentDropdownMenu(
       {required this.itemList,
@@ -510,7 +511,7 @@ class _PaymentDropdownMenuState extends State<PaymentDropdownMenu> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    String? selectedItem = widget.mode == ProductFormMode.edit
+    String? selectedItem = widget.mode == AddOrderProductFormMode.edit
         ? (widget.selectedValue.isEmpty == true ? null : widget.selectedValue)
         : widget.itemList!.first.methodTitle; // ✅
 

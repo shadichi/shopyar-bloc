@@ -21,30 +21,33 @@ import '../bloc/add_order_status.dart';
 import '../widgets/add_order_bill.dart';
 import '../widgets/add_order_product.dart';
 
-enum ProductFormMode {
+enum AddOrderProductFormMode {
   create,
   edit(),
 }
 
-class ProductFormScreen extends StatefulWidget {
+class AddOrderProductFormScreen extends StatefulWidget {
   static const createRoute = '/orders-create';
   static const editRoute = '/orders-edit';
 
-  final ProductFormMode mode;
+  final AddOrderProductFormMode mode;
   final OrdersEntity? ordersEntity;
 
-  const ProductFormScreen._({required this.mode, this.ordersEntity});
+  const AddOrderProductFormScreen._({required this.mode, this.ordersEntity});
 
-  factory ProductFormScreen.create() => ProductFormScreen._(mode: ProductFormMode.create);
+  factory AddOrderProductFormScreen.create() =>
+      AddOrderProductFormScreen._(mode: AddOrderProductFormMode.create);
 
-  factory ProductFormScreen.edit({required OrdersEntity ordersEntity}) =>
-      ProductFormScreen._(mode: ProductFormMode.edit, ordersEntity: ordersEntity);
+  factory AddOrderProductFormScreen.edit(
+          {required OrdersEntity ordersEntity}) =>
+      AddOrderProductFormScreen._(
+          mode: AddOrderProductFormMode.edit, ordersEntity: ordersEntity);
 
   @override
   _AddOrderTest createState() => _AddOrderTest();
 }
 
-class _AddOrderTest extends State<ProductFormScreen> {
+class _AddOrderTest extends State<AddOrderProductFormScreen> {
   int activeStep = 0;
   int upperBound = 1;
 
@@ -72,12 +75,12 @@ class _AddOrderTest extends State<ProductFormScreen> {
   List<LineItem> _cartToLineItems(Map<int, int> cart) {
     return cart.entries
         .map((e) => LineItem(
-      id: 0,
-      productId: e.key,
-      name: "",
-      quantity: e.value,
-      total: '0',
-    ))
+              id: 0,
+              productId: e.key,
+              name: "",
+              quantity: e.value,
+              total: '0',
+            ))
         .toList();
   }
 
@@ -94,7 +97,6 @@ class _AddOrderTest extends State<ProductFormScreen> {
     // 3) Hydrate فقط بعد از ProductsLoaded و فقط یک بار (در listener)
   }
 
-
   final TextEditingController controller = TextEditingController();
 
   final TextEditingController step1CustomerFNBill = TextEditingController();
@@ -109,7 +111,8 @@ class _AddOrderTest extends State<ProductFormScreen> {
   // خط کمکی برای مشتق‌کردن LineItem از state (بدون setState)
   List<LineItem> _deriveLineItemsFromState(AddOrderState s) {
     if (s.addOrderCardProductStatus is AddOrderCardProductLoaded) {
-      final cart = (s.addOrderCardProductStatus as AddOrderCardProductLoaded).cart;
+      final cart =
+          (s.addOrderCardProductStatus as AddOrderCardProductLoaded).cart;
       return _cartToLineItems(cart);
     }
     if (s.addOrderStatus is AddOrderProductsLoadedStatus) {
@@ -136,69 +139,77 @@ class _AddOrderTest extends State<ProductFormScreen> {
     ];
 
     final List<Function(String)> onTextChange = [
-          (value) => customerLNBill = value,
-          (value) => customerFNBill = value,
-          (value) => cityBill = value,
-          (value) => provinceBill = value,
-          (value) => addressBill = value,
-          (value) => postalCodeBill = value,
-          (value) => emailBill = value,
-          (value) => phoneBill = value,
-          (value) => shipmentBill = value,
-          (value) => paymentBill = value,
-          (value) => shipPriceBill = value,
+      (value) => customerLNBill = value,
+      (value) => customerFNBill = value,
+      (value) => cityBill = value,
+      (value) => provinceBill = value,
+      (value) => addressBill = value,
+      (value) => postalCodeBill = value,
+      (value) => emailBill = value,
+      (value) => phoneBill = value,
+      (value) => shipmentBill = value,
+      (value) => paymentBill = value,
+      (value) => shipPriceBill = value,
     ];
 
-    paymentMethod = StaticValues.paymentMethods.map((m) => PaymentMethod.fromJson(m)).toList();
-    shipmentMethod = StaticValues.shippingMethods.map((m) => ShippingMethod.fromJson(m)).toList();
+    paymentMethod = StaticValues.paymentMethods
+        .map((m) => PaymentMethod.fromJson(m))
+        .toList();
+    shipmentMethod = StaticValues.shippingMethods
+        .map((m) => ShippingMethod.fromJson(m))
+        .toList();
 
     return BlocConsumer<AddOrderBloc, AddOrderState>(
       listener: (context, state) async {
         // فقط یک‌بار بعد از لودشدن محصولات، Hydrate کن
         if (!_hydratedOnce &&
-            widget.mode == ProductFormMode.edit &&
+            widget.mode == AddOrderProductFormMode.edit &&
             state.addOrderStatus is AddOrderProductsLoadedStatus) {
           _hydratedOnce = true;
-          context.read<AddOrderBloc>().add(HydrateCartFromOrder(widget.ordersEntity!));
+          context
+              .read<AddOrderBloc>()
+              .add(HydrateCartFromOrder(widget.ordersEntity!));
         }
 
         if (state.addOrderStatus is AddOrderSuccessStatus) {
           final isSuccess = await alertDialogScreen(
             context,
-            widget.mode == ProductFormMode.edit ? 'سفارش با موفقیت ویرایش شد.' : 'سفارش با موفقیت ایجاد شد.',
+            widget.mode == AddOrderProductFormMode.edit
+                ? 'سفارش با موفقیت ویرایش شد.'
+                : 'سفارش با موفقیت ایجاد شد.',
             2,
             false,
             icon: Icons.check_circle,
           );
-          if(isSuccess!){
+          if (isSuccess!) {
             context.read<OrdersBloc>().add(
-              LoadOrdersData(
-                false,
-                '',
-                false,
-                (
-                    10).toString(),
-                '',
-                isChangeStatus: true,
-              ),
-            );
-            if(widget.mode == ProductFormMode.edit){
+                  LoadOrdersData(
+                    false,
+                    '',
+                    false,
+                    (10).toString(),
+                    '',
+                    isChangeStatus: true,
+                  ),
+                );
+            if (widget.mode == AddOrderProductFormMode.edit) {
               Navigator.pop(context);
               Navigator.pop(context);
             }
-           // Navigator.pop(context);
+            // Navigator.pop(context);
             Navigator.pop(context);
           }
-
         }
         if (state.addOrderStatus is AddOrderErrorStatus) {
-          alertDialogScreen(context, 'خطا در ایجاد سفارش.', 2, false, icon: Icons.check_circle);
+          alertDialogScreen(context, 'خطا در ایجاد سفارش.', 2, false,
+              icon: Icons.check_circle);
         }
       },
       builder: (context, state) {
         final isSubmitting = state.addOrderStatus is AddOrderLoadingStatus;
         final isLoadError = state.addOrderStatus is AddOrderProductsErrorStatus;
-        final isLoadingProducts = state.addOrderStatus is AddOrderProductsLoadingStatus;
+        final isLoadingProducts =
+            state.addOrderStatus is AddOrderProductsLoadingStatus;
 
         if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
           _lastLoaded = state.addOrderStatus as AddOrderProductsLoadedStatus;
@@ -208,7 +219,8 @@ class _AddOrderTest extends State<ProductFormScreen> {
         if (isLoadingProducts) {
           mainContent = Center(child: ProgressBar());
         } else if (isLoadError && _lastLoaded == null) {
-          mainContent = const Center(child: Text('خطا!', style: TextStyle(color: Colors.white)));
+          mainContent = const Center(
+              child: Text('خطا!', style: TextStyle(color: Colors.white)));
         } else if (_lastLoaded != null) {
           final loaded = _lastLoaded!;
           final products = state.visibleProducts;
@@ -223,28 +235,36 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 ListTile(
                   title: Text(
                     activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                    style:  TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4.5)),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppConfig.calFontSize(context, 4.5)),
                   ),
                   subtitle: Text(
-                    activeStep == 0 ? 'لطفا مشخصات صورتحساب را وارد فرمایید.' : 'لطفا محصولات را انتخاب فرمایید.',
-                    style:  TextStyle(color: Colors.grey, fontSize:  AppConfig.calFontSize(context, 4.3)),
+                    activeStep == 0
+                        ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
+                        : 'لطفا محصولات را انتخاب فرمایید.',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: AppConfig.calFontSize(context, 4.3)),
                   ),
                 ),
                 Expanded(
                   child: Container(
-                   // color: Colors.green,
+                    // color: Colors.green,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 400),
                       transitionBuilder: (child, animation) => SlideTransition(
-                        position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
+                        position: Tween<Offset>(
+                                begin: const Offset(1, 0), end: Offset.zero)
+                            .animate(animation),
                         child: child,
                       ),
                       child: Padding(
-                        
                         key: ValueKey<int>(activeStep),
                         //width: 500,
-                        padding: EdgeInsets.symmetric(horizontal: width*0.01),
-                        child: _buildSection(onTextChange, textEditing, widget.mode, widget.ordersEntity, products),
+                        padding: EdgeInsets.symmetric(horizontal: width * 0.01),
+                        child: _buildSection(onTextChange, textEditing,
+                            widget.mode, widget.ordersEntity, products),
                       ),
                     ),
                   ),
@@ -260,23 +280,28 @@ class _AddOrderTest extends State<ProductFormScreen> {
             ),
           );
         } else {
-          mainContent =
-          const Center(child: Text("خطا در پردازش داده‌ها", style: TextStyle(color: Colors.white)));
+          mainContent = const Center(
+              child: Text("خطا در پردازش داده‌ها",
+                  style: TextStyle(color: Colors.white)));
         }
 
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              widget.mode == ProductFormMode.create
-                  ? 'ایجاد سفارش جدید'
-                  : 'ویرایش سفارش ${widget.ordersEntity?.id ?? ""}',
-              style:  TextStyle(color: Colors.white, fontSize: AppConfig.calTitleFontSize(context))
-            ),
+                widget.mode == AddOrderProductFormMode.create
+                    ? 'ایجاد سفارش جدید'
+                    : 'ویرایش سفارش ${widget.ordersEntity?.id ?? ""}',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: AppConfig.calTitleFontSize(context))),
           ),
           body: Stack(
             children: [
               mainContent,
-              if (isSubmitting) _loadingBarrier(widget.mode == ProductFormMode.edit?'در حال ویرایش سفارش...':'در حال ثبت سفارش...'),
+              if (isSubmitting)
+                _loadingBarrier(widget.mode == AddOrderProductFormMode.edit
+                    ? 'در حال ویرایش سفارش...'
+                    : 'در حال ثبت سفارش...'),
             ],
           ),
         );
@@ -285,12 +310,12 @@ class _AddOrderTest extends State<ProductFormScreen> {
   }
 
   Widget _buildSection(
-      List<Function(String)> onTextChange,
-      List<TextEditingController> textEditing,
-      ProductFormMode isEditMode,
-      OrdersEntity? ordersEntity,
-      List<ProductEntity> products,
-      ) {
+    List<Function(String)> onTextChange,
+    List<TextEditingController> textEditing,
+    AddOrderProductFormMode isEditMode,
+    OrdersEntity? ordersEntity,
+    List<ProductEntity> products,
+  ) {
     switch (activeStep) {
       case 0:
         return AddOrderBill(
@@ -313,26 +338,36 @@ class _AddOrderTest extends State<ProductFormScreen> {
                 vertical: MediaQuery.of(context).size.width * 0.01,
               ),
               child: SearchBar(
-                backgroundColor: WidgetStateProperty.all(AppConfig.secondaryColor),
+                backgroundColor:
+                    WidgetStateProperty.all(AppConfig.secondaryColor),
                 shape: MaterialStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)),
+                    borderRadius: BorderRadius.circular(
+                        AppConfig.calBorderRadiusSize(context)),
                   ),
                 ),
-                leading: Icon(Icons.search, color: Colors.white, size: AppConfig.calWidth(context, 5)),
+                leading: Icon(Icons.search,
+                    color: Colors.white, size: AppConfig.calWidth(context, 5)),
                 hintText: 'جستجو',
                 textStyle: WidgetStateProperty.all(
-                  TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 3)),
+                  TextStyle(
+                      color: Colors.white,
+                      fontSize: AppConfig.calFontSize(context, 3)),
                 ),
                 hintStyle: WidgetStateProperty.all(
-                  TextStyle(fontSize: AppConfig.calFontSize(context, 3), color: Colors.white60),
+                  TextStyle(
+                      fontSize: AppConfig.calFontSize(context, 3),
+                      color: Colors.white60),
                 ),
-                onChanged: (q) => context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(q)),
-                onSubmitted: (q) => context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(q)),
+                onChanged: (q) => context
+                    .read<AddOrderBloc>()
+                    .add(LoadOnChangedAddOrderProductsData(q)),
+                onSubmitted: (q) => context
+                    .read<AddOrderBloc>()
+                    .add(LoadOnChangedAddOrderProductsData(q)),
               ),
             ),
             Expanded(
-
               child: ListView.builder(
                 shrinkWrap: true, // ← Add this
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -347,7 +382,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
                       ordersEntity,
                       // ⚠️ این کال‌بک دیگه state محلی lineItem رو دستکاری نمی‌کنه
                       // چون ثبت سفارش مستقیم از state مشتق میشه
-                          (p0) {},
+                      (p0) {},
                     ),
                   );
                 },
@@ -363,22 +398,27 @@ class _AddOrderTest extends State<ProductFormScreen> {
 
   Widget nextButton(AddOrderProductsLoadedStatus _) {
     return Container(
-    //  margin: const EdgeInsets.all(10),
+      //  margin: const EdgeInsets.all(10),
       width: AppConfig.calWidth(context, 31),
       child: ElevatedButton(
         onPressed: () {
           if (activeStep == 0) {
-            final payIdx = paymentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == paymentBill.trim()) ?? -1;
-            final shipIdx =
-                shipmentMethod?.indexWhere((m) => (m.methodTitle ?? '').trim() == shipmentBill.trim()) ?? -1;
-            if(emailBill.isNotEmpty){
-              if(!isValidEmail(emailBill)) {
+            final payIdx = paymentMethod?.indexWhere((m) =>
+                    (m.methodTitle ?? '').trim() == paymentBill.trim()) ??
+                -1;
+            final shipIdx = shipmentMethod?.indexWhere((m) =>
+                    (m.methodTitle ?? '').trim() == shipmentBill.trim()) ??
+                -1;
+            if (emailBill.isNotEmpty) {
+              if (!isValidEmail(emailBill)) {
                 showSnack(context, "ایمیل حتما باید به فرمت صحیح باشد!");
                 return;
               }
             }
 
-            if ((_formKey.currentState?.validate() ?? false) && payIdx >= 0 && shipIdx >= 0) {
+            if ((_formKey.currentState?.validate() ?? false) &&
+                payIdx >= 0 &&
+                shipIdx >= 0) {
               setState(() => activeStep = 1);
             } else {
               showSnack(context, "لطفاً فیلدهای مورد نیاز را پر کنید!");
@@ -391,16 +431,17 @@ class _AddOrderTest extends State<ProductFormScreen> {
             final derived = _deriveLineItemsFromState(st);
 
             if (derived.isEmpty) {
-              alertDialogScreen(context, 'هیچ محصولی انتخاب نشده است!', 1, true);
+              alertDialogScreen(
+                  context, 'هیچ محصولی انتخاب نشده است!', 1, true);
               return;
             }
 
             final selectedPay = (paymentMethod ?? []).firstWhere(
-                  (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
+              (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
               orElse: () => paymentMethod!.first,
             );
             final selectedShip = (shipmentMethod ?? []).firstWhere(
-                  (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
+              (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
               orElse: () => shipmentMethod!.first,
             );
 
@@ -409,7 +450,9 @@ class _AddOrderTest extends State<ProductFormScreen> {
             final shipTypeTitle = selectedShip.methodTitle?.toString() ?? "";
             final priceShip = shipPriceBill.isEmpty ? "" : shipPriceBill;
 
-            shippingLine = [ShippingLine(methodId: shipType, methodTitle: shipTypeTitle)];
+            shippingLine = [
+              ShippingLine(methodId: shipType, methodTitle: shipTypeTitle)
+            ];
 
             final billing = Ing(
               firstName: customerLNBill,
@@ -436,7 +479,9 @@ class _AddOrderTest extends State<ProductFormScreen> {
             );
 
             final int orderIdForEdit =
-            (widget.mode == ProductFormMode.edit) ? (widget.ordersEntity?.id ?? 0) : 0;
+                (widget.mode == AddOrderProductFormMode.edit)
+                    ? (widget.ordersEntity?.id ?? 0)
+                    : 0;
 
             final order = AddOrderOrdersEntity(
               id: orderIdForEdit,
@@ -449,17 +494,23 @@ class _AddOrderTest extends State<ProductFormScreen> {
               shippingLines: shippingLine,
             );
 
-            context.read<AddOrderBloc>().add(SetOrderEvent(SetOrderParams(order, payType, shipType, priceShip)));
+            context.read<AddOrderBloc>().add(SetOrderEvent(
+                SetOrderParams(order, payType, shipType, priceShip)));
             return;
           }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConfig.secondaryColor,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
         child: Text(
-          activeStep == 1 ? (widget.mode == ProductFormMode.edit ? 'ویرایش' : 'ثبت') : 'بعدی',
-          style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),textAlign: TextAlign.center,
+          activeStep == 1
+              ? (widget.mode == AddOrderProductFormMode.edit ? 'ویرایش' : 'ثبت')
+              : 'بعدی',
+          style: TextStyle(
+              color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
+          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -479,9 +530,13 @@ class _AddOrderTest extends State<ProductFormScreen> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConfig.secondaryColor,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
-        child: Text('قبلی', style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 4))),
+        child: Text('قبلی',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: AppConfig.calFontSize(context, 4))),
       ),
     );
   }
@@ -498,14 +553,17 @@ class _AddOrderTest extends State<ProductFormScreen> {
             width: 40,
             decoration: BoxDecoration(
               color: AppConfig.backgroundColor,
-              border: activeStep == 1 ? Border.all(width: 2, color: Colors.grey) : null,
+              border: activeStep == 1
+                  ? Border.all(width: 2, color: Colors.grey)
+                  : null,
               shape: BoxShape.circle,
             ),
             child: const Center(
               child: FractionallySizedBox(
                 heightFactor: 0.6,
                 widthFactor: 0.9,
-                child: CircleAvatar(backgroundColor: Colors.white, child: Text('2')),
+                child: CircleAvatar(
+                    backgroundColor: Colors.white, child: Text('2')),
               ),
             ),
           ),
@@ -519,11 +577,17 @@ class _AddOrderTest extends State<ProductFormScreen> {
               lineThickness: 1.0,
               dashLength: 4.0,
               dashColor: Colors.black,
-              dashGradient: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],
+              dashGradient: [
+                AppConfig.firstLinearColor,
+                AppConfig.secondLinearColor
+              ],
               dashRadius: 0.0,
               dashGapLength: 4.0,
               dashGapColor: Colors.transparent,
-              dashGapGradient: [AppConfig.firstLinearColor, AppConfig.secondLinearColor],
+              dashGapGradient: [
+                AppConfig.firstLinearColor,
+                AppConfig.secondLinearColor
+              ],
               dashGapRadius: 0.0,
             ),
           ),
@@ -531,14 +595,17 @@ class _AddOrderTest extends State<ProductFormScreen> {
             width: 40,
             decoration: BoxDecoration(
               color: AppConfig.backgroundColor,
-              border: activeStep == 0 ? Border.all(width: 2, color: Colors.grey) : null,
+              border: activeStep == 0
+                  ? Border.all(width: 2, color: Colors.grey)
+                  : null,
               shape: BoxShape.circle,
             ),
             child: const Center(
               child: FractionallySizedBox(
                 heightFactor: 0.6,
                 widthFactor: 0.9,
-                child: CircleAvatar(backgroundColor: Colors.white, child: Text('1')),
+                child: CircleAvatar(
+                    backgroundColor: Colors.white, child: Text('1')),
               ),
             ),
           ),
@@ -555,7 +622,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-               ProgressBar(),
+              ProgressBar(),
               if (message != null) ...[
                 SizedBox(height: AppConfig.calHeight(context, 8)),
                 Text(
@@ -575,6 +642,7 @@ class _AddOrderTest extends State<ProductFormScreen> {
     );
   }
 }
+
 bool isValidEmail(String email) {
   final RegExp regex = RegExp(
     r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',

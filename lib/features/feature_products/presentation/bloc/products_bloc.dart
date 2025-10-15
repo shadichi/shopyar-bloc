@@ -114,7 +114,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
         // ❗️ مهم: perPage را '10' بده (مثل لود اولیه)
         final dataState = await getProductsUseCase(
-          ProductsParams(
+          InfParams(
             '10',
             false,
             '',

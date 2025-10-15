@@ -14,7 +14,7 @@ import '../../../domain/entities/add_order_orders_entity.dart';
 class AddOrderProductsApiProvider {
   final Dio _dio = Dio();
 
-  Future<dynamic> getOrderProducts(ProductsParams productsParams) async {
+  Future<dynamic> getOrderProducts(InfParams productsParams) async {
     var response = await _dio.get(
         "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=10",
         options: Options(headers: {'Authorization': StaticValues.passWord}));

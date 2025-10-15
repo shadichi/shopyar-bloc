@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 import 'package:shopyar/features/feature_home/data/repository/home_repositoryImpl.dart';
 import 'package:shopyar/features/feature_home/presentation/bloc/home_bloc.dart';
 import 'package:shopyar/features/feature_log_in/data/data_source/remote/api_provider.dart';
@@ -21,6 +22,11 @@ import 'features/feature_add_edit_order/domain/use_cases/add_order_get_products_
 import 'features/feature_add_edit_order/domain/use_cases/add_order_set_order_use_case.dart';
 import 'features/feature_add_edit_order/domain/use_cases/add_order_get_selected_products_use_case.dart';
 import 'features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
+import 'features/feature_add_edit_product/data/data_source/remote/add_order_products_api_provider.dart';
+import 'features/feature_add_edit_product/data/repository/add_product_repositoryImpl.dart';
+import 'features/feature_add_edit_product/domain/repository/add_product_repository.dart';
+import 'features/feature_add_edit_product/domain/use_cases/add_product_get_products_use_case.dart';
+import 'features/feature_add_edit_product/domain/use_cases/upload_image_use_case.dart';
 import 'features/feature_home/data/data_source/remote/home_api_provider.dart';
 import 'features/feature_home/domain/repository/home_repository.dart';
 import 'features/feature_home/domain/use_cases/get_home-data_use_case.dart';
@@ -48,16 +54,18 @@ setup() async {
   locator.registerSingleton<OrdersApiProvider>(OrdersApiProvider());
   locator.registerSingleton<ProductsApiProvider>(ProductsApiProvider());
   locator.registerSingleton<AddOrderProductsApiProvider>(AddOrderProductsApiProvider());
+  locator.registerSingleton<AddProductsGetDataApiProvider>(AddProductsGetDataApiProvider());
 
- ///repositories
+  ///repositories
   locator.registerSingleton<LogInRepository>(LogInRepositoryImpl(locator()));
   locator.registerSingleton<HomeRepository>(HomeRepositoryImpl(locator()));
   locator.registerSingleton<OrdersRepository>(OrdersRepositoryImpl(locator()));
   locator.registerSingleton<ProductRepository>(ProductRepositoryImpl(locator()));
   locator.registerSingleton<AddOrderRepository>(AddOrderRepositoryImpl(locator()));
   locator.registerSingleton<StartRepository>(StartRepositoryImpl());
+  locator.registerSingleton<AddProductRepository>(AddProductRepositoryImpl(locator()));
 
- ///usecases
+  ///usecases
   locator.registerSingleton<GetLoginDataUseCase>(GetLoginDataUseCase(locator()));
   locator.registerSingleton<GetStringUseCase>(GetStringUseCase(locator()));
   locator.registerSingleton<SetStringUseCase>(SetStringUseCase(locator()));
@@ -70,16 +78,19 @@ setup() async {
   locator.registerSingleton<GetProductsUseCase>(GetProductsUseCase(locator()));
   locator.registerSingleton<ProductsGetStringDataUseCase>(ProductsGetStringDataUseCase(locator()));
 
-  locator.registerSingleton<AddOrderGetProductsUseCase>(AddOrderGetProductsUseCase(locator()));
+  locator.registerSingleton<AddProductGetDataUseCase>(AddProductGetDataUseCase(locator()));
   locator.registerSingleton<AddOrderGetSelectedProductsUseCase>(AddOrderGetSelectedProductsUseCase(locator()));
   locator.registerSingleton<AddOrderSetOrderUseCase>(AddOrderSetOrderUseCase(locator()));
+  locator.registerSingleton<AddProductGetDataNeededUseCase>(AddProductGetDataNeededUseCase(locator()));
+  locator.registerSingleton<UploadImageUseCase>(UploadImageUseCase(locator()));
 
- ///bloc
+  ///bloc
   locator.registerSingleton<LogInBloc>(LogInBloc(locator(), locator()));
   locator.registerSingleton<HomeBloc>(HomeBloc(locator(),locator()));
   locator.registerSingleton<OrdersBloc>(OrdersBloc(locator(), locator(), locator()));
   locator.registerSingleton<ProductsBloc>(ProductsBloc(locator(), locator()));
   locator.registerSingleton<AddOrderBloc>(AddOrderBloc( locator(), locator()));
   locator.registerSingleton<StartBloc>(StartBloc( locator(), locator()));
+  locator.registerSingleton<AddProductBloc>(AddProductBloc( locator(), locator()));
 
 }

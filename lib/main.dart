@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 import 'package:shopyar/features/feature_home/presentation/screens/home-screen.dart';
 import 'package:shopyar/features/feature_log_in/presentation/screens/log_in_screen.dart';
 import 'package:shopyar/features/feature_orders/domain/entities/orders_entity.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => locator<ProductsBloc>()),
         BlocProvider(create: (_) => locator<AddOrderBloc>()),
         BlocProvider(create: (_) => locator<StartBloc>()),
+        BlocProvider(create: (_) => locator<AddProductBloc>()),
       ],
       child: MaterialApp(
         //themeMode: ThemeMode.light,
@@ -108,15 +110,15 @@ class MyApp extends StatelessWidget {
         },
         onGenerateRoute: (settings) {
           switch (settings.name) {
-            case ProductFormScreen.createRoute:
+            case AddOrderProductFormScreen.createRoute:
               return MaterialPageRoute(
-                builder: (_) => ProductFormScreen.create(),
+                builder: (_) => AddOrderProductFormScreen.create(),
               );
 
-            case ProductFormScreen.editRoute:
+            case AddOrderProductFormScreen.editRoute:
               final entity = settings.arguments as OrdersEntity;
               return MaterialPageRoute(
-                builder: (_) => ProductFormScreen.edit(ordersEntity: entity),
+                builder: (_) => AddOrderProductFormScreen.edit(ordersEntity: entity),
               );
           }
         },

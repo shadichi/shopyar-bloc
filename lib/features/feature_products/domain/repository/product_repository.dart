@@ -10,7 +10,7 @@ import '../entities/product_entity.dart';
 
 abstract class ProductRepository{
 
-  Future<ProductsParams> getString();
+  Future<InfParams> getString();
 
-  Future<OrderDataState<ProductEntity>> getProducts(ProductsParams productsParams);
+  Future<OrderDataState<ProductEntity>> getProducts(InfParams productsParams);
 }

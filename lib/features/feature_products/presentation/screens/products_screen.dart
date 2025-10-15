@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shopyar/core/params/products_params.dart';
+import 'package:shopyar/features/feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopyar/features/feature_products/presentation/widgets/product.dart';
@@ -10,6 +11,7 @@ import '../../../../core/config/app-colors.dart';
 import '../../../../core/utils/static_values.dart';
 import '../../../../core/widgets/alert_dialog.dart';
 import '../../../../core/widgets/progress-bar.dart';
+import '../../../feature_add_edit_product/presentation/screens/product_form_screen.dart';
 import '../bloc/products_status.dart';
 
 class ProductsScreen extends StatefulWidget {
@@ -34,7 +36,7 @@ class _ProductsScreenState extends State<ProductsScreen>
     // TODO: implement initState
     super.initState();
     BlocProvider.of<ProductsBloc>(context)
-        .add(LoadProductsData(ProductsParams('10', false, '', false)));
+        .add(LoadProductsData(InfParams('10', false, '', false)));
   }
 
   Future<void> _onRefresh() {
@@ -80,7 +82,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 title: Align(
                   alignment: Alignment.centerRight,
                   child: Container(
-                    width: AppConfig.calWidth(context, 94),
+                    //width: AppConfig.calWidth(context, 94),
                     height: AppConfig.calWidth(context, 9),
                     padding: EdgeInsets.only(right: AppConfig.calWidth(context, 7)),
                     child: SearchBar(
@@ -102,7 +104,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                         if (query.trim().isEmpty) return;
 
                         context.read<ProductsBloc>().add(
-                          LoadProductsData(ProductsParams('10', true, query, false)),
+                          LoadProductsData(InfParams('10', true, query, false)),
                         );
 
                         _suppressNextSubmit = true;
@@ -110,7 +112,16 @@ class _ProductsScreenState extends State<ProductsScreen>
                       },
                     ),
                   ),
+                ),  actions: [
+
+                IconButton(
+                  icon:  Icon(Icons.add, color: Colors.white,size: AppConfig.calFontSize(context, 8.1),),
+                  onPressed: () =>Navigator.push(context, MaterialPageRoute(builder: (context){
+                    return AddProductProductFormScreen();
+                  })),
                 ),
+                // const SizedBox(width: 8),
+              ],
               ),
               body: RefreshIndicator(
                 onRefresh: _onRefresh,
@@ -216,7 +227,7 @@ class _LoadMoreButton extends StatelessWidget {
                 final currentCount = StaticValues.staticProducts.length;
                 print(currentCount);
                 context.read<ProductsBloc>().add(
-                      LoadProductsData(ProductsParams(
+                      LoadProductsData(InfParams(
                           (currentCount + 10).toString(), false, '', true)),
                     );
               },

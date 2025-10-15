@@ -1,26 +1,16 @@
 import 'package:shopyar/core/params/products_params.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:shopyar/core/usecases/get_string_use_case.dart';
 import 'package:shopyar/core/utils/static_values.dart';
 import 'package:shopyar/features/feature_add_edit_order/data/models/add_order_orders_model.dart';
-import 'package:shopyar/features/feature_add_edit_order/domain/entities/add_order_data_entity.dart';
 import 'package:shopyar/features/feature_products/domain/entities/product_entity.dart';
-import '../../../../core/params/add_order_data_state.dart';
 import '../../../../core/params/add_order_get_selected_products_params.dart';
 import '../../../../core/params/add_order_products_card.dart';
-import '../../../../core/params/home_user_data_params.dart';
-import '../../../../core/params/selected_products-params.dart';
 import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../../feature_products/data/models/product_model.dart';
 import '../../domain/entities/add_order_orders_entity.dart';
-import '../../domain/entities/add_order_product_entity.dart';
 import '../../domain/repository/add_order_repository.dart';
-import '../../presentation/bloc/add_order_bloc.dart';
 import '../data_source/remote/add_order_products_api_provider.dart';
-import '../models/add_order_data_model.dart';
-import '../models/add_order_product_model.dart';
 
 class AddOrderRepositoryImpl extends AddOrderRepository {
   AddOrderProductsApiProvider apiProvider;
@@ -29,7 +19,7 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
 
   @override
   Future<OrderDataState<ProductEntity>> getOrderProducts(
-      ProductsParams productsParams) async {
+      InfParams productsParams) async {
     try {
       Response response = await apiProvider.getOrderProducts(productsParams);
 

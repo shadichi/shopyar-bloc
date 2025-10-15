@@ -6,43 +6,36 @@ import 'package:shopyar/features/feature_products/domain/entities/product_entity
 
 import '../../../../core/params/home_user_data_params.dart';
 import '../../../../core/params/products_params.dart';
+import '../../domain/entities/add_order_data_entity.dart';
+import '../../domain/entities/add_order_product_entity.dart';
 
 @immutable
-abstract class ProductsStatus extends Equatable{}
+abstract class AddOrderSetOrderStatus extends Equatable{}
 
-class ProductsLoadingStatus extends ProductsStatus{
+class AddOrderSetOrderInitialStatus extends AddOrderSetOrderStatus{
+
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
-class pUserLoadedStatus extends ProductsStatus{
-  final InfParams productsParams;
-  pUserLoadedStatus(this.productsParams);
-  @override
-  // TODO: implement props
-  List<Object?> get props => [productsParams];
-}
-class UserErrorStatus extends ProductsStatus{
+
+class AddOrderSetOrderLoadingStatus extends AddOrderSetOrderStatus{
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
-class ProductsLoadedStatus extends ProductsStatus{
- /* final List<ProductEntity>? productsDataState;
-  ProductsLoadedStatus(this.productsDataState);*/
+class AddOrderSetOrderSuccess extends AddOrderSetOrderStatus{
+
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
-class ProductsErrorStatus extends ProductsStatus{
+class AddOrderSetOrderFailed extends AddOrderSetOrderStatus{
+
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
-class ProductsSearchFailedStatus extends ProductsStatus {
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
-}
+
 
 

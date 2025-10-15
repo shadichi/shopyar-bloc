@@ -62,7 +62,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           ),
         );
         if(StaticValues.staticProducts.isEmpty){
-          final dataState = await getProductsUseCase(ProductsParams('100',false,'',false));
+          final dataState = await getProductsUseCase(InfParams('100',false,'',false));
 
 
         }

@@ -14,7 +14,7 @@ class ProductRepositoryImpl extends ProductRepository{
   ProductRepositoryImpl(this.apiProvider);
 
   @override
-  Future<ProductsParams> getString() async {
+  Future<InfParams> getString() async {
     if(StaticValues.webService == '' && StaticValues.passWord == ''){
       final prefs = await SharedPreferences.getInstance();
       final webService = prefs.getString("webService");
@@ -22,19 +22,19 @@ class ProductRepositoryImpl extends ProductRepository{
       StaticValues.webService = webService.toString();
       StaticValues.passWord = passWord.toString();
       if(webService == null || passWord == null){
-        return ProductsParams('10',false,'',false);
+        return InfParams('10',false,'',false);
       }
 
-      return ProductsParams('10',false, '',false);
+      return InfParams('10',false, '',false);
     }
     else{
-      return ProductsParams('10',false, '',false);
+      return InfParams('10',false, '',false);
     }
 
   }
 
   @override
-  Future<OrderDataState<ProductEntity>> getProducts(ProductsParams productsParams) async{
+  Future<OrderDataState<ProductEntity>> getProducts(InfParams productsParams) async{
 
     try{
       Response response = await apiProvider.GetProducts(productsParams);

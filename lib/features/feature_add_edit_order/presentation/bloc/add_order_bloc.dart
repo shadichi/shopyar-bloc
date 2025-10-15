@@ -29,7 +29,7 @@ part 'add_order_event.dart';
 part 'add_order_state.dart';
 
 class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
-  final AddOrderGetProductsUseCase getProductsUseCase;
+  final AddProductGetDataUseCase getProductsUseCase;
   final AddOrderSetOrderUseCase addOrderSetOrderUseCase;
 
   AddOrderBloc(this.getProductsUseCase, this.addOrderSetOrderUseCase)
@@ -46,7 +46,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     // --- Load products
     on<LoadAddOrderProductsData>((event, emit) async {
       if (StaticValues.staticProducts.isEmpty) {
-        final dataState = await getProductsUseCase(ProductsParams('10', false, '', false));
+        final dataState = await getProductsUseCase(InfParams('10', false, '', false));
 
         if (dataState is OrderDataSuccess) {
           StaticValues.staticProducts = dataState.data!.cast<ProductEntity>();

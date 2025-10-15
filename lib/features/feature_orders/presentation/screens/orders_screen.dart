@@ -143,7 +143,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => ProductFormScreen.create())),
+                            builder: (_) => AddOrderProductFormScreen.create())),
                   ),
                   // const SizedBox(width: 8),
                 ],

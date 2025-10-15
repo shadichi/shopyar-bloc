@@ -9,12 +9,12 @@ import '../../../feature_log_in/domain/entities/login_entity.dart';
 import '../entities/product_entity.dart';
 import '../repository/product_repository.dart';
 
-class GetProductsUseCase implements UseCase<OrderDataState<ProductEntity>, ProductsParams>{
+class GetProductsUseCase implements UseCase<OrderDataState<ProductEntity>, InfParams>{
   final ProductRepository _productRepository;
   GetProductsUseCase(this._productRepository);
 
   @override
-  Future<OrderDataState<ProductEntity>> call(ProductsParams productsParams) {
+  Future<OrderDataState<ProductEntity>> call(InfParams productsParams) {
     return _productRepository.getProducts(productsParams);
   }
 
