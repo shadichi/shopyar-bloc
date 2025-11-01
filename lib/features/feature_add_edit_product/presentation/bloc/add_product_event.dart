@@ -23,3 +23,9 @@ class RemoveGalleryAtRequested extends AddProductEvent {          // حذف یک
 
 class ClearGalleryRequested extends AddProductEvent {}            // پاک‌کردن همه
 
+class SelectAttribute extends AddProductEvent {
+  final String value;
+  SelectAttribute(this.value);
+}
+
+

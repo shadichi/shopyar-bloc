@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../feature_add_edit_order/data/models/add_order_data_model.dart';
 import '../../data/models/add_order_data_model.dart';
 
 class AddOrderDataEntity extends Equatable{

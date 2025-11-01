@@ -4,6 +4,7 @@ import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/app-colors.dart';
+import '../../data/models/add_order_data_model.dart';
 import '../bloc/add_product_status.dart';
 import '../widgets/add_product_bill.dart';
 import '../widgets/add_product_bill_additional.dart';
@@ -41,6 +42,7 @@ class _AddProductProductFormScreenState
         if (status is AddProductsDataLoading) {
           mainContent = ProgressBar();
         } else if (status is AddProductsDataLoaded) {
+          final data = status.addProductDataModel;
           mainContent = Column(
             children: [
               stepper(),
@@ -74,7 +76,7 @@ class _AddProductProductFormScreenState
                       key: ValueKey<int>(activeStep),
                       //width: 500,
                       padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                      child: _buildSection(),
+                      child: _buildSection(data),
                     ),
                   ),
                 ),
@@ -192,7 +194,7 @@ class _AddProductProductFormScreenState
     );
   }
 
-  Widget _buildSection(
+  Widget _buildSection(AddProductDataModel addProductDataModel
      /* List<Function(String)> onTextChange,
       List<TextEditingController> textEditing,*/
       ) {
@@ -201,7 +203,7 @@ class _AddProductProductFormScreenState
         return AddProductBill(_formKey);
 
       case 1:
-        return AddProductBillAdditional();
+        return AddProductBillAdditional(addProductDataModel);
 
       default:
         return const SizedBox.shrink();

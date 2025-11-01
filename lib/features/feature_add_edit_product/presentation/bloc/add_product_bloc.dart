@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:shopyar/core/resources/data_state.dart';
 import '../../../../core/params/products_params.dart';
+import '../../../../core/resources/add_product_data_state.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../data/models/add_order_data_model.dart';
 import '../../domain/use_cases/add_product_get_products_use_case.dart';
@@ -27,23 +28,41 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       : super(
           AddProductState(
             addProductStatus: AddProductsDataLoading(),
-            featuredImage: null
+            featuredImage: null,
+              allAttributes: const [],
+              availableAttributes: const ["dffdf","dffddfdf","qwqwwqqw"],
+              selectedAttributes: const [],
 
           ),
         ) {
     on<AddProductsDataLoad>((event, emit) async {
       emit(state.copyWith(newAddProductStatus: AddProductsDataLoading()));
-      final OrderDataState data =
-          await addProductGetDataNeededUseCase(InfParams("", false, "", false));
-      if (data is OrderDataSuccess) {
-        print('success');
 
-        AddProductsDataLoaded addProductsDataLoaded = AddProductDataModel.fromJson(data.d)
-        emit(state.copyWith(newAddProductStatus: AddProductsDataLoaded(addProductDataModelFromJson(da))));
+      final AddProductDataState result =
+      await addProductGetDataNeededUseCase(InfParams("", false, "", false));
+      if (result is AddProductDataSuccess) {
+        try {
+          final model = AddProductDataModel.fromJson(
+            result.data as Map<String, dynamic>,
+          );
+
+          emit(
+            state.copyWith(
+              newAddProductStatus: AddProductsDataLoaded(model),
+            ),
+          );
+        } catch (e, st) {
+          print('❌ خطا در پارس کردن AddProductDataModel: $e');
+          print(st);
+          emit(state.copyWith(newAddProductStatus: AddProductsDataError()));
+        }
       } else {
         emit(state.copyWith(newAddProductStatus: AddProductsDataError()));
       }
+
     });
+
+
     on<PickImageFromGalleryRequested>((event, emit) async {
       emit(state.copyWith(newIsPickingImage: true, newImageError: null));
       try {
@@ -57,6 +76,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
         emit(state.copyWith(newIsPickingImage: false, newImageError: e.toString()));
       }
     });
+    
     on<ClearPickedImage>((event, emit){
       print("ClearPickedImage");
       emit(state.copyWith(
@@ -103,6 +123,23 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
     on<ClearGalleryRequested>((event, emit) {
       emit(state.copyWith(galleryImages: [],));
     });
+
+    on<SelectAttribute>((event, emit) {
+      final selected = List<String>.from(state.selectedAttributes);
+      final available = List<String>.from(state.availableAttributes);
+
+      // از لیست قابل‌انتخاب‌ها حذفش کن
+      available.remove(event.value);
+
+      // به لیست انتخاب‌شده‌ها اضافه کن
+      selected.add(event.value);
+
+      emit(state.copyWith(
+        newAvailableAttributes: available,
+        newSelectedAttributes: selected,
+      ));
+    });
+
 
 /*
     on<UploadGalleryRequested>((event, emit) async {
