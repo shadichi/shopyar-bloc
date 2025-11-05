@@ -16,14 +16,15 @@ class AddProductState extends Equatable {
   final List<File> galleryImages;
   final bool isPickingGallery;
   final bool isUploadingGallery;
+  final bool isSimpleProduct;
 
   // error
   final String? imageError;
 
   //for attribute selection
   final List<String> allAttributes;
-  final List<String> availableAttributes;
-  final List<String> selectedAttributes;
+  final List<Attribute> availableAttributes;
+  final List<Attribute> selectedAttributes;
 
   const AddProductState({
     required this.addProductStatus,
@@ -39,6 +40,7 @@ class AddProductState extends Equatable {
      this.allAttributes = const [],
      this.availableAttributes= const [],
      this.selectedAttributes= const [],
+    this.isSimpleProduct = true
   });
 
   AddProductState copyWith({
@@ -58,8 +60,9 @@ class AddProductState extends Equatable {
     String? newImageError,
     int? newAttList,
     List<String>? newAllAttributes,
-    List<String>? newAvailableAttributes,
-    List<String>? newSelectedAttributes,
+    List<Attribute>? newAvailableAttributes,
+    List<Attribute>? newSelectedAttributes,
+    bool? newIsSimpleProduct,
   }) {
     // محاسبه‌ی featuredImage با احترام به clearImageFile
     final File? nextFeatured =
@@ -90,6 +93,7 @@ class AddProductState extends Equatable {
       allAttributes: newAllAttributes ?? this.allAttributes,
       availableAttributes: newAvailableAttributes ?? this.availableAttributes,
       selectedAttributes: newSelectedAttributes ?? this.selectedAttributes,
+      isSimpleProduct: newIsSimpleProduct ?? this.isSimpleProduct,
     );
   }
 
@@ -107,6 +111,7 @@ class AddProductState extends Equatable {
     attList,
     allAttributes,
     availableAttributes,
-    selectedAttributes
+    selectedAttributes,
+    isSimpleProduct
   ];
 }

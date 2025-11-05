@@ -5,7 +5,9 @@ abstract class AddProductEvent {}
 
 
 class AddProductsDataLoad extends AddProductEvent{
+
   AddProductsDataLoad();
+
 }
 
 class PickImageFromGalleryRequested extends AddProductEvent {}
@@ -24,8 +26,16 @@ class RemoveGalleryAtRequested extends AddProductEvent {          // حذف یک
 class ClearGalleryRequested extends AddProductEvent {}            // پاک‌کردن همه
 
 class SelectAttribute extends AddProductEvent {
-  final String value;
+  final Attribute value;
   SelectAttribute(this.value);
+}
+class AddAttribute extends AddProductEvent {
+  final List<Attribute> attribute;
+  AddAttribute(this.attribute);
+}
+class SetTypeOfProduct extends AddProductEvent {
+  final bool isSimpleProduct;
+  SetTypeOfProduct(this.isSimpleProduct);
 }
 
 

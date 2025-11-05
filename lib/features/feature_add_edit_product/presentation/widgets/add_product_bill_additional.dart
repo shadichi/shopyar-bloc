@@ -13,22 +13,28 @@ import '../../data/models/add_order_data_model.dart';
 
 class AddProductBillAdditional extends StatefulWidget {
   AddProductDataModel addProductDataModel;
-  //final GlobalKey<FormState> formKey;
 
   AddProductBillAdditional(this.addProductDataModel);
 
   @override
-  State<AddProductBillAdditional> createState() => _AddProductBillAdditionalState();
+  State<AddProductBillAdditional> createState() =>
+      _AddProductBillAdditionalState();
 }
 
 class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
   @override
   void initState() {
     super.initState();
+    context
+        .read<AddProductBloc>()
+        .add(AddAttribute(widget.addProductDataModel.attributes));
   }
 
-  String customerLNBill = 'dd';
+  List<String> productTypeList = ["ساده", "متغیر"];
 
+  List<String> productStatusList = ["موجود", "ناموجود"];
+
+  String customerLNBill = 'dd';
 
   TextEditingController controller = TextEditingController();
 
@@ -42,16 +48,14 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
     var width = MediaQuery.of(context).size.width;
     Widget mainContent;
     mainContent = Form(
-   //   key: widget.formKey,
+      //   key: widget.formKey,
       child: Container(
-
         // height: height,
         padding: EdgeInsets.all(8),
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
-
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -93,20 +97,22 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
         return Column(
           spacing: AppConfig.calHeight(context, 2),
           children: [
-          /*  DropdownMenu(
-              itemList: ["ساده","متغیر"],
-              selectedValue: "ساده",
-              onTextChange:  (value) => customerLNBill = value,
-              key1: 'نوع محصول',
+            AppDropdown<String>(
+              items: productTypeList,
+              label: 'نوع محصول',
+              getLabel: (c) => c,
+              onChanged: (c) {
+                print('type picked: $c');
+                bool isSimplProduct = c == productTypeList[0] ? true : false;
+                context
+                    .read<AddProductBloc>()
+                    .add(SetTypeOfProduct(isSimplProduct));
+                // اینجا میتونی توی bloc بفرستی
+              },
             ),
-            AttributeSection(key1: '',),
-
-            DropdownMenu(
-              itemList: ["ساده","متغیر"],
-              selectedValue: "ساده",
-              onTextChange:  (value) => customerLNBill = value,
-              key1: 'فروشنده',
-            ),*/
+            AttributeSection(
+              key1: '',
+            ),
             AppDropdown<Category>(
               items: widget.addProductDataModel.categories,
               label: 'دسته‌بندی',
@@ -131,35 +137,25 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               onChanged: (a) {
                 // اگه خواستی بعدش terms اون attribute رو هم یه dropdown دیگه نشون بده
               },
+            ), AppDropdown<String>(
+              items: productStatusList,
+              label: 'وضعیت',
+              getLabel: (a) => a,
+              onChanged: (a) {
+                // اگه خواستی بعدش terms اون attribute رو هم یه dropdown دیگه نشون بده
+              },
             ),
-
-            /*DropdownMenu(
-              itemList: ["ساده","متغیر"],
-              selectedValue: "ساده",
-              onTextChange:  (value) => customerLNBill = value,
-              key1: 'برچسب',
+            SizedBox(
+              height: AppConfig.calHeight(context, 0.5),
             ),
-            DropdownMenu(
-              itemList: ["ساده","متغیر"],
-              selectedValue: "ساده",
-              onTextChange:  (value) => customerLNBill = value,
-              key1: 'برند',
-            ),
-            DropdownMenu(
-              itemList: ["ساده","متغیر"],
-              selectedValue: "ساده",
-              onTextChange:  (value) => customerLNBill = value,
-              key1: 'وضعیت',
-            ),*/
-            SizedBox(height: AppConfig.calHeight(context, 0.5),),
-
             textField(
               controller,
               'موجودی',
               context,
               onChanged: (String value) {},
-             //   isNec: true
-            ),checkBoxs()
+              //   isNec: true
+            ),
+           // checkBoxs()
           ],
         );
 
@@ -175,73 +171,33 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
         return const SizedBox.shrink();
     }
   }
-/*
-
-  Widget attributeSection(){
-    return Container(
-
-      padding: EdgeInsets.all(AppConfig.calHeight(context, 2)),
-      width: double.infinity,
-      height: AppConfig.calHeight(context, 20),
-      decoration: BoxDecoration(
-         // color: Colors.green,
-          border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.all(Radius.circular(
-              AppConfig.calBorderRadiusSize(context)))),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Flexible(
-                child: AttributeSection( itemList: ["رنگ","حجم",],
-                  selectedValue: "رنگ",
-                  onTextChange:  (value) => customerLNBill = value,
-                  key1: 'انتخاب ویژگی موجود', buildAttRowList: llllList,),
-              ),
-            ],
-          ),
-          BlocBuilder<AddProductBloc, AddProductState>(builder: (context, state){
-            return   Flexible(child: ListView.builder(itemCount: state.attList,itemBuilder: (context, index){
-              return llllList[index];
-            }));
-          })
-
-        ],
-      ),
-
-    );
-  }
-*/
-
-/*
-
-  List<Widget> llllList = [
-    Text("data",style: TextStyle(color: AppConfig.white),),
-    Text("data",style: TextStyle(color: AppConfig.white),),
-    Text("data",style: TextStyle(color: AppConfig.white),),
-    Text("data",style: TextStyle(color: AppConfig.white),),
-    Text("data",style: TextStyle(color: AppConfig.white),),
-  ];*/
 
   Widget checkBoxs() {
     return Container(
       width: double.infinity,
-     // height: 150,
+      // height: 150,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Flexible(
             child: Container(
               child: CheckboxListTile(
-                title: Text("مدیریت انبار",style: TextStyle(color: AppConfig.white),),
+                title: Text(
+                  "مدیریت انبار",
+                  style: TextStyle(color: AppConfig.white),
+                ),
                 value: true,
                 onChanged: (newValue) {},
               ),
             ),
-          ),   Flexible(
+          ),
+          Flexible(
             child: Container(
               child: CheckboxListTile(
-                title: Text("در انبار",style: TextStyle(color: AppConfig.white),),
+                title: Text(
+                  "در انبار",
+                  style: TextStyle(color: AppConfig.white),
+                ),
                 value: true,
                 onChanged: (newValue) {},
               ),
@@ -284,7 +240,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
         ));
   }
 
-  Widget _CustomElevatedButton(String label, void Function() onPress,
+/*  Widget _CustomElevatedButton(String label, void Function() onPress,
       {Color color = Colors.black}) {
     return ElevatedButton(
       onPressed: onPress,
@@ -297,25 +253,8 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
         backgroundColor: MaterialStateProperty.all(AppConfig.white),
       ),
     );
-  }
+  }*/
 }
-
-/*Widget sdfcsdfsd(customerLNBill, llllList){
-  return Container(
-    child: Row(
-      children: [
-        Text("نگ"),
-        Flexible(
-          child: AttributeSection( itemList: ["رنگ","حجم",],
-            selectedValue: "رنگ",
-            onTextChange:  (value) => customerLNBill = value,
-            key1: 'انتخاب ویژگی موجود', buildAttRowList:llllList,),
-        ),
-      ],
-    ),
-  );
-}*/
-
 
 class AttributeSection extends StatefulWidget {
   final String key1;
@@ -338,106 +277,180 @@ class _AttributeSectionState extends State<AttributeSection> {
     return BlocBuilder<AddProductBloc, AddProductState>(
       builder: (context, state) {
         // ✅ ۱. لیست‌هایی که از بلاک می‌گیریم
-        final available = state.availableAttributes.toSet().toList(); // یکتا
+        final available = state.availableAttributes.toSet().toList();
         final selected = state.selectedAttributes;
+        final isSimpleProduct = state.isSimpleProduct;
 
-        return Container(
-          padding: EdgeInsets.all(AppConfig.calHeight(context, 2)),
-          width: double.infinity,
-          height: AppConfig.calHeight(context, 20),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white),
-            borderRadius: BorderRadius.all(
-              Radius.circular(AppConfig.calBorderRadiusSize(context)),
-            ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: w * 0.4,
-                    child: Text(
-                      widget.key1,
-                      style: TextStyle(
-                        color: AppConfig.white,
-                        fontSize: AppConfig.calFontSize(context, 3),
-                      ),
-                    ),
+        return !isSimpleProduct
+            ? Container(
+                padding: EdgeInsets.all(AppConfig.calHeight(context, 2)),
+                width: double.infinity,
+                height: AppConfig.calHeight(context, 20),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(AppConfig.calBorderRadiusSize(context)),
                   ),
-                  Expanded(
-                    child: SizedBox(
-                      height: h * 0.045,
-                      child: DropdownButtonFormField2<String>(
-                        // ✅ ۲. کلید پویا تا dropdown بعد از هر انتخاب ریست بشه
-                        key: ValueKey(available.join(',')),
-                        isExpanded: true,
-                        value: null, // ✅ ۳. همیشه null، چون بعد از انتخاب می‌خوایم خالی شه
-                        hint: const Text('Choose'),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          filled: true,
-                          fillColor: const Color(0xffededed),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: w * 0.01,
-                            horizontal: w * 0.01,
-                          ),
-                          enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(width: 0.5),
-                          ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(width: 1),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(w * 0.01),
-                          ),
-                        ),
-                        items: available
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                fontSize:
-                                AppConfig.calFontSize(context, 3),
-                              ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: w * 0.4,
+                          child: Text(
+                            "ویژگی",
+                            style: TextStyle(
+                              color: AppConfig.white,
+                              fontSize: AppConfig.calFontSize(context, 3),
                             ),
                           ),
-                        )
-                            .toList(),
-                        onChanged: (value) {
-                          if (value == null) return;
+                        ),
+                        Expanded(
+                          child: SizedBox(
+                            height: h * 0.045,
+                            child: DropdownButtonFormField2<String>(
+                              // ✅ ۲. کلید پویا تا dropdown بعد از هر انتخاب ریست بشه
+                              key: ValueKey(available.join(',')),
+                              isExpanded: true,
+                              value: null,
+                              // ✅ ۳. همیشه null، چون بعد از انتخاب می‌خوایم خالی شه
+                              hint: const Text('انتخاب کنید'),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                filled: true,
+                                fillColor: const Color(0xffededed),
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: w * 0.01,
+                                  horizontal: w * 0.01,
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(width: 0.5),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(width: 1),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(w * 0.01),
+                                ),
+                              ),
+                              items: available
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item.name,
+                                      child: Text(
+                                        item.name,
+                                        style: TextStyle(
+                                          fontSize:
+                                              AppConfig.calFontSize(context, 3),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value == null) return;
+                                Attribute attr = available.firstWhere(
+                                  (test) => test.name == value,
+                                  orElse: () =>
+                                      throw Exception("Attribute not found"),
+                                );
+                                context
+                                    .read<AddProductBloc>()
+                                    .add(SelectAttribute(attr));
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
-                          // به بلاک بگو این یکی انتخاب شد
-                          context
-                              .read<AddProductBloc>()
-                              .add(SelectAttribute(value));
+                    const SizedBox(height: 8),
+
+                    // ✅ لیست انتخاب‌شده‌ها
+                    Container(
+                      //  color: Colors.red,
+                      height: h * 0.1,
+                      width: w * 0.8,
+                      child: ListView.builder(
+                        itemCount: selected.length,
+                        itemBuilder: (context, index) {
+                          final item = selected[index];
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.name,
+                                style: TextStyle(color: AppConfig.white),
+                              ),
+                              SizedBox(
+                                height: h * 0.045,
+                                width: w * 0.3,
+                                child: DropdownButtonFormField2<String>(
+                                  // ✅ ۲. کلید پویا تا dropdown بعد از هر انتخاب ریست بشه
+                                  key: ValueKey(selected.join(',')),
+                                  isExpanded: true,
+                                  value: null,
+                                  // ✅ ۳. همیشه null، چون بعد از انتخاب می‌خوایم خالی شه
+                                  hint: const Text('انتخاب کنید'),
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    filled: true,
+                                    fillColor: const Color(0xffededed),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: w * 0.01,
+                                      horizontal: w * 0.01,
+                                    ),
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(width: 0.5),
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(width: 1),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(w * 0.01),
+                                    ),
+                                  ),
+                                  items: selected[index]
+                                      .terms
+                                      .map(
+                                        (item) => DropdownMenuItem<String>(
+                                          value: item.name,
+                                          child: Text(
+                                            item.name,
+                                            style: TextStyle(
+                                              fontSize: AppConfig.calFontSize(
+                                                  context, 3),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value == null) return;
+
+                                  /*  final Attribute attr = selected.firstWhere(
+                                      (test) => test.name == value,
+                                      orElse: () => throw Exception(
+                                          "Attribute not found"),
+                                    );
+
+                                    context
+                                        .read<AddProductBloc>()
+                                        .add(SelectAttribute(attr));*/
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
                         },
                       ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              // ✅ لیست انتخاب‌شده‌ها
-              Expanded(
-                child: ListView.builder(
-                  itemCount: selected.length,
-                  itemBuilder: (context, index) {
-                    final item = selected[index];
-                    return Text(
-                      item,
-                      style: TextStyle(color: AppConfig.white),
-                    );
-                  },
+                  ],
                 ),
-              ),
-            ],
-          ),
-        );
+              )
+            : SizedBox.shrink();
       },
     );
   }
@@ -449,15 +462,16 @@ class AppDropdown<T> extends StatefulWidget {
   final String label; // مثلا: "دسته‌بندی" یا "برند"
   final String Function(T) getLabel; // بگه از این مدل چی نشون بدم
   final void Function(T) onChanged;
+  final bool isShouldHalf;
 
-  const AppDropdown({
-    super.key,
-    required this.items,
-    required this.getLabel,
-    required this.onChanged,
-    required this.label,
-    this.initialValue,
-  });
+  const AppDropdown(
+      {super.key,
+      required this.items,
+      required this.getLabel,
+      required this.onChanged,
+      required this.label,
+      this.initialValue,
+      this.isShouldHalf = false});
 
   @override
   State<AppDropdown<T>> createState() => _AppDropdownState<T>();
@@ -469,7 +483,8 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
   @override
   void initState() {
     super.initState();
-    _selected = widget.initialValue ?? (widget.items.isNotEmpty ? widget.items.first : null);
+    _selected = widget.initialValue ??
+        (widget.items.isNotEmpty ? widget.items.first : null);
   }
 
   @override
@@ -480,12 +495,15 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          widget.label,
-          style: TextStyle(color: AppConfig.white),
-        ),
+        !widget.isShouldHalf
+            ? Text(
+                widget.label,
+                style: TextStyle(color: AppConfig.white),
+              )
+            : SizedBox.shrink(),
         SizedBox(
           height: h * 0.05,
+          width: widget.isShouldHalf ? w / 3 : w,
           child: DropdownButtonFormField2<T>(
             isExpanded: true,
             value: _selected,
@@ -493,7 +511,8 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
               isDense: true,
               filled: true,
               fillColor: const Color(0xffededed),
-              contentPadding: EdgeInsets.symmetric(vertical: w * 0.02, horizontal: 8),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: w * 0.02, horizontal: 8),
               enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(width: 0.5),
               ),
@@ -505,15 +524,15 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
             items: widget.items
                 .map(
                   (item) => DropdownMenuItem<T>(
-                value: item,
-                child: Text(
-                  widget.getLabel(item),
-                  style: TextStyle(
-                    fontSize: AppConfig.calFontSize(context, 4),
+                    value: item,
+                    child: Text(
+                      widget.getLabel(item),
+                      style: TextStyle(
+                        fontSize: AppConfig.calFontSize(context, 4),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            )
+                )
                 .toList(),
             onChanged: (value) {
               if (value == null) return;
@@ -528,5 +547,3 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
     );
   }
 }
-
-

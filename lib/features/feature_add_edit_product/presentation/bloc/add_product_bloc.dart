@@ -29,17 +29,16 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
           AddProductState(
             addProductStatus: AddProductsDataLoading(),
             featuredImage: null,
-              allAttributes: const [],
-              availableAttributes: const ["dffdf","dffddfdf","qwqwwqqw"],
-              selectedAttributes: const [],
-
+            allAttributes: const [],
+            availableAttributes: const [],
+            selectedAttributes: const [],
           ),
         ) {
     on<AddProductsDataLoad>((event, emit) async {
       emit(state.copyWith(newAddProductStatus: AddProductsDataLoading()));
 
       final AddProductDataState result =
-      await addProductGetDataNeededUseCase(InfParams("", false, "", false));
+          await addProductGetDataNeededUseCase(InfParams("", false, "", false));
       if (result is AddProductDataSuccess) {
         try {
           final model = AddProductDataModel.fromJson(
@@ -59,32 +58,33 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       } else {
         emit(state.copyWith(newAddProductStatus: AddProductsDataError()));
       }
-
     });
-
 
     on<PickImageFromGalleryRequested>((event, emit) async {
       emit(state.copyWith(newIsPickingImage: true, newImageError: null));
       try {
         final x = await _picker.pickImage(source: ImageSource.gallery);
-        if (x == null) { emit(state.copyWith(newIsPickingImage: false)); return; }
+        if (x == null) {
+          emit(state.copyWith(newIsPickingImage: false));
+          return;
+        }
         emit(state.copyWith(
           newIsPickingImage: false,
           newImageFile: File(x.path),
         ));
       } catch (e) {
-        emit(state.copyWith(newIsPickingImage: false, newImageError: e.toString()));
+        emit(state.copyWith(
+            newIsPickingImage: false, newImageError: e.toString()));
       }
     });
-    
-    on<ClearPickedImage>((event, emit){
+
+    on<ClearPickedImage>((event, emit) {
       print("ClearPickedImage");
       emit(state.copyWith(
         clearImageFile: true,
         newIsPickingImage: false,
         newImageFile: null,
-      ));     // print("ClearPickedImage");
-
+      )); // print("ClearPickedImage");
     });
 
     on<PickGalleryRequested>((event, emit) async {
@@ -108,7 +108,8 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
           appendGallery: true, // تصاویر جدید به انتها اضافه شوند
         ));
       } catch (e) {
-        emit(state.copyWith(newIsPickingGallery: false, newImageError: e.toString()));
+        emit(state.copyWith(
+            newIsPickingGallery: false, newImageError: e.toString()));
       }
     });
 
@@ -121,12 +122,14 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
     });
 
     on<ClearGalleryRequested>((event, emit) {
-      emit(state.copyWith(galleryImages: [],));
+      emit(state.copyWith(
+        galleryImages: [],
+      ));
     });
 
     on<SelectAttribute>((event, emit) {
-      final selected = List<String>.from(state.selectedAttributes);
-      final available = List<String>.from(state.availableAttributes);
+      final selected = List<Attribute>.from(state.selectedAttributes);
+      final available = List<Attribute>.from(state.availableAttributes);
 
       // از لیست قابل‌انتخاب‌ها حذفش کن
       available.remove(event.value);
@@ -140,6 +143,28 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       ));
     });
 
+    on<AddAttribute>((event, emit) {
+      final selected = List<Attribute>.from(state.selectedAttributes);
+      final available = List<Attribute>.from(state.availableAttributes);
+
+      if (event.attribute.isNotEmpty) {
+        available.clear();
+        for (final attr in event.attribute) {
+          available.add(attr);
+        }
+      }
+
+      emit(state.copyWith(
+        newAvailableAttributes: available,
+        newSelectedAttributes: selected,
+      ));
+    });
+
+    on<SetTypeOfProduct>((event, emit) {
+      emit(state.copyWith(
+        newIsSimpleProduct: event.isSimpleProduct
+      ));
+    });
 
 /*
     on<UploadGalleryRequested>((event, emit) async {
@@ -181,7 +206,6 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
     });
 */
-
 
 /*
      on<UploadPickedImageRequested>((event, emit) async {
