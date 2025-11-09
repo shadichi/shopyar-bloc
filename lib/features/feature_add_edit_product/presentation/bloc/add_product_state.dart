@@ -25,6 +25,8 @@ class AddProductState extends Equatable {
   final List<String> allAttributes;
   final List<Attribute> availableAttributes;
   final List<Attribute> selectedAttributes;
+  final Map<String, Set<String>> selectedTerms;
+
 
   const AddProductState({
     required this.addProductStatus,
@@ -40,7 +42,8 @@ class AddProductState extends Equatable {
      this.allAttributes = const [],
      this.availableAttributes= const [],
      this.selectedAttributes= const [],
-    this.isSimpleProduct = true
+    this.isSimpleProduct = true,
+    required this.selectedTerms,
   });
 
   AddProductState copyWith({
@@ -63,6 +66,8 @@ class AddProductState extends Equatable {
     List<Attribute>? newAvailableAttributes,
     List<Attribute>? newSelectedAttributes,
     bool? newIsSimpleProduct,
+    Map<String, Set<String>>? newSelectedTerms,
+
   }) {
     // محاسبه‌ی featuredImage با احترام به clearImageFile
     final File? nextFeatured =
@@ -94,6 +99,8 @@ class AddProductState extends Equatable {
       availableAttributes: newAvailableAttributes ?? this.availableAttributes,
       selectedAttributes: newSelectedAttributes ?? this.selectedAttributes,
       isSimpleProduct: newIsSimpleProduct ?? this.isSimpleProduct,
+      selectedTerms: newSelectedTerms ?? selectedTerms,
+
     );
   }
 
@@ -112,6 +119,7 @@ class AddProductState extends Equatable {
     allAttributes,
     availableAttributes,
     selectedAttributes,
-    isSimpleProduct
+    isSimpleProduct,
+    selectedTerms
   ];
 }

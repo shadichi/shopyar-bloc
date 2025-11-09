@@ -37,5 +37,17 @@ class SetTypeOfProduct extends AddProductEvent {
   final bool isSimpleProduct;
   SetTypeOfProduct(this.isSimpleProduct);
 }
+class ToggleTerm extends AddProductEvent{
+  final String attributeName;
+  final bool selected;
+  final String termSlug; // ← اسم را termSlug بگذار
+  ToggleTerm(this.attributeName, this.termSlug, this.selected);
+}
+
+
+class RemoveSelectedAttribute extends AddProductEvent{
+  final Attribute attribute;
+  RemoveSelectedAttribute(this.attribute);
+}
 
 

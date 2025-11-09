@@ -32,6 +32,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
             allAttributes: const [],
             availableAttributes: const [],
             selectedAttributes: const [],
+            selectedTerms: {}
           ),
         ) {
     on<AddProductsDataLoad>((event, emit) async {
@@ -131,29 +132,27 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       final selected = List<Attribute>.from(state.selectedAttributes);
       final available = List<Attribute>.from(state.availableAttributes);
 
-      // از لیست قابل‌انتخاب‌ها حذفش کن
-      available.remove(event.value);
+      available.removeWhere((a) => a.name == event.value.name);
+      if (!selected.any((a) => a.name == event.value.name)) selected.add(event.value);
 
-      // به لیست انتخاب‌شده‌ها اضافه کن
-      selected.add(event.value);
+      final terms = Map<String, Set<String>>.from(state.selectedTerms);
+      terms.putIfAbsent(event.value.name, () => <String>{});
 
       emit(state.copyWith(
         newAvailableAttributes: available,
         newSelectedAttributes: selected,
+        newSelectedTerms: terms,
       ));
     });
 
+
+
     on<AddAttribute>((event, emit) {
       final selected = List<Attribute>.from(state.selectedAttributes);
-      final available = List<Attribute>.from(state.availableAttributes);
-
+      final available = <Attribute>[];
       if (event.attribute.isNotEmpty) {
-        available.clear();
-        for (final attr in event.attribute) {
-          available.add(attr);
-        }
+        available.addAll(event.attribute);
       }
-
       emit(state.copyWith(
         newAvailableAttributes: available,
         newSelectedAttributes: selected,
@@ -161,10 +160,51 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
     });
 
     on<SetTypeOfProduct>((event, emit) {
+      // اگر ساده شد: همه چیز مرتبط با متغیرها را ریست کن
+      if (event.isSimpleProduct) {
+        emit(state.copyWith(
+          newIsSimpleProduct: true,
+          newSelectedAttributes: <Attribute>[],
+          newAvailableAttributes: state.availableAttributes, // یا دوباره از منبع پر کن
+          newSelectedTerms: <String, Set<String>>{},
+        ));
+      } else {
+        emit(state.copyWith(newIsSimpleProduct: false));
+      }
+    });
+
+    on<ToggleTerm>((event, emit) {
+      final map = Map<String, Set<String>>.from(state.selectedTerms);
+      final current = map[event.attributeName] ?? <String>{};
+      final newSet = Set<String>.from(current); // ← کپی عمیق
+
+      if (event.selected) newSet.add(event.termSlug);
+      else newSet.remove(event.termSlug);
+
+      map[event.attributeName] = newSet;        // ← جایگزینی کامل
+      emit(state.copyWith(newSelectedTerms: map));
+    });
+
+    on<RemoveSelectedAttribute>((event, emit) {
+      final selected = List<Attribute>.from(state.selectedAttributes);
+      final available = List<Attribute>.from(state.availableAttributes);
+
+      selected.removeWhere((a) => a.name == event.attribute.name);
+      if (!available.any((a) => a.name == event.attribute.name)) {
+        available.add(event.attribute);
+      }
+
+      final terms = Map<String, Set<String>>.from(state.selectedTerms);
+      terms.remove(event.attribute.name);
+
       emit(state.copyWith(
-        newIsSimpleProduct: event.isSimpleProduct
+        newSelectedAttributes: selected,
+        newAvailableAttributes: available,
+        newSelectedTerms: terms,
       ));
     });
+
+
 
 /*
     on<UploadGalleryRequested>((event, emit) async {

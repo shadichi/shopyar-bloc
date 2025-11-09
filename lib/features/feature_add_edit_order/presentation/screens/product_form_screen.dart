@@ -90,11 +90,10 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
   @override
   void initState() {
     super.initState();
-    // 1) همیشه cart قبلی رو صفر کن
+    // clear cart
     context.read<AddOrderBloc>().add(ClearCart());
-    // 2) محصولات رو لود کن
+    // load product
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
-    // 3) Hydrate فقط بعد از ProductsLoaded و فقط یک بار (در listener)
   }
 
   final TextEditingController controller = TextEditingController();
@@ -108,7 +107,6 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
   final TextEditingController step1PhoneBill = TextEditingController();
   final TextEditingController step1ShipPrice = TextEditingController();
 
-  // خط کمکی برای مشتق‌کردن LineItem از state (بدون setState)
   List<LineItem> _deriveLineItemsFromState(AddOrderState s) {
     if (s.addOrderCardProductStatus is AddOrderCardProductLoaded) {
       final cart =

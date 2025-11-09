@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
@@ -28,9 +30,52 @@ class _AddProductProductFormScreenState
     super.initState();
     context.read<AddProductBloc>().add(AddProductsDataLoad());
   }
+  final TextEditingController productName = TextEditingController();
+  final TextEditingController shortExplanation = TextEditingController();
+  final TextEditingController explanation = TextEditingController();
+  final TextEditingController price = TextEditingController();
+  final TextEditingController commissionPrice = TextEditingController();
+  final TextEditingController sku = TextEditingController();
+
+  File? imageFile;
+  List<File> galleryImages = [];
+
+  String productNameValue = '';
+  String shortExplanationValue = '';
+  String explanationValue = '';
+  String priceValue = '';
+  String commissionPriceValue = '';
+  String skuValue = '';
 
   @override
   Widget build(BuildContext context) {
+    final List<TextEditingController> textEditing = [
+      productName,
+      shortExplanation,
+      explanation,
+      price,
+      commissionPrice,
+      sku,
+    ];
+
+    final List<Function(String)> onTextChange = [
+          (value) => productNameValue = value,
+          (value) => shortExplanationValue = value,
+          (value) => explanationValue = value,
+          (value) => priceValue = value,
+          (value) => commissionPriceValue = value,
+          (value) => skuValue = value,
+    ];
+
+    void onFeaturedImageChanged(File? f) {
+      setState(() => imageFile = f);
+    }
+
+    void onGalleryChanged(List<File> files) {
+      setState(() => galleryImages = files);
+    }
+
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return BlocConsumer<AddProductBloc, AddProductState>(
@@ -76,7 +121,7 @@ class _AddProductProductFormScreenState
                       key: ValueKey<int>(activeStep),
                       //width: 500,
                       padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                      child: _buildSection(data),
+                      child: _buildSection(data,onTextChange,textEditing, onFeaturedImageChanged ,onGalleryChanged),
                     ),
                   ),
                 ),
@@ -194,13 +239,21 @@ class _AddProductProductFormScreenState
     );
   }
 
-  Widget _buildSection(AddProductDataModel addProductDataModel
+  Widget _buildSection(AddProductDataModel addProductDataModel,List<Function(String)> onTextChange,textEditing, onFeaturedImageChanged, onGalleryChanged
      /* List<Function(String)> onTextChange,
       List<TextEditingController> textEditing,*/
       ) {
     switch (activeStep) {
       case 0:
-        return AddProductBill(_formKey);
+        return AddProductBill(
+          onTextChange,
+          textEditing,
+          _formKey,
+          imageFile,            // File?
+          galleryImages,        // List<File>
+          onFeaturedImageChanged,
+          onGalleryChanged,
+        );
 
       case 1:
         return AddProductBillAdditional(addProductDataModel);
@@ -225,6 +278,9 @@ class _AddProductProductFormScreenState
             activeStep = 0;
           }
         });
+         /* print('galleryImages');
+          print(galleryImages);
+          print(imageFile);*/
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConfig.secondaryColor,

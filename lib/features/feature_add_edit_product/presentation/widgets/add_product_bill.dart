@@ -12,8 +12,23 @@ import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_
 
 class AddProductBill extends StatefulWidget {
   final GlobalKey<FormState> formKey;
+  final List<Function(String)> onTextChange;
+  final List<TextEditingController> textEditing;
 
-  AddProductBill(this.formKey);
+  final File? featuredImage;                 // نال‌ابل
+  final List<File> galleryImages;
+
+  final ValueChanged<File?> onFeaturedChange;    // ← کال‌بک واضح
+  final ValueChanged<List<File>> onGalleryChange;
+  AddProductBill(
+      this.onTextChange,
+      this.textEditing,
+      this.formKey,
+      this.featuredImage,
+      this.galleryImages,
+      this.onFeaturedChange,
+      this.onGalleryChange,
+      );
 
   @override
   State<AddProductBill> createState() => _AddProductBillState();
@@ -25,11 +40,12 @@ class _AddProductBillState extends State<AddProductBill> {
     super.initState();
   }
 
-  TextEditingController controller = TextEditingController();
+  //TextEditingController controller = TextEditingController();
 
   int activeStep = 0;
   final _picker = ImagePicker();
   String indexImagePath = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +95,12 @@ class _AddProductBillState extends State<AddProductBill> {
                 ),
                 BlocBuilder<AddProductBloc, AddProductState>(
                     builder: (context, state) {
-                  final stateImageFile = state.featuredImage;
-                  print("statestate");
-                  print(state);
-                  print(stateImageFile);
+                      final File? stateImageFile = state.featuredImage;
+
+                      // 🔔 به والد خبر بده
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.onFeaturedChange(stateImageFile);
+                      });
                   return stateImageFile == null
                       ? Container(
                           width: double.infinity,
@@ -100,7 +118,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                 context
                                     .read<AddProductBloc>()
                                     .add(PickImageFromGalleryRequested());
-                              })),
+                                  })),
                         )
                       : Container(
                           width: double.infinity,
@@ -149,13 +167,6 @@ class _AddProductBillState extends State<AddProductBill> {
                               ),
                             ],
                           ));
-                  return Container(
-                    width: double.infinity,
-                    // عرض نهایی
-                    height: AppConfig.calHeight(context, 20),
-                    // ارتفاع ثابت دلخواه
-                    color: Colors.red,
-                  );
                 }),
                 Container(
                   child: Text("گالری تصاویر",
@@ -166,7 +177,10 @@ class _AddProductBillState extends State<AddProductBill> {
                 ),
                 BlocBuilder<AddProductBloc, AddProductState>(
                     builder: (context, state) {
-                  final List<File> galleryImages = state.galleryImages;
+                      final List<File> galleryImages = state.galleryImages;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        widget.onGalleryChange(galleryImages);
+                      });
                   return galleryImages.isNotEmpty
                       ? Container(
                           width: double.infinity,
@@ -291,33 +305,33 @@ class _AddProductBillState extends State<AddProductBill> {
         return Column(
           children: [
             textField(
-              controller,
+              widget.textEditing[0],
               'نام محصول',
               context,
-              onChanged: (String value) {},
+              onChanged: widget.onTextChange[0],
              //   isNec: true
             ),
-            textField(controller, 'توضیح کوتاه', context,
-                onChanged: (String value) {},),
-            textField(controller, 'توضیح', context,
-                onChanged: (String value) {}, isLongExpression: true),
+            textField( widget.textEditing[1], 'توضیح کوتاه', context,
+                onChanged: widget.onTextChange[1]),
+            textField(widget.textEditing[2], 'توضیح', context,
+                onChanged: widget.onTextChange[2], isLongExpression: true),
             textField(
-              controller,
+              widget.textEditing[3],
               'قیمت',
               context,
-              onChanged: (String value) {},
+              onChanged: widget.onTextChange[3],
             ),
             textField(
-              controller,
+              widget.textEditing[4],
               'قیمت کمیسیون',
               context,
-              onChanged: (String value) {},
+              onChanged: widget.onTextChange[4],
             ),
             textField(
-              controller,
+              widget.textEditing[5],
               'sku',
               context,
-              onChanged: (String value) {},
+              onChanged: widget.onTextChange[5],
 
             ),
           ],
@@ -325,7 +339,7 @@ class _AddProductBillState extends State<AddProductBill> {
 
       case 1:
         return textField(
-          controller,
+          widget.textEditing[0],
           'نام',
           context,
           onChanged: (String value) {},
@@ -335,8 +349,6 @@ class _AddProductBillState extends State<AddProductBill> {
         return const SizedBox.shrink();
     }
   }
-
-
 
   Widget textField(
       TextEditingController controller, String hintText, BuildContext context,
