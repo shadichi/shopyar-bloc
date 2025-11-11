@@ -30,12 +30,14 @@ class _AddProductProductFormScreenState
     super.initState();
     context.read<AddProductBloc>().add(AddProductsDataLoad());
   }
+
   final TextEditingController productName = TextEditingController();
   final TextEditingController shortExplanation = TextEditingController();
   final TextEditingController explanation = TextEditingController();
   final TextEditingController price = TextEditingController();
   final TextEditingController commissionPrice = TextEditingController();
   final TextEditingController sku = TextEditingController();
+
 
   File? imageFile;
   List<File> galleryImages = [];
@@ -47,9 +49,16 @@ class _AddProductProductFormScreenState
   String commissionPriceValue = '';
   String skuValue = '';
 
+  String productTypeValue = '';
+  String productCatValue = '';
+  String productBrandValue = '';
+  String productStatValue = '';
+  String productCountValue = '';
+  Map<String, String> attributesValue = {};
+
   @override
   Widget build(BuildContext context) {
-    final List<TextEditingController> textEditing = [
+    final List<TextEditingController> addProductBillTextEditing = [
       productName,
       shortExplanation,
       explanation,
@@ -58,14 +67,25 @@ class _AddProductProductFormScreenState
       sku,
     ];
 
-    final List<Function(String)> onTextChange = [
-          (value) => productNameValue = value,
-          (value) => shortExplanationValue = value,
-          (value) => explanationValue = value,
-          (value) => priceValue = value,
-          (value) => commissionPriceValue = value,
-          (value) => skuValue = value,
+
+    final List<Function(String)> addProductBillOnTextChange = [
+      (value) => productNameValue = value,
+      (value) => shortExplanationValue = value,
+      (value) => explanationValue = value,
+      (value) => priceValue = value,
+      (value) => commissionPriceValue = value,
+      (value) => skuValue = value,
     ];
+
+    final List<Function(String)> addProductBillAddOnTextChange = [
+      (value) => productTypeValue = value,
+      (value) => productCatValue = value,
+      (value) => productBrandValue = value,
+      (value) => productStatValue = value,
+      (value) => productCountValue = value,
+    ];
+
+    final Function(Map<String, String>) attributeChooser = (value) => attributesValue = value;
 
     void onFeaturedImageChanged(File? f) {
       setState(() => imageFile = f);
@@ -74,7 +94,6 @@ class _AddProductProductFormScreenState
     void onGalleryChanged(List<File> files) {
       setState(() => galleryImages = files);
     }
-
 
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -121,7 +140,12 @@ class _AddProductProductFormScreenState
                       key: ValueKey<int>(activeStep),
                       //width: 500,
                       padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                      child: _buildSection(data,onTextChange,textEditing, onFeaturedImageChanged ,onGalleryChanged),
+                      child: _buildSection(
+                          data,
+                          addProductBillOnTextChange,
+                          addProductBillTextEditing,
+                          onFeaturedImageChanged,
+                          onGalleryChanged, addProductBillAddOnTextChange, attributeChooser),
                     ),
                   ),
                 ),
@@ -239,24 +263,32 @@ class _AddProductProductFormScreenState
     );
   }
 
-  Widget _buildSection(AddProductDataModel addProductDataModel,List<Function(String)> onTextChange,textEditing, onFeaturedImageChanged, onGalleryChanged
-     /* List<Function(String)> onTextChange,
-      List<TextEditingController> textEditing,*/
+  Widget _buildSection(
+      AddProductDataModel addProductDataModel,
+      List<Function(String)> addProductBillOnTextChange,
+      addProductBillTextEditing,
+      onFeaturedImageChanged,
+      onGalleryChanged,
+      List<Function(String)> addProductBillAddOnTextChange,
+      Function(Map<String, String>) attributeChooser
+
       ) {
     switch (activeStep) {
       case 0:
         return AddProductBill(
-          onTextChange,
-          textEditing,
+          addProductBillOnTextChange,
+          addProductBillTextEditing,
           _formKey,
-          imageFile,            // File?
-          galleryImages,        // List<File>
+          imageFile,
+          // File?
+          galleryImages,
+          // List<File>
           onFeaturedImageChanged,
           onGalleryChanged,
         );
 
       case 1:
-        return AddProductBillAdditional(addProductDataModel);
+        return AddProductBillAdditional(addProductDataModel, addProductBillAddOnTextChange, attributeChooser);
 
       default:
         return const SizedBox.shrink();
@@ -269,16 +301,23 @@ class _AddProductProductFormScreenState
       width: AppConfig.calWidth(context, 31),
       child: ElevatedButton(
         onPressed: () {
-        setState(() {
-          if (activeStep == 0){
-           if(_formKey.currentState!.validate()){
-             activeStep ++;
-           }
-          }else{
-            activeStep = 0;
-          }
-        });
-         /* print('galleryImages');
+          setState(() {
+            if (activeStep == 0) {
+              if (_formKey.currentState!.validate()) {
+                activeStep++;
+              }
+            } else if(activeStep == 1){
+              print(productTypeValue);
+              print(productCatValue);
+              print(productBrandValue);
+              print(productStatValue);
+              print(productCountValue);
+              print(attributesValue);
+            }/*else {
+              activeStep = 0;
+            }*/
+          });
+          /* print('galleryImages');
           print(galleryImages);
           print(imageFile);*/
         },
@@ -288,9 +327,7 @@ class _AddProductProductFormScreenState
               borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
         child: Text(
-          activeStep == 1
-              ?  'ثبت'
-              : 'بعدی',
+          activeStep == 1 ? 'ثبت' : 'بعدی',
           style: TextStyle(
               color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
           textAlign: TextAlign.center,

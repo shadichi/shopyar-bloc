@@ -13,8 +13,10 @@ import '../../data/models/add_order_data_model.dart';
 
 class AddProductBillAdditional extends StatefulWidget {
   AddProductDataModel addProductDataModel;
+  final List<Function(String)> onTextChange;
+  final Function(Map<String, String>) attributeChooser;
 
-  AddProductBillAdditional(this.addProductDataModel);
+  AddProductBillAdditional(this.addProductDataModel, this.onTextChange, this.attributeChooser);
 
   @override
   State<AddProductBillAdditional> createState() =>
@@ -45,7 +47,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
   // === Helpers (بالای فایل، بعد از importها) ===
   String nameBySlug(Attribute attr, String slug) {
     final m = attr.terms.firstWhere(
-          (b) => b.slug == slug,
+      (b) => b.slug == slug,
       orElse: () => Brand(id: -1, name: slug, slug: slug),
     );
     return m.name;
@@ -53,12 +55,11 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
 
   String slugByName(Attribute attr, String name) {
     final m = attr.terms.firstWhere(
-          (b) => b.name == name,
+      (b) => b.name == name,
       orElse: () => Brand(id: -1, name: name, slug: name),
     );
     return m.slug;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +126,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
                 context
                     .read<AddProductBloc>()
                     .add(SetTypeOfProduct(isSimplProduct));
-                // اینجا میتونی توی bloc بفرستی
+                widget.onTextChange[0](c);
               },
             ),
 
@@ -138,7 +139,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               getLabel: (c) => c.name,
               onChanged: (c) {
                 print('category picked: ${c.id} - ${c.name}');
-                // اینجا میتونی توی bloc بفرستی
+                widget.onTextChange[1](c.id.toString());
               },
             ),
             AppDropdown<Brand>(
@@ -147,21 +148,22 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               getLabel: (b) => b.name,
               onChanged: (b) {
                 print('brand picked: ${b.id}');
+                widget.onTextChange[2](b.id.toString());
               },
             ),
-            AppDropdown<Attribute>(
-              items: widget.addProductDataModel.attributes,
-              label: 'ویژگی',
-              getLabel: (a) => a.name,
-              onChanged: (a) {
-                // اگه خواستی بعدش terms اون attribute رو هم یه dropdown دیگه نشون بده
-              },
-            ), AppDropdown<String>(
+
+            AppDropdown<String>(
               items: productStatusList,
               label: 'وضعیت',
               getLabel: (a) => a,
               onChanged: (a) {
-                // اگه خواستی بعدش terms اون attribute رو هم یه dropdown دیگه نشون بده
+                print('brand picked: ${a}');
+                if(a == 'موجود'){
+                  widget.onTextChange[3]("in_stock");
+                }else{
+                  widget.onTextChange[3]("outofstock");
+                }
+
               },
             ),
             SizedBox(
@@ -171,10 +173,13 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               controller,
               'موجودی',
               context,
-              onChanged: (String value) {},
-              //   isNec: true
+              onChanged: (String value) {
+                print('brand picked: $value');
+                widget.onTextChange[4](value.toString());
+              },
+
             ),
-           // checkBoxs()
+            // checkBoxs()
           ],
         );
 
@@ -288,7 +293,7 @@ class _AttributeSectionState extends State<AttributeSection> {
   // === Helpers (بالای فایل، بعد از importها) ===
   String nameBySlug(Attribute attr, String slug) {
     final m = attr.terms.firstWhere(
-          (b) => b.slug == slug,
+      (b) => b.slug == slug,
       orElse: () => Brand(id: -1, name: slug, slug: slug),
     );
     return m.name;
@@ -296,7 +301,7 @@ class _AttributeSectionState extends State<AttributeSection> {
 
   String slugByName(Attribute attr, String name) {
     final m = attr.terms.firstWhere(
-          (b) => b.name == name,
+      (b) => b.name == name,
       orElse: () => Brand(id: -1, name: name, slug: name),
     );
     return m.slug;
@@ -314,11 +319,10 @@ class _AttributeSectionState extends State<AttributeSection> {
 
         // ➊ ویژگی‌های قابل افزودن (available) و انتخاب‌شده (selected)
         final available = state.availableAttributes.toSet().toList();
-        final selected  = state.selectedAttributes;
+        final selected = state.selectedAttributes;
 
         return Container(
           width: double.infinity,
-
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -344,20 +348,23 @@ class _AttributeSectionState extends State<AttributeSection> {
                 children: [
                   Expanded(
                     child: // ➌ DROPDOWN افزودن ویژگی از available
-                    AppDropdown<Attribute>(
-                      key: ValueKey('add-attr-${available.map((e) => e.name).join(',')}'),
+                        AppDropdown<Attribute>(
+                      key: ValueKey(
+                          'add-attr-${available.map((e) => e.name).join(',')}'),
                       items: available,
                       label: 'افزودن ویژگی',
                       getLabel: (a) => a.name,
                       onChanged: (picked) {
-                        context.read<AddProductBloc>().add(SelectAttribute(picked));
+                        context
+                            .read<AddProductBloc>()
+                            .add(SelectAttribute(picked));
                       },
                     ),
-
                   ),
                   const SizedBox(width: 8),
                   const Tooltip(
-                    message: 'از لیست یک ویژگی انتخاب کنید تا به پایین اضافه شود',
+                    message:
+                        'از لیست یک ویژگی انتخاب کنید تا به پایین اضافه شود',
                     child: Icon(Icons.add_circle_outline, size: 18),
                   ),
                 ],
@@ -370,7 +377,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                 _EmptyHint(
                   width: w,
                   text:
-                  'هیچ ویژگی‌ای انتخاب نشده است.\nاز بالا یک ویژگی انتخاب کنید تا مقادیر آن را تعیین کنید.',
+                      'هیچ ویژگی‌ای انتخاب نشده است.\nاز بالا یک ویژگی انتخاب کنید تا مقادیر آن را تعیین کنید.',
                 ),
 
               // ➎ لیست ویژگی‌های انتخاب‌شده + چیپ‌های انتخاب/حذف مقدارها
@@ -387,20 +394,23 @@ class _AttributeSectionState extends State<AttributeSection> {
                       final allSlugs = attr.terms.map((b) => b.slug).toList();
 
                       // ستِ انتخاب‌شده‌ها از state (بر اساس slug)
-                      final chosen = state.selectedTerms[attr.name] ?? <String>{};
-
+                      final chosen =
+                          state.selectedTerms[attr.name] ?? <String>{};
 
                       print("chosen:");
                       print(chosen);
 
                       // نمایش نام‌ها برای چیپ‌ها
-                      final chosenNames = chosen.map((slug) => nameBySlug(attr, slug)).toList();
+                      final chosenNames =
+                          chosen.map((slug) => nameBySlug(attr, slug)).toList();
 
                       // باقی‌مانده‌ها برای افزودن (slug) + نام‌شان
-                      final remainingSlugs  =
-                      allSlugs.where((slug) => !chosen.contains(slug)).toList();
-                      final remainingNames  =
-                      remainingSlugs.map((slug) => nameBySlug(attr, slug)).toList();
+                      final remainingSlugs = allSlugs
+                          .where((slug) => !chosen.contains(slug))
+                          .toList();
+                      final remainingNames = remainingSlugs
+                          .map((slug) => nameBySlug(attr, slug))
+                          .toList();
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,8 +455,8 @@ class _AttributeSectionState extends State<AttributeSection> {
                                   onDeleted: () {
                                     // حذف فقط همین مقدار (slug)
                                     context.read<AddProductBloc>().add(
-                                      ToggleTerm(attr.name, slug, false),
-                                    );
+                                          ToggleTerm(attr.name, slug, false),
+                                        );
                                   },
                                 );
                               }).toList(),
@@ -470,10 +480,10 @@ class _AttributeSectionState extends State<AttributeSection> {
                                 return ActionChip(
                                   label: Text(name),
                                   onPressed: () {
-                                   print('addddd');
+                                    print('addddd');
                                     context.read<AddProductBloc>().add(
-                                      ToggleTerm(attr.name, slug, true),
-                                    );
+                                          ToggleTerm(attr.name, slug, true),
+                                        );
                                   },
                                 );
                               }).toList(),
@@ -525,7 +535,6 @@ class _EmptyHint extends StatelessWidget {
   }
 }
 
-
 /// Dropdown بالای سکشن برای "افزودن ویژگی"
 class _AddAttributeDropdown extends StatelessWidget {
   final List<Attribute> available;
@@ -548,7 +557,7 @@ class _AddAttributeDropdown extends StatelessWidget {
             hint: const Text('افزودن ویژگی'),
             items: available
                 .map((attr) =>
-                DropdownMenuItem(value: attr.name, child: Text(attr.name)))
+                    DropdownMenuItem(value: attr.name, child: Text(attr.name)))
                 .toList(),
             onChanged: (val) {
               if (val == null) return;
@@ -569,8 +578,8 @@ class _AddAttributeDropdown extends StatelessWidget {
 /// یک ردیف برای هر ویژگی انتخاب‌شده: عنوان + چیپ‌های Toggle + دکمه حذف کل ویژگی
 class _AttributeRow extends StatelessWidget {
   final String attributeName;
-  final List<String> allTerms;          // همه‌ی termها
-  final Set<String> chosenTerms;        // termهای انتخاب‌شده
+  final List<String> allTerms; // همه‌ی termها
+  final Set<String> chosenTerms; // termهای انتخاب‌شده
   final void Function(String termName, bool selected) onToggleTerm;
   final VoidCallback onRemoveAttribute;
 
@@ -586,10 +595,10 @@ class _AttributeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     // اگر دوست داری، می‌توانی چیپ‌های انتخاب‌شده را اول نشان دهی
     final sorted = [...allTerms]..sort((a, b) {
-      final aSel = chosenTerms.contains(a) ? 0 : 1;
-      final bSel = chosenTerms.contains(b) ? 0 : 1;
-      return aSel != bSel ? aSel - bSel : a.compareTo(b);
-    });
+        final aSel = chosenTerms.contains(a) ? 0 : 1;
+        final bSel = chosenTerms.contains(b) ? 0 : 1;
+        return aSel != bSel ? aSel - bSel : a.compareTo(b);
+      });
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
