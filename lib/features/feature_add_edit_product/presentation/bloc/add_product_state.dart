@@ -2,6 +2,7 @@ part of 'add_product_bloc.dart';
 
 class AddProductState extends Equatable {
   final AddProductStatus addProductStatus;
+  final SubmitProductStatus submitProductStatus;
 
   // feature image
   final File? featuredImage;
@@ -16,7 +17,7 @@ class AddProductState extends Equatable {
   final List<File> galleryImages;
   final bool isPickingGallery;
   final bool isUploadingGallery;
-  final bool isSimpleProduct;
+  final ProductType productType;
 
   // error
   final String? imageError;
@@ -30,6 +31,7 @@ class AddProductState extends Equatable {
 
   const AddProductState({
     required this.addProductStatus,
+    required this.submitProductStatus,
     this.featuredImage,
     this.galleryImages = const [],
     this.isPickingGallery = false,
@@ -42,12 +44,13 @@ class AddProductState extends Equatable {
      this.allAttributes = const [],
      this.availableAttributes= const [],
      this.selectedAttributes= const [],
-    this.isSimpleProduct = true,
+    this.productType = ProductType.simple,
     required this.selectedTerms,
   });
 
   AddProductState copyWith({
     AddProductStatus? newAddProductStatus,
+    SubmitProductStatus? newSubmitProductStatus,
     // feature image
     File? newImageFile,
     bool clearImageFile = false,
@@ -65,7 +68,7 @@ class AddProductState extends Equatable {
     List<String>? newAllAttributes,
     List<Attribute>? newAvailableAttributes,
     List<Attribute>? newSelectedAttributes,
-    bool? newIsSimpleProduct,
+    ProductType? newProductType,
     Map<String, Set<String>>? newSelectedTerms,
 
   }) {
@@ -83,6 +86,7 @@ class AddProductState extends Equatable {
 
     return AddProductState(
       addProductStatus: newAddProductStatus ?? addProductStatus,
+      submitProductStatus: newSubmitProductStatus ?? submitProductStatus,
 
       featuredImage: nextFeatured,
       isPickingImage: newIsPickingImage ?? isPickingImage,
@@ -98,7 +102,7 @@ class AddProductState extends Equatable {
       allAttributes: newAllAttributes ?? this.allAttributes,
       availableAttributes: newAvailableAttributes ?? this.availableAttributes,
       selectedAttributes: newSelectedAttributes ?? this.selectedAttributes,
-      isSimpleProduct: newIsSimpleProduct ?? this.isSimpleProduct,
+      productType: newProductType ?? this.productType,
       selectedTerms: newSelectedTerms ?? selectedTerms,
 
     );
@@ -107,6 +111,7 @@ class AddProductState extends Equatable {
   @override
   List<Object?> get props => [
     addProductStatus,
+    submitProductStatus,
     featuredImage,
     galleryImages,
     isPickingImage,
@@ -119,7 +124,7 @@ class AddProductState extends Equatable {
     allAttributes,
     availableAttributes,
     selectedAttributes,
-    isSimpleProduct,
+    productType,
     selectedTerms
   ];
 }

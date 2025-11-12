@@ -22,7 +22,7 @@ abstract class AddProductRepository{
 
   Future<AddProductDataState> getProductData();
 
-  Future<OrderDataState> uploadImages();
+  Future<AddProductDataState> submitProduct();
 
 
 }

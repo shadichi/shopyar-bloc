@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shopyar/core/resources/data_state.dart';
+import 'package:shopyar/core/widgets/alert_dialog.dart';
 import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -10,6 +13,11 @@ import '../../data/models/add_order_data_model.dart';
 import '../bloc/add_product_status.dart';
 import '../widgets/add_product_bill.dart';
 import '../widgets/add_product_bill_additional.dart';
+
+enum ProductType {
+  simple,
+  variable,
+}
 
 class AddProductProductFormScreen extends StatefulWidget {
   const AddProductProductFormScreen({super.key});
@@ -22,13 +30,14 @@ class AddProductProductFormScreen extends StatefulWidget {
 class _AddProductProductFormScreenState
     extends State<AddProductProductFormScreen> {
   int activeStep = 0;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _addProductBillformKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _addProductBillAddformKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<AddProductBloc>().add(AddProductsDataLoad());
+    context.read<AddProductBloc>().add(AddProductsDataLoadEvent());
   }
 
   final TextEditingController productName = TextEditingController();
@@ -54,7 +63,7 @@ class _AddProductProductFormScreenState
   String productBrandValue = '';
   String productStatValue = '';
   String productCountValue = '';
-  Map<String, String> attributesValue = {};
+  List<Map<String, dynamic>> attributesValue = [];
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +94,7 @@ class _AddProductProductFormScreenState
       (value) => productCountValue = value,
     ];
 
-    final Function(Map<String, String>) attributeChooser = (value) => attributesValue = value;
+    final Function(List<Map<String, dynamic>>) attributeChooser = (value) => attributesValue = value;
 
     void onFeaturedImageChanged(File? f) {
       setState(() => imageFile = f);
@@ -270,7 +279,7 @@ class _AddProductProductFormScreenState
       onFeaturedImageChanged,
       onGalleryChanged,
       List<Function(String)> addProductBillAddOnTextChange,
-      Function(Map<String, String>) attributeChooser
+      Function(List<Map<String, dynamic>>) attributeChooser,
 
       ) {
     switch (activeStep) {
@@ -278,7 +287,7 @@ class _AddProductProductFormScreenState
         return AddProductBill(
           addProductBillOnTextChange,
           addProductBillTextEditing,
-          _formKey,
+          _addProductBillformKey,
           imageFile,
           // File?
           galleryImages,
@@ -288,7 +297,7 @@ class _AddProductProductFormScreenState
         );
 
       case 1:
-        return AddProductBillAdditional(addProductDataModel, addProductBillAddOnTextChange, attributeChooser);
+        return AddProductBillAdditional(_addProductBillAddformKey,addProductDataModel, addProductBillAddOnTextChange, attributeChooser);
 
       default:
         return const SizedBox.shrink();
@@ -303,16 +312,32 @@ class _AddProductProductFormScreenState
         onPressed: () {
           setState(() {
             if (activeStep == 0) {
-              if (_formKey.currentState!.validate()) {
+              if (_addProductBillformKey.currentState!.validate()) {
                 activeStep++;
               }
             } else if(activeStep == 1){
-              print(productTypeValue);
-              print(productCatValue);
-              print(productBrandValue);
-              print(productStatValue);
-              print(productCountValue);
-              print(attributesValue);
+              if((productTypeValue == ProductType.variable.name) && attributesValue.isEmpty){
+                alertDialogScreen(context, "لطفا درصورت اتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ", 1, true);
+              }
+              if((_addProductBillAddformKey.currentState?.validate() ?? false)){
+                context.read<AddProductBloc>().add(SubmitProductBlocEvent());
+
+           /*     print(productNameValue);
+                print(shortExplanationValue);
+                print(explanationValue);
+                print(priceValue);
+                print(commissionPriceValue);
+                print(skuValue);
+                print(imageFile);
+                print(galleryImages);
+                print(productTypeValue);
+                print(jsonEncode(attributesValue));
+                print(productCatValue);
+                print(productBrandValue);
+                print(productStatValue);
+                print(productCountValue);*/
+              }
+
             }/*else {
               activeStep = 0;
             }*/

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,13 +11,16 @@ import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 
 import '../../data/models/add_order_data_model.dart';
+import '../screens/product_form_screen.dart' hide ProductStatus;
 
 class AddProductBillAdditional extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
   AddProductDataModel addProductDataModel;
   final List<Function(String)> onTextChange;
-  final Function(Map<String, String>) attributeChooser;
+  final Function(List<Map<String, dynamic>>) attributeChooser;
 
-  AddProductBillAdditional(this.addProductDataModel, this.onTextChange, this.attributeChooser);
+  AddProductBillAdditional(this.formKey,
+      this.addProductDataModel, this.onTextChange, this.attributeChooser);
 
   @override
   State<AddProductBillAdditional> createState() =>
@@ -29,14 +33,15 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
     super.initState();
     context
         .read<AddProductBloc>()
-        .add(AddAttribute(widget.addProductDataModel.attributes));
+        .add(AddAttributeEvent(widget.addProductDataModel.attributes));
   }
 
   List<String> productTypeList = ["ساده", "متغیر"];
 
-  List<String> productStatusList = ["موجود", "ناموجود"];
+  List<String> productStatusList = ["منتشر شده", "پیش نویس", "در انتظار بازبینی"];
 
   String customerLNBill = 'dd';
+
 
   TextEditingController controller = TextEditingController();
 
@@ -67,7 +72,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
     var width = MediaQuery.of(context).size.width;
     Widget mainContent;
     mainContent = Form(
-      //   key: widget.formKey,
+        key: widget.formKey,
       child: Container(
         // height: height,
         padding: EdgeInsets.all(8),
@@ -122,16 +127,17 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               getLabel: (c) => c,
               onChanged: (c) {
                 print('type picked: $c');
-                bool isSimplProduct = c == productTypeList[0] ? true : false;
+                ProductType pt = c == productTypeList[0] ? ProductType.simple : ProductType.variable;
                 context
                     .read<AddProductBloc>()
-                    .add(SetTypeOfProduct(isSimplProduct));
-                widget.onTextChange[0](c);
+                    .add(SetTypeOfProductEvent(pt));
+                widget.onTextChange[0](pt.name);
               },
             ),
 
             AttributeSection(
               key1: '',
+              attributeChooser: widget.attributeChooser,
             ),
             AppDropdown<Category>(
               items: widget.addProductDataModel.categories,
@@ -152,17 +158,13 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               },
             ),
 
-            AppDropdown<String>(
-              items: productStatusList,
+            AppDropdown<ProductStatus>(
+              items: ProductStatus.values,
               label: 'وضعیت',
-              getLabel: (a) => a,
+              getLabel: (a) => a.faLabel,
               onChanged: (a) {
-                print('brand picked: ${a}');
-                if(a == 'موجود'){
-                  widget.onTextChange[3]("in_stock");
-                }else{
-                  widget.onTextChange[3]("outofstock");
-                }
+                print('Status picked: ${a.apiValue}');
+                widget.onTextChange[4](a.apiValue);
 
               },
             ),
@@ -177,7 +179,6 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
                 print('brand picked: $value');
                 widget.onTextChange[4](value.toString());
               },
-
             ),
             // checkBoxs()
           ],
@@ -282,8 +283,10 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
 
 class AttributeSection extends StatefulWidget {
   final String key1;
+  final Function(List<Map<String, dynamic>>) attributeChooser;
 
-  const AttributeSection({super.key, required this.key1});
+  const AttributeSection(
+      {super.key, required this.key1, required this.attributeChooser});
 
   @override
   State<AttributeSection> createState() => _AttributeSectionState();
@@ -312,192 +315,200 @@ class _AttributeSectionState extends State<AttributeSection> {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
 
-    return BlocBuilder<AddProductBloc, AddProductState>(
-      builder: (context, state) {
-        // اگر محصول ساده است، این سکشن نمایش داده نشود
-        if (state.isSimpleProduct) return const SizedBox.shrink();
+    return  BlocBuilder<AddProductBloc, AddProductState>(
+        builder: (context, state) {
+          // اگر محصول ساده است، این سکشن نمایش داده نشود
+          if (state.productType == ProductType.simple) return const SizedBox.shrink();
 
-        // ➊ ویژگی‌های قابل افزودن (available) و انتخاب‌شده (selected)
-        final available = state.availableAttributes.toSet().toList();
-        final selected = state.selectedAttributes;
+          // ➊ ویژگی‌های قابل افزودن (available) و انتخاب‌شده (selected)
+          final available = state.availableAttributes.toSet().toList();
+          final selected = state.selectedAttributes;
 
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black12),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ➋ هدر سکشن
-              Row(
-                children: [
-                  const Icon(Icons.category_outlined, size: 18),
-                  const SizedBox(width: 6),
-                  Text('ویژگی‌های محصول متغیر',
-                      style: Theme.of(context).textTheme.titleMedium),
-                ],
-              ),
-              const SizedBox(height: 12),
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ➋ هدر سکشن
+                Row(
+                  children: [
+                    const Icon(Icons.category_outlined, size: 18),
+                    const SizedBox(width: 6),
+                    Text('ویژگی‌های محصول متغیر',
+                        style: Theme.of(context).textTheme.titleMedium),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // ➌ DROPDOWN افزودن ویژگی جدید از لیست available
-              Row(
-                children: [
-                  Expanded(
-                    child: // ➌ DROPDOWN افزودن ویژگی از available
-                        AppDropdown<Attribute>(
-                      key: ValueKey(
-                          'add-attr-${available.map((e) => e.name).join(',')}'),
-                      items: available,
-                      label: 'افزودن ویژگی',
-                      getLabel: (a) => a.name,
-                      onChanged: (picked) {
-                        context
-                            .read<AddProductBloc>()
-                            .add(SelectAttribute(picked));
+                // ➌ DROPDOWN افزودن ویژگی جدید از لیست available
+                Row(
+                  children: [
+                    Expanded(
+                      child: // ➌ DROPDOWN افزودن ویژگی از available
+                      AppDropdown<Attribute>(
+                        key: ValueKey(
+                            'add-attr-${available.map((e) => e.name).join(',')}'),
+                        items: available,
+                        label: 'افزودن ویژگی',
+                        getLabel: (a) => a.name,
+                        onChanged: (picked) {
+                          context
+                              .read<AddProductBloc>()
+                              .add(SelectAttributeEvent(picked));
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Tooltip(
+                      message:
+                      'از لیست یک ویژگی انتخاب کنید تا به پایین اضافه شود',
+                      child: Icon(Icons.add_circle_outline, size: 18),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // ➍ اگر هنوز هیچ ویژگی انتخاب نشده:
+                if (selected.isEmpty)
+                  _EmptyHint(
+                    width: w,
+                    text:
+                    'هیچ ویژگی‌ای انتخاب نشده است.\nاز بالا یک ویژگی انتخاب کنید تا مقادیر آن را تعیین کنید.',
+                  ),
+
+                // ➎ لیست ویژگی‌های انتخاب‌شده + چیپ‌های انتخاب/حذف مقدارها
+                if (selected.isNotEmpty)
+                  SizedBox(
+                    height: h * 0.24,
+                    child: ListView.separated(
+                      itemCount: selected.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final attr = selected[index];
+
+                        // همه‌ی slugهای این ویژگی (کلید منطقی ما)
+                        final allSlugs = attr.terms.map((b) => b.slug).toList();
+
+                        // ستِ انتخاب‌شده‌ها از state (بر اساس slug)
+                        final chosen =
+                            state.selectedTerms[attr.name] ?? <String>{};
+
+                        // نمایش نام‌ها برای چیپ‌ها
+                        final chosenNames =
+                        chosen.map((slug) => nameBySlug(attr, slug)).toList();
+
+                        // باقی‌مانده‌ها برای افزودن (slug) + نام‌شان
+                        final remainingSlugs = allSlugs
+                            .where((slug) => !chosen.contains(slug))
+                            .toList();
+                        final remainingNames = remainingSlugs
+                            .map((slug) => nameBySlug(attr, slug))
+                            .toList();
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // ➏ سرتیتر هر ویژگی + حذف کل ویژگی
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    attr.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'حذف کل ویژگی',
+                                  icon: const Icon(Icons.close, size: 18),
+                                  onPressed: () {
+                                    context
+                                        .read<AddProductBloc>()
+                                        .add(RemoveSelectedAttributeEvent(attr));
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+
+                            // ➐ مقادیر انتخاب‌شده (چیپ با ضربدر برای حذف تکی)
+                            if (chosen.isNotEmpty) ...[
+                              Text('انتخاب‌شده‌ها',
+                                  style: Theme.of(context).textTheme.bodySmall),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: chosen.map((slug) {
+                                  final name = nameBySlug(attr, slug);
+                                  return InputChip(
+                                    label: Text(name),
+                                    onDeleted: () {
+                                      // حذف فقط همین مقدار (slug)
+                                      context.read<AddProductBloc>().add(
+                                        ToggleTermEvent(attr.name, slug, false),
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+
+                            // ➑ افزودن مقدار جدید (چیپ‌های اضافه‌کردن)
+                            Text('افزودن مقدار',
+                                style: Theme.of(context).textTheme.bodySmall),
+                            const SizedBox(height: 4),
+                            if (remainingSlugs.isEmpty)
+                              Text('مقداری برای افزودن باقی نمانده',
+                                  style: Theme.of(context).textTheme.bodySmall)
+                            else
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: remainingNames.map((name) {
+                                  final slug = slugByName(attr, name);
+                                  return ActionChip(
+                                    label: Text(name),
+                                      onPressed: () {
+                                        context.read<AddProductBloc>().add(ToggleTermEvent(attr.name, slug, true));
+                                        // بعد از آپدیت state در فریم بعدی
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          final state = context.read<AddProductBloc>().state;
+                                          final result = buildSelectedAttributesMap(
+                                            state.selectedAttributes,
+                                            state.selectedTerms,
+                                          );
+/*
+                                          print("✅ لیست ویژگی‌های انتخاب‌شده:");
+                                          print(result); // ساختار Dart
+                                          print(jsonEncode(result)); // خروجی JSON واقعی*/
+                                          widget.attributeChooser(result);
+                                        });
+                                      }
+                                  );
+                                }).toList(),
+                              ),
+                          ],
+                        );
                       },
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Tooltip(
-                    message:
-                        'از لیست یک ویژگی انتخاب کنید تا به پایین اضافه شود',
-                    child: Icon(Icons.add_circle_outline, size: 18),
-                  ),
-                ],
-              ),
+              ],
+            ),
+          );
+        },
+      );
 
-              const SizedBox(height: 12),
-
-              // ➍ اگر هنوز هیچ ویژگی انتخاب نشده:
-              if (selected.isEmpty)
-                _EmptyHint(
-                  width: w,
-                  text:
-                      'هیچ ویژگی‌ای انتخاب نشده است.\nاز بالا یک ویژگی انتخاب کنید تا مقادیر آن را تعیین کنید.',
-                ),
-
-              // ➎ لیست ویژگی‌های انتخاب‌شده + چیپ‌های انتخاب/حذف مقدارها
-              if (selected.isNotEmpty)
-                SizedBox(
-                  height: h * 0.24,
-                  child: ListView.separated(
-                    itemCount: selected.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final attr = selected[index];
-
-                      // همه‌ی slugهای این ویژگی (کلید منطقی ما)
-                      final allSlugs = attr.terms.map((b) => b.slug).toList();
-
-                      // ستِ انتخاب‌شده‌ها از state (بر اساس slug)
-                      final chosen =
-                          state.selectedTerms[attr.name] ?? <String>{};
-
-                      print("chosen:");
-                      print(chosen);
-
-                      // نمایش نام‌ها برای چیپ‌ها
-                      final chosenNames =
-                          chosen.map((slug) => nameBySlug(attr, slug)).toList();
-
-                      // باقی‌مانده‌ها برای افزودن (slug) + نام‌شان
-                      final remainingSlugs = allSlugs
-                          .where((slug) => !chosen.contains(slug))
-                          .toList();
-                      final remainingNames = remainingSlugs
-                          .map((slug) => nameBySlug(attr, slug))
-                          .toList();
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // ➏ سرتیتر هر ویژگی + حذف کل ویژگی
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  attr.name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall
-                                      ?.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                              IconButton(
-                                tooltip: 'حذف کل ویژگی',
-                                icon: const Icon(Icons.close, size: 18),
-                                onPressed: () {
-                                  context
-                                      .read<AddProductBloc>()
-                                      .add(RemoveSelectedAttribute(attr));
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-
-                          // ➐ مقادیر انتخاب‌شده (چیپ با ضربدر برای حذف تکی)
-                          if (chosen.isNotEmpty) ...[
-                            Text('انتخاب‌شده‌ها',
-                                style: Theme.of(context).textTheme.bodySmall),
-                            const SizedBox(height: 4),
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: chosen.map((slug) {
-                                final name = nameBySlug(attr, slug);
-                                return InputChip(
-                                  label: Text(name),
-                                  onDeleted: () {
-                                    // حذف فقط همین مقدار (slug)
-                                    context.read<AddProductBloc>().add(
-                                          ToggleTerm(attr.name, slug, false),
-                                        );
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-
-                          // ➑ افزودن مقدار جدید (چیپ‌های اضافه‌کردن)
-                          Text('افزودن مقدار',
-                              style: Theme.of(context).textTheme.bodySmall),
-                          const SizedBox(height: 4),
-                          if (remainingSlugs.isEmpty)
-                            Text('مقداری برای افزودن باقی نمانده',
-                                style: Theme.of(context).textTheme.bodySmall)
-                          else
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: remainingNames.map((name) {
-                                final slug = slugByName(attr, name);
-                                return ActionChip(
-                                  label: Text(name),
-                                  onPressed: () {
-                                    print('addddd');
-                                    context.read<AddProductBloc>().add(
-                                          ToggleTerm(attr.name, slug, true),
-                                        );
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
-    );
   }
 }
 
@@ -535,7 +546,7 @@ class _EmptyHint extends StatelessWidget {
   }
 }
 
-/// Dropdown بالای سکشن برای "افزودن ویژگی"
+/*/// Dropdown بالای سکشن برای "افزودن ویژگی"
 class _AddAttributeDropdown extends StatelessWidget {
   final List<Attribute> available;
   final ValueChanged<String> onPick;
@@ -648,7 +659,7 @@ class _AttributeRow extends StatelessWidget {
       ],
     );
   }
-}
+}*/
 
 class AppDropdown<T> extends StatefulWidget {
   final List<T> items;
@@ -740,4 +751,28 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
       ],
     );
   }
+}
+
+List<Map<String, dynamic>> buildSelectedAttributesMap(
+    List<Attribute> selectedAttributes,
+    Map<String, Set<String>> selectedTerms,
+    ) {
+  final List<Map<String, dynamic>> result = [];
+
+  for (final attr in selectedAttributes) {
+    // termهایی که برای این ویژگی انتخاب شدن
+    final chosenSlugs = selectedTerms[attr.name] ?? <String>{};
+
+    // فقط اگه چیزی انتخاب شده بود
+    if (chosenSlugs.isNotEmpty) {
+      result.add({
+        "name": attr.taxonomy,   // مثل pa_color
+        "options": chosenSlugs.toList(), // مثل ["red","blue"]
+        "visible": true,
+        "variation": true,
+      });
+    }
+  }
+
+  return result;
 }

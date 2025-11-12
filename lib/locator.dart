@@ -26,7 +26,7 @@ import 'features/feature_add_edit_product/data/data_source/remote/add_order_prod
 import 'features/feature_add_edit_product/data/repository/add_product_repositoryImpl.dart';
 import 'features/feature_add_edit_product/domain/repository/add_product_repository.dart';
 import 'features/feature_add_edit_product/domain/use_cases/add_product_get_products_use_case.dart';
-import 'features/feature_add_edit_product/domain/use_cases/upload_image_use_case.dart';
+import 'features/feature_add_edit_product/domain/use_cases/submit_product_use_case.dart';
 import 'features/feature_home/data/data_source/remote/home_api_provider.dart';
 import 'features/feature_home/domain/repository/home_repository.dart';
 import 'features/feature_home/domain/use_cases/get_home-data_use_case.dart';
@@ -82,7 +82,7 @@ setup() async {
   locator.registerSingleton<AddOrderGetSelectedProductsUseCase>(AddOrderGetSelectedProductsUseCase(locator()));
   locator.registerSingleton<AddOrderSetOrderUseCase>(AddOrderSetOrderUseCase(locator()));
   locator.registerSingleton<AddProductGetDataNeededUseCase>(AddProductGetDataNeededUseCase(locator()));
-  locator.registerSingleton<UploadImageUseCase>(UploadImageUseCase(locator()));
+  locator.registerSingleton<SubmitProductUseCase>(SubmitProductUseCase(locator()));
 
   ///bloc
   locator.registerSingleton<LogInBloc>(LogInBloc(locator(), locator()));

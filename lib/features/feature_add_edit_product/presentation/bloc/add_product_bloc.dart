@@ -4,12 +4,14 @@ import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:shopyar/core/resources/data_state.dart';
+import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/submit_product_status.dart';
 import '../../../../core/params/products_params.dart';
 import '../../../../core/resources/add_product_data_state.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../data/models/add_order_data_model.dart';
 import '../../domain/use_cases/add_product_get_products_use_case.dart';
-import '../../domain/use_cases/upload_image_use_case.dart';
+import '../../domain/use_cases/submit_product_use_case.dart';
+import '../screens/product_form_screen.dart';
 import 'add_product_status.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -20,7 +22,7 @@ part 'add_product_state.dart';
 
 class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
   AddProductGetDataNeededUseCase addProductGetDataNeededUseCase;
-  UploadImageUseCase uploadImageUseCase;
+  SubmitProductUseCase uploadImageUseCase;
 
   final _picker = ImagePicker();
 
@@ -32,10 +34,11 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
             allAttributes: const [],
             availableAttributes: const [],
             selectedAttributes: const [],
-            selectedTerms: {}
+            selectedTerms: {} ,
+            productType: ProductType.simple, submitProductStatus: SubmitProductLoading(),
           ),
         ) {
-    on<AddProductsDataLoad>((event, emit) async {
+    on<AddProductsDataLoadEvent>((event, emit) async {
       emit(state.copyWith(newAddProductStatus: AddProductsDataLoading()));
 
       final AddProductDataState result =
@@ -61,7 +64,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
     });
 
-    on<PickImageFromGalleryRequested>((event, emit) async {
+    on<PickImageFromGalleryRequestedEvent>((event, emit) async {
       emit(state.copyWith(newIsPickingImage: true, newImageError: null));
       try {
         final x = await _picker.pickImage(source: ImageSource.gallery);
@@ -79,7 +82,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
     });
 
-    on<ClearPickedImage>((event, emit) {
+    on<ClearPickedImageEvent>((event, emit) {
       print("ClearPickedImage");
       emit(state.copyWith(
         clearImageFile: true,
@@ -88,7 +91,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       )); // print("ClearPickedImage");
     });
 
-    on<PickGalleryRequested>((event, emit) async {
+    on<PickGalleryRequestedEvent>((event, emit) async {
       emit(state.copyWith(newIsPickingGallery: true, newImageError: null));
       try {
         final picker = ImagePicker();
@@ -114,7 +117,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
     });
 
-    on<RemoveGalleryAtRequested>((event, emit) {
+    on<RemoveGalleryAtRequestedEvent>((event, emit) {
       final list = [...state.galleryImages];
       if (event.index >= 0 && event.index < list.length) {
         list.removeAt(event.index);
@@ -122,13 +125,13 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
     });
 
-    on<ClearGalleryRequested>((event, emit) {
+    on<ClearGalleryRequestedEvent>((event, emit) {
       emit(state.copyWith(
         galleryImages: [],
       ));
     });
 
-    on<SelectAttribute>((event, emit) {
+    on<SelectAttributeEvent>((event, emit) {
       final selected = List<Attribute>.from(state.selectedAttributes);
       final available = List<Attribute>.from(state.availableAttributes);
 
@@ -147,7 +150,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
 
 
 
-    on<AddAttribute>((event, emit) {
+    on<AddAttributeEvent>((event, emit) {
       final selected = List<Attribute>.from(state.selectedAttributes);
       final available = <Attribute>[];
       if (event.attribute.isNotEmpty) {
@@ -159,21 +162,21 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       ));
     });
 
-    on<SetTypeOfProduct>((event, emit) {
+    on<SetTypeOfProductEvent>((event, emit) {
       // اگر ساده شد: همه چیز مرتبط با متغیرها را ریست کن
-      if (event.isSimpleProduct) {
+      if (event.productType == ProductType.simple) {
         emit(state.copyWith(
-          newIsSimpleProduct: true,
+          newProductType: ProductType.simple,
           newSelectedAttributes: <Attribute>[],
           newAvailableAttributes: state.availableAttributes, // یا دوباره از منبع پر کن
           newSelectedTerms: <String, Set<String>>{},
         ));
       } else {
-        emit(state.copyWith(newIsSimpleProduct: false));
+        emit(state.copyWith(newProductType: ProductType.variable));
       }
     });
 
-    on<ToggleTerm>((event, emit) {
+    on<ToggleTermEvent>((event, emit) {
       final map = Map<String, Set<String>>.from(state.selectedTerms);
       final current = map[event.attributeName] ?? <String>{};
       final newSet = Set<String>.from(current); // ← کپی عمیق
@@ -185,7 +188,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       emit(state.copyWith(newSelectedTerms: map));
     });
 
-    on<RemoveSelectedAttribute>((event, emit) {
+    on<RemoveSelectedAttributeEvent>((event, emit) {
       final selected = List<Attribute>.from(state.selectedAttributes);
       final available = List<Attribute>.from(state.availableAttributes);
 
@@ -202,6 +205,14 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
         newAvailableAttributes: available,
         newSelectedTerms: terms,
       ));
+    });
+
+
+    on<RemoveSelectedAttributeEvent>((event, emit) async {
+      emit(state.copyWith(newSubmitProductStatus: SubmitProductLoading()));
+
+      final AddProductDataState result =
+          await SubmitProductUseCase(InfParams("", false, "", false));
     });
 
 

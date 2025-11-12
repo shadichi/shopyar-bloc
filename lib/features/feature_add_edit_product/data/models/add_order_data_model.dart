@@ -163,3 +163,65 @@ class Category {
     "children": List<dynamic>.from(children.map((x) => x)),
   };
 }
+
+class SendAttribute {
+  final String name;            // مثلا taxonomy یا خود attr.name
+  final List<String> options;   // slugها یا nameها، هرکدوم که برای API می‌خوای
+  final bool visible;
+  final bool variation;
+
+  SendAttribute({
+    required this.name,
+    required this.options,
+    required this.visible,
+    required this.variation,
+  });
+
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "options": options,
+    "visible": visible,
+    "variation": variation,
+  };
+
+  factory SendAttribute.fromJson(Map<String, dynamic> json) => SendAttribute(
+    name: json["name"] as String,
+    options: List<String>.from(json["options"] ?? const []),
+    visible: json["visible"] as bool? ?? true,
+    variation: json["variation"] as bool? ?? true,
+  );
+}
+
+enum ProductStatus { publish, draft, pending }
+
+extension ProductStatusX on ProductStatus {
+  /// برچسب فارسی برای UI
+  String get faLabel {
+    switch (this) {
+      case ProductStatus.publish: return 'انتشار';
+      case ProductStatus.draft:   return 'پیش‌نویس';
+      case ProductStatus.pending: return 'در انتظار بازبینی';
+    }
+  }
+
+  /// رشتهٔ موردنیاز API/JSON
+  String get apiValue {
+    switch (this) {
+      case ProductStatus.publish: return 'publish';
+      case ProductStatus.draft:   return 'draft';
+      case ProductStatus.pending: return 'pending';
+    }
+  }
+
+  /// اگر از سرور string گرفتی و خواستی برش گردانی به enum
+  static ProductStatus fromApi(String value) {
+    switch (value) {
+      case 'publish': return ProductStatus.publish;
+      case 'draft':   return ProductStatus.draft;
+      case 'pending': return ProductStatus.pending;
+      default:        return ProductStatus.draft; // fallback
+    }
+  }
+}
+
+

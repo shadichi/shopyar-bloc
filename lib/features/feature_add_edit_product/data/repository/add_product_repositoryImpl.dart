@@ -30,12 +30,12 @@ class AddProductRepositoryImpl extends AddProductRepository {
   }
 
   @override
-  Future<OrderDataState> uploadImages() async {
-    try {
+  Future<AddProductDataState> submitProduct() async {
+  /*  try {
       Response response = await apiProvider.getData();
       if (response.statusCode == 200) {
-        /* List<ProductEntity> editOrderProductEntity =
-        productsFromJson(response.data);*/
+        *//* List<ProductEntity> editOrderProductEntity =
+        productsFromJson(response.data);*//*
 
         return OrderDataSuccess([]);
       } else {
@@ -44,7 +44,7 @@ class AddProductRepositoryImpl extends AddProductRepository {
     } catch (e) {
       print(e.toString());
       return const OrderDataFailed("please check your connection...");
-    }
+    }*/
   }
 
 }

@@ -50,6 +50,7 @@ dev_dependencies:
   flutter_advanced_switch: ^3.1.0
   image_picker: ^1.2.0
   file_picker: ^8.0.0
+  http_parser: ^4.1.2
 
 flutter:
   uses-material-design: true

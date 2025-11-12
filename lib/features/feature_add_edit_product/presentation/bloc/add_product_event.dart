@@ -4,50 +4,54 @@ part of 'add_product_bloc.dart';
 abstract class AddProductEvent {}
 
 
-class AddProductsDataLoad extends AddProductEvent{
+class AddProductsDataLoadEvent extends AddProductEvent{
 
-  AddProductsDataLoad();
+  AddProductsDataLoadEvent();
 
 }
 
-class PickImageFromGalleryRequested extends AddProductEvent {}
+class PickImageFromGalleryRequestedEvent extends AddProductEvent {}
 
-class ClearPickedImage extends AddProductEvent {}
+class ClearPickedImageEvent extends AddProductEvent {}
 
-class UploadPickedImageRequested extends AddProductEvent {}
+class UploadPickedImageRequestedEvent extends AddProductEvent {}
 
-class PickGalleryRequested extends AddProductEvent {}             // انتخاب چندتایی
+class PickGalleryRequestedEvent extends AddProductEvent {}             // انتخاب چندتایی
 
-class RemoveGalleryAtRequested extends AddProductEvent {          // حذف یکی
+class RemoveGalleryAtRequestedEvent extends AddProductEvent {          // حذف یکی
   final int index;
-  RemoveGalleryAtRequested(this.index);
+  RemoveGalleryAtRequestedEvent(this.index);
 }
 
-class ClearGalleryRequested extends AddProductEvent {}            // پاک‌کردن همه
+class ClearGalleryRequestedEvent extends AddProductEvent {}            // پاک‌کردن همه
 
-class SelectAttribute extends AddProductEvent {
+class SelectAttributeEvent extends AddProductEvent {
   final Attribute value;
-  SelectAttribute(this.value);
+  SelectAttributeEvent(this.value);
 }
-class AddAttribute extends AddProductEvent {
+class AddAttributeEvent extends AddProductEvent {
   final List<Attribute> attribute;
-  AddAttribute(this.attribute);
+  AddAttributeEvent(this.attribute);
 }
-class SetTypeOfProduct extends AddProductEvent {
-  final bool isSimpleProduct;
-  SetTypeOfProduct(this.isSimpleProduct);
+class SetTypeOfProductEvent extends AddProductEvent {
+  final ProductType  productType;
+  SetTypeOfProductEvent(this.productType);
 }
-class ToggleTerm extends AddProductEvent{
+class ToggleTermEvent extends AddProductEvent{
   final String attributeName;
   final bool selected;
   final String termSlug; // ← اسم را termSlug بگذار
-  ToggleTerm(this.attributeName, this.termSlug, this.selected);
+  ToggleTermEvent(this.attributeName, this.termSlug, this.selected);
 }
 
 
-class RemoveSelectedAttribute extends AddProductEvent{
+class RemoveSelectedAttributeEvent extends AddProductEvent{
   final Attribute attribute;
-  RemoveSelectedAttribute(this.attribute);
+  RemoveSelectedAttributeEvent(this.attribute);
+}
+
+class SubmitProductBlocEvent extends AddProductEvent{
+  SubmitProductBlocEvent();
 }
 
 

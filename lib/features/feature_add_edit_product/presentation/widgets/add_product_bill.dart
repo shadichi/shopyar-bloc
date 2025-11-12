@@ -15,10 +15,10 @@ class AddProductBill extends StatefulWidget {
   final List<Function(String)> onTextChange;
   final List<TextEditingController> textEditing;
 
-  final File? featuredImage;                 // نال‌ابل
+  final File? featuredImage;
   final List<File> galleryImages;
 
-  final ValueChanged<File?> onFeaturedChange;    // ← کال‌بک واضح
+  final ValueChanged<File?> onFeaturedChange;
   final ValueChanged<List<File>> onGalleryChange;
   AddProductBill(
       this.onTextChange,
@@ -117,7 +117,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                   () {
                                 context
                                     .read<AddProductBloc>()
-                                    .add(PickImageFromGalleryRequested());
+                                    .add(PickImageFromGalleryRequestedEvent());
                                   })),
                         )
                       : Container(
@@ -151,7 +151,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                         _CustomElevatedButton("حذف تصویر", () {
                                       context
                                           .read<AddProductBloc>()
-                                          .add(ClearPickedImage());
+                                          .add(ClearPickedImageEvent());
                                     })),
                               ),
                               Expanded(
@@ -162,7 +162,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                         () {
                                       context
                                           .read<AddProductBloc>()
-                                          .add(PickImageFromGalleryRequested());
+                                          .add(PickImageFromGalleryRequestedEvent());
                                     })),
                               ),
                             ],
@@ -227,7 +227,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                             onPressed: () {
                                               context
                                                   .read<AddProductBloc>()
-                                                  .add(RemoveGalleryAtRequested(
+                                                  .add(RemoveGalleryAtRequestedEvent(
                                                       index));
                                             },
                                           ),
@@ -243,7 +243,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                           "افزودن تصویر", () {
                                         context
                                             .read<AddProductBloc>()
-                                            .add(PickGalleryRequested());
+                                            .add(PickGalleryRequestedEvent());
                                       }, color: Colors.red),
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
@@ -256,7 +256,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                           "پاک کردن همه", () {
                                         context
                                             .read<AddProductBloc>()
-                                            .add(PickGalleryRequested());
+                                            .add(PickGalleryRequestedEvent());
                                       }),
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
@@ -285,7 +285,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                   "افزودن گالری تصاویر", () {
                                 context
                                     .read<AddProductBloc>()
-                                    .add(PickGalleryRequested());
+                                    .add(PickGalleryRequestedEvent());
                               })),
                         );
                 })
@@ -309,6 +309,7 @@ class _AddProductBillState extends State<AddProductBill> {
               'نام محصول',
               context,
               onChanged: widget.onTextChange[0],
+             isNec: true
              //   isNec: true
             ),
             textField( widget.textEditing[1], 'توضیح کوتاه', context,
@@ -320,6 +321,7 @@ class _AddProductBillState extends State<AddProductBill> {
               'قیمت',
               context,
               onChanged: widget.onTextChange[3],
+              isNec: true
             ),
             textField(
               widget.textEditing[4],
