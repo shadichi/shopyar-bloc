@@ -13,13 +13,17 @@ class SubmitProductLoading extends SubmitProductStatus{
 }
 
 class SubmitProductLoaded extends SubmitProductStatus{
-  final AddProductDataModel addProductDataModel;
-  SubmitProductLoaded(this.addProductDataModel);
+  SubmitProductLoaded();
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
 class SubmitProductError extends SubmitProductStatus{
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+class SubmitProductInitial extends SubmitProductStatus{
   @override
   // TODO: implement props
   List<Object?> get props => [];

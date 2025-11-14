@@ -22,11 +22,11 @@ part 'add_product_state.dart';
 
 class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
   AddProductGetDataNeededUseCase addProductGetDataNeededUseCase;
-  SubmitProductUseCase uploadImageUseCase;
+  SubmitProductUseCase submitProductUseCase;
 
   final _picker = ImagePicker();
 
-  AddProductBloc(this.addProductGetDataNeededUseCase, this.uploadImageUseCase)
+  AddProductBloc(this.addProductGetDataNeededUseCase, this.submitProductUseCase)
       : super(
           AddProductState(
             addProductStatus: AddProductsDataLoading(),
@@ -35,7 +35,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
             availableAttributes: const [],
             selectedAttributes: const [],
             selectedTerms: {} ,
-            productType: ProductType.simple, submitProductStatus: SubmitProductLoading(),
+            productType: ProductType.simple, submitProductStatus: SubmitProductInitial(),
           ),
         ) {
     on<AddProductsDataLoadEvent>((event, emit) async {
@@ -208,11 +208,19 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
     });
 
 
-    on<RemoveSelectedAttributeEvent>((event, emit) async {
+    on<SubmitProductBlocEvent>((event, emit) async {
       emit(state.copyWith(newSubmitProductStatus: SubmitProductLoading()));
 
       final AddProductDataState result =
-          await SubmitProductUseCase(InfParams("", false, "", false));
+          await submitProductUseCase(InfParams("", false, "", false));
+      if(result is AddProductDataSuccess){
+        emit(state.copyWith(newSubmitProductStatus: SubmitProductLoaded()));
+
+      }else{
+        emit(state.copyWith(newSubmitProductStatus: SubmitProductError()));
+
+      }
+
     });
 
 

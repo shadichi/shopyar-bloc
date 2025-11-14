@@ -131,7 +131,7 @@ class AddProductsGetDataApiProvider {
 
     // =============== 3) call create_item endpoint ===============
     final res = await _dio.post(
-      "${StaticValues.webService}/wp-json/shop-yar/v1/create-item",
+      "${StaticValues.webService}/wp-json/shop-yar/products",
       data: payload,
       options: Options(
         headers: {

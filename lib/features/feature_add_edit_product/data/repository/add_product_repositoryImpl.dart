@@ -31,20 +31,22 @@ class AddProductRepositoryImpl extends AddProductRepository {
 
   @override
   Future<AddProductDataState> submitProduct() async {
-  /*  try {
-      Response response = await apiProvider.getData();
-      if (response.statusCode == 200) {
-        *//* List<ProductEntity> editOrderProductEntity =
-        productsFromJson(response.data);*//*
+    try {
 
-        return OrderDataSuccess([]);
+      Response response = await apiProvider.submitProduct(name: 'ddd');
+      if (response.statusCode == 200) {
+         print("response for submit product is 200:");
+         print(response.data);
+
+        return AddProductDataSuccess([]);
       } else {
-        return const OrderDataFailed("Something Went Wrong. try again...");
+        return const AddProductDataFailed("AddProductDataFailed");
       }
     } catch (e) {
+      print('error in submitProductImpl:');
       print(e.toString());
-      return const OrderDataFailed("please check your connection...");
-    }*/
+      return const AddProductDataFailed("AddProductDataFailed");
+    }
   }
 
 }

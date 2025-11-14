@@ -3,7 +3,7 @@ abstract class AddProductDataState {
 }
 
 class AddProductDataSuccess extends AddProductDataState {
-  final dynamic data; // 👈 اینجا رو از List<dynamic>? به dynamic تغییر بده
+  final dynamic data;
   const AddProductDataSuccess(this.data);
 }
 

@@ -8,6 +8,7 @@ import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/submit_product_status.dart';
 import '../../../../core/config/app-colors.dart';
 import '../../data/models/add_order_data_model.dart';
 import '../bloc/add_product_status.dart';
@@ -47,7 +48,6 @@ class _AddProductProductFormScreenState
   final TextEditingController commissionPrice = TextEditingController();
   final TextEditingController sku = TextEditingController();
 
-
   File? imageFile;
   List<File> galleryImages = [];
 
@@ -76,7 +76,6 @@ class _AddProductProductFormScreenState
       sku,
     ];
 
-
     final List<Function(String)> addProductBillOnTextChange = [
       (value) => productNameValue = value,
       (value) => shortExplanationValue = value,
@@ -94,7 +93,8 @@ class _AddProductProductFormScreenState
       (value) => productCountValue = value,
     ];
 
-    final Function(List<Map<String, dynamic>>) attributeChooser = (value) => attributesValue = value;
+    final Function(List<Map<String, dynamic>>) attributeChooser =
+        (value) => attributesValue = value;
 
     void onFeaturedImageChanged(File? f) {
       setState(() => imageFile = f);
@@ -107,9 +107,25 @@ class _AddProductProductFormScreenState
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return BlocConsumer<AddProductBloc, AddProductState>(
-      listener: (context, state) {},
+      listener: (context, state) async{
+        if (state.submitProductStatus is SubmitProductLoaded) {
+          alertDialogScreen(
+            context,
+            "محصول با موفقیت اضافه شد!",
+            2,
+            false,
+            icon: Icons.check_circle,
+          );
+
+        }
+        if (state.submitProductStatus is SubmitProductError) {
+          alertDialogScreen(context, 'خطا در اضافه کردن محصول!', 2, false,
+              icon: Icons.check_circle);
+        }
+      },
       builder: (context, state) {
         final status = state.addProductStatus;
+        final isSubmitting = state.submitProductStatus is SubmitProductLoading;
 
         Widget mainContent;
         if (status is AddProductsDataLoading) {
@@ -154,7 +170,9 @@ class _AddProductProductFormScreenState
                           addProductBillOnTextChange,
                           addProductBillTextEditing,
                           onFeaturedImageChanged,
-                          onGalleryChanged, addProductBillAddOnTextChange, attributeChooser),
+                          onGalleryChanged,
+                          addProductBillAddOnTextChange,
+                          attributeChooser),
                     ),
                   ),
                 ),
@@ -193,7 +211,12 @@ class _AddProductProductFormScreenState
               ),
             ),
           ),
-          body: mainContent,
+          body: Stack(
+            children: [
+              mainContent,
+              if (isSubmitting) _loadingBarrier('در حال ثبت محصول...'),
+            ],
+          ),
         );
       },
     );
@@ -273,15 +296,14 @@ class _AddProductProductFormScreenState
   }
 
   Widget _buildSection(
-      AddProductDataModel addProductDataModel,
-      List<Function(String)> addProductBillOnTextChange,
-      addProductBillTextEditing,
-      onFeaturedImageChanged,
-      onGalleryChanged,
-      List<Function(String)> addProductBillAddOnTextChange,
-      Function(List<Map<String, dynamic>>) attributeChooser,
-
-      ) {
+    AddProductDataModel addProductDataModel,
+    List<Function(String)> addProductBillOnTextChange,
+    addProductBillTextEditing,
+    onFeaturedImageChanged,
+    onGalleryChanged,
+    List<Function(String)> addProductBillAddOnTextChange,
+    Function(List<Map<String, dynamic>>) attributeChooser,
+  ) {
     switch (activeStep) {
       case 0:
         return AddProductBill(
@@ -297,7 +319,11 @@ class _AddProductProductFormScreenState
         );
 
       case 1:
-        return AddProductBillAdditional(_addProductBillAddformKey,addProductDataModel, addProductBillAddOnTextChange, attributeChooser);
+        return AddProductBillAdditional(
+            _addProductBillAddformKey,
+            addProductDataModel,
+            addProductBillAddOnTextChange,
+            attributeChooser);
 
       default:
         return const SizedBox.shrink();
@@ -315,14 +341,20 @@ class _AddProductProductFormScreenState
               if (_addProductBillformKey.currentState!.validate()) {
                 activeStep++;
               }
-            } else if(activeStep == 1){
-              if((productTypeValue == ProductType.variable.name) && attributesValue.isEmpty){
-                alertDialogScreen(context, "لطفا درصورت اتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ", 1, true);
+            } else if (activeStep == 1) {
+              if ((productTypeValue == ProductType.variable.name) &&
+                  attributesValue.isEmpty) {
+                alertDialogScreen(
+                    context,
+                    "لطفا درصورت اتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ",
+                    1,
+                    true);
               }
-              if((_addProductBillAddformKey.currentState?.validate() ?? false)){
+              if ((_addProductBillAddformKey.currentState?.validate() ??
+                  false)) {
                 context.read<AddProductBloc>().add(SubmitProductBlocEvent());
 
-           /*     print(productNameValue);
+                /*     print(productNameValue);
                 print(shortExplanationValue);
                 print(explanationValue);
                 print(priceValue);
@@ -337,8 +369,7 @@ class _AddProductProductFormScreenState
                 print(productStatValue);
                 print(productCountValue);*/
               }
-
-            }/*else {
+            } /*else {
               activeStep = 0;
             }*/
           });
@@ -383,6 +414,34 @@ class _AddProductProductFormScreenState
                 color: Colors.white,
                 fontSize: AppConfig.calFontSize(context, 4))),
       ),
+    );
+  }
+
+  Widget _loadingBarrier([String? message]) {
+    return Stack(
+      children: [
+        const ModalBarrier(dismissible: false, color: Colors.black54),
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ProgressBar(),
+              if (message != null) ...[
+                SizedBox(height: AppConfig.calHeight(context, 8)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: AppConfig.calWidth(context, 3.5),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
