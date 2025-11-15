@@ -9,6 +9,7 @@ import '../../../../core/params/products_params.dart';
 import '../../../../core/resources/add_product_data_state.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../data/models/add_order_data_model.dart';
+import '../../data/models/product_submit_model.dart';
 import '../../domain/use_cases/add_product_get_products_use_case.dart';
 import '../../domain/use_cases/submit_product_use_case.dart';
 import '../screens/product_form_screen.dart';
@@ -212,7 +213,7 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       emit(state.copyWith(newSubmitProductStatus: SubmitProductLoading()));
 
       final AddProductDataState result =
-          await submitProductUseCase(InfParams("", false, "", false));
+          await submitProductUseCase(event.model);
       if(result is AddProductDataSuccess){
         emit(state.copyWith(newSubmitProductStatus: SubmitProductLoaded()));
 
@@ -222,79 +223,11 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       }
 
     });
-
-
-
-/*
-    on<UploadGalleryRequested>((event, emit) async {
-      if (state.galleryImages.isEmpty) return;
-      emit(state.copyWith(newIsUploadingGallery: true, newerror: null));
-
-      try {
-        final uri = Uri.parse('https://shop-yar.ir/wp-json/shop-yar/upload');
-        final req = http.MultipartRequest('POST', uri)
-          ..headers['authorization'] = 'shadi2';
-
-        // files[] برای چندتایی
-        for (final f in state.galleryImages) {
-          req.files.add(await http.MultipartFile.fromPath('files[]', f.path));
-        }
-
-        final resp = await req.send();
-        final body = await resp.stream.bytesToString();
-        if (resp.statusCode < 200 || resp.statusCode >= 300) {
-          throw Exception('Upload failed: ${resp.statusCode} $body');
-        }
-
-        // پاسخ: { success:true, items:[ { id, url, index }, ... ] }
-        final json = jsonDecode(body) as Map<String, dynamic>;
-        final items = (json['items'] as List).cast<Map<String, dynamic>>();
-        final ids = <int>[];
-        for (final it in items) {
-          final id = it['id'];
-          if (id is int) ids.add(id);
-          if (id is String) ids.add(int.tryParse(id) ?? 0);
-        }
-
-        emit(state.copyWith(
-          isUploadingGallery: false,
-          galleryMediaIds: ids.where((e) => e > 0).toList(),
-        ));
-      } catch (e) {
-        emit(state.copyWith(isUploadingGallery: false, error: e.toString()));
-      }
+    on<ResetSubmitProductStatusEvent>((event, emit) {
+      emit(state.copyWith(
+        newSubmitProductStatus: SubmitProductInitial(),
+      ));
     });
-*/
 
-/*
-     on<UploadPickedImageRequested>((event, emit) async {
-      if (state.featuredImage == null) return;
-      emit(state.copyWith(newIsUploadingImage: true, newImageError: null));
-      OrderDataState dataState = await uploadImageUseCase(InfParams("0", false, "search", false));
-      if(dataState is OrderDataSuccess ){
-        emit
-      }
-      try {
-        final uri = Uri.parse('https://shop-yar.ir/wp-json/shop-yar/upload');
-        final req = http.MultipartRequest('POST', uri)
-          ..headers['authorization'] = 'shadi2'
-          ..files.add(await http.MultipartFile.fromPath('file', state.imageFile!.path));
-
-      final resp = await req.send();
-      final body = await resp.stream.bytesToString();
-      if (resp.statusCode < 200 || resp.statusCode >= 300) {
-      throw Exception('Upload failed: ${resp.statusCode} $body');
-      }
-      // خروجی: { success:true, items:[ { id: 345, url: ... } ] }
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      final items = (json['items'] as List).cast<Map<String, dynamic>>();
-      final mediaId = (items.isNotEmpty ? items.first['id'] : null) as int?;
-
-      emit(state.copyWith(isUploadingImage: false, imageMediaId: mediaId));
-      } catch (e) {
-      emit(state.copyWith(isUploadingImage: false, imageError: e.toString()));
-      }
-    });
-*/
   }
 }

@@ -5,6 +5,7 @@ import '../../domain/repository/add_product_repository.dart';
 import 'package:dio/dio.dart';
 
 import '../data_source/remote/add_order_products_api_provider.dart';
+import '../models/product_submit_model.dart';
 
 class AddProductRepositoryImpl extends AddProductRepository {
   AddProductsGetDataApiProvider apiProvider;
@@ -30,10 +31,10 @@ class AddProductRepositoryImpl extends AddProductRepository {
   }
 
   @override
-  Future<AddProductDataState> submitProduct() async {
+  Future<AddProductDataState> submitProduct(ProductSubmitModel model) async {
     try {
 
-      Response response = await apiProvider.submitProduct(name: 'ddd');
+      Response response = await apiProvider.submitProduct(model);
       if (response.statusCode == 200) {
          print("response for submit product is 200:");
          print(response.data);

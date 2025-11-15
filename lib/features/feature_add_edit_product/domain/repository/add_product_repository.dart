@@ -13,6 +13,7 @@ import '../../../../core/resources/add_product_data_state.dart';
 import '../../../../core/resources/order_data_state.dart';
 import '../../../feature_log_in/data/data_source/remote/api_provider.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
+import '../../data/models/product_submit_model.dart';
 import '../entities/add_order_data_entity.dart';
 import '../entities/add_order_orders_entity.dart';
 import '../entities/add_order_product_entity.dart';
@@ -22,7 +23,7 @@ abstract class AddProductRepository{
 
   Future<AddProductDataState> getProductData();
 
-  Future<AddProductDataState> submitProduct();
+  Future<AddProductDataState> submitProduct(ProductSubmitModel model);
 
 
 }

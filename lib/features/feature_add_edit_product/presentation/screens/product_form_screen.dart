@@ -9,8 +9,11 @@ import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/submit_product_status.dart';
+import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
 import '../../../../core/config/app-colors.dart';
+import '../../../../core/params/products_params.dart';
 import '../../data/models/add_order_data_model.dart';
+import '../../data/models/product_submit_model.dart';
 import '../bloc/add_product_status.dart';
 import '../widgets/add_product_bill.dart';
 import '../widgets/add_product_bill_additional.dart';
@@ -36,7 +39,6 @@ class _AddProductProductFormScreenState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<AddProductBloc>().add(AddProductsDataLoadEvent());
   }
@@ -59,11 +61,11 @@ class _AddProductProductFormScreenState
   String skuValue = '';
 
   String productTypeValue = '';
-  String productCatValue = '';
-  String productBrandValue = '';
+  List<int> productCatValue = [];
+  List<int> productBrandValue = [];
   String productStatValue = '';
   String productCountValue = '';
-  List<Map<String, dynamic>> attributesValue = [];
+   BuiltAttributePayload attributesValue = BuiltAttributePayload(attributes: [], variations: []);
 
   @override
   Widget build(BuildContext context) {
@@ -87,14 +89,18 @@ class _AddProductProductFormScreenState
 
     final List<Function(String)> addProductBillAddOnTextChange = [
       (value) => productTypeValue = value,
-      (value) => productCatValue = value,
-      (value) => productBrandValue = value,
       (value) => productStatValue = value,
       (value) => productCountValue = value,
     ];
 
-    final Function(List<Map<String, dynamic>>) attributeChooser =
+    final Function(BuiltAttributePayload) attributeChooser =
         (value) => attributesValue = value;
+
+    final Function(List<int>) categoryChooser =
+        (value) => productCatValue = value;
+
+    final Function(List<int>) brandChooser =
+        (value) => productBrandValue = value;
 
     void onFeaturedImageChanged(File? f) {
       setState(() => imageFile = f);
@@ -107,16 +113,27 @@ class _AddProductProductFormScreenState
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return BlocConsumer<AddProductBloc, AddProductState>(
-      listener: (context, state) async{
+      listener: (context, state) async {
         if (state.submitProductStatus is SubmitProductLoaded) {
-          alertDialogScreen(
-            context,
-            "محصول با موفقیت اضافه شد!",
-            2,
-            false,
-            icon: Icons.check_circle,
-          );
+          context.read<AddProductBloc>().add(ResetSubmitProductStatusEvent());
 
+          bool isSuccess = false;
+          isSuccess = await alertDialogScreen(
+                context,
+                "محصول با موفقیت اضافه شد!",
+                2,
+                false,
+                icon: Icons.check_circle,
+              ) ??
+              false;
+          if (isSuccess) {
+            context.read<ProductsBloc>().add(
+                  LoadProductsData(InfParams('10', true, "", false)),
+                );
+
+            // Navigator.pop(context);
+            Navigator.pop(context);
+          }
         }
         if (state.submitProductStatus is SubmitProductError) {
           alertDialogScreen(context, 'خطا در اضافه کردن محصول!', 2, false,
@@ -172,6 +189,8 @@ class _AddProductProductFormScreenState
                           onFeaturedImageChanged,
                           onGalleryChanged,
                           addProductBillAddOnTextChange,
+                          categoryChooser,
+                          brandChooser,
                           attributeChooser),
                     ),
                   ),
@@ -302,7 +321,9 @@ class _AddProductProductFormScreenState
     onFeaturedImageChanged,
     onGalleryChanged,
     List<Function(String)> addProductBillAddOnTextChange,
-    Function(List<Map<String, dynamic>>) attributeChooser,
+    Function(List<int>) categoryChooser,
+    Function(List<int>) brandChooser,
+    Function(BuiltAttributePayload) attributeChooser,
   ) {
     switch (activeStep) {
       case 0:
@@ -323,6 +344,8 @@ class _AddProductProductFormScreenState
             _addProductBillAddformKey,
             addProductDataModel,
             addProductBillAddOnTextChange,
+            categoryChooser,
+            brandChooser,
             attributeChooser);
 
       default:
@@ -343,18 +366,48 @@ class _AddProductProductFormScreenState
               }
             } else if (activeStep == 1) {
               if ((productTypeValue == ProductType.variable.name) &&
-                  attributesValue.isEmpty) {
+                  attributesValue.attributes.isNotEmpty) {
                 alertDialogScreen(
                     context,
-                    "لطفا درصورت اتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ",
+                    "لطفا درصورت انتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ",
                     1,
                     true);
               }
               if ((_addProductBillAddformKey.currentState?.validate() ??
                   false)) {
-                context.read<AddProductBloc>().add(SubmitProductBlocEvent());
+                print(attributesValue.attributes);
+                print(attributesValue.variations);
+              /*  context
+                    .read<AddProductBloc>()
+                    .add(SubmitProductBlocEvent(ProductSubmitModel(
+                      name: productNameValue,
+                      type: productTypeValue,
+                      status: productStatValue,
+                      sku: skuValue,
+                      regularPrice: priceValue,
+                      salePrice: commissionPriceValue,
+                      description: explanationValue,
+                      shortDescription: shortExplanationValue,
+                      stockQuantity: 1,
+                      featuredFile: imageFile,
+                      galleryFiles: galleryImages,
+                      categoryIds: productCatValue,
+                      brandIds: productBrandValue,
+                      attributes: attributesValue,
+                      variations: attributesValue.isNotEmpty
+                          ? [
+                              {
+                                "attributes": attributesValue,
+                                "regular_price": priceValue,
+                                "sale_price": commissionPriceValue,
+                                "manage_stock": true,
+                                "stock_quantity": 5
+                              }
+                            ]
+                          : [],
+                    )));*/
 
-                /*     print(productNameValue);
+                /*  print(productNameValue);
                 print(shortExplanationValue);
                 print(explanationValue);
                 print(priceValue);

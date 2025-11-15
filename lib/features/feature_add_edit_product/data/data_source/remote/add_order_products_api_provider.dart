@@ -4,6 +4,8 @@ import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:shopyar/core/utils/static_values.dart';
 
+import '../../models/product_submit_model.dart';
+
 class AddProductsGetDataApiProvider {
   final Dio _dio = Dio();
 
@@ -18,118 +20,91 @@ class AddProductsGetDataApiProvider {
     print(response.data);
     return response;
   }
-  Future<dynamic> submitProduct({
-    // الزامی
-    required String name,
-
-    // عمومی
-    String type = 'simple',                  // 'simple' | 'variable'
-    String? status,                          // 'publish' | 'draft' | 'pending' | 'private'
-    String? sku,
-    String? regularPrice,
-    String? salePrice,
-    String? description,
-    String? shortDescription,
-
-    // موجودی
-    bool? manageStock,
-    int? stockQuantity,
-    bool? inStock,
-
-    // مدیا
-    File? featuredFile,                      // اگر بدی، خودش آپلود می‌کند و image_media_id ست می‌شود
-    List<File> galleryFiles = const [],      // اگر بدی، خودش آپلود می‌کند و gallery_media_ids ست می‌شود
-    String? featuredImageUrl,                // اگر بخواهی به‌جای آپلود، sideload شود
-
-    // دسته‌بندی/خصوصیات
-    List<int>? categoryIds,
-    List<Map<String, dynamic>>? attributes,  // [{"name":"pa_color","options":["red","blue"],"visible":true,"variation":true}]
-    List<Map<String, dynamic>>? variations,  // [{"attributes":{"pa_color":"red"},"regular_price":"..."}]
-  }) async {
+  Future<dynamic> submitProduct(ProductSubmitModel model) async {
     print('submitProduct: start');
 
     // =============== helper: upload one media ===============
     Future<int> _uploadMedia(File file, {String? title}) async {
-      final path = file.path;
-      final fileName = path.split('/').last;
+      try {
+        final path = file.path;
+        final fileName = path.split('/').last;
 
-      final mime = lookupMimeType(path) ?? 'application/octet-stream';
-      final mediaType = MediaType.parse(mime);
+        final mime = lookupMimeType(path) ?? 'application/octet-stream';
+        final mediaType = MediaType.parse(mime);
 
-      final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          path,
-          filename: fileName,
-          contentType: mediaType,
-        ),
-        if (title != null) 'title': title,
-      });
+        final formData = FormData.fromMap({
+          // طبق PHP: $_FILES['file']
+          'file': await MultipartFile.fromFile(
+            path,
+            filename: fileName,
+            contentType: mediaType,
+          ),
+          if (title != null) 'title': title,
+        });
 
-      final res = await _dio.post(
-        "${StaticValues.webService}/wp-json/wp/v2/media",
-        data: formData,
-        options: Options(
-          headers: {
-            'Authorization': StaticValues.passWord,
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-            'Content-Disposition': 'attachment; filename="$fileName"',
-          },
-        ),
-      );
-      final id = (res.data['id'] as num).toInt();
-      print('uploadMedia: ok id=$id');
-      return id;
+        final res = await _dio.post(
+          "${StaticValues.webService}/wp-json/shop-yar/upload",
+          data: formData,
+          options: Options(
+            headers: {
+              'Authorization': StaticValues.passWord,   // همون توکن پلاگین
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+            },
+          ),
+        );
+
+        print('uploadMedia: status=${res.statusCode}');
+        print('uploadMedia: data=${res.data}');
+
+        // ساختار پاسخ handle_upload تو PHP:
+        // ['success'=>true,'items'=>[ ['index'=>0,'id'=>123,'url'=>'...'], ... ]]
+        final data = res.data as Map<String, dynamic>;
+        if (data['success'] != true) {
+          throw Exception('uploadMedia: success=false | $data');
+        }
+
+        final items = (data['items'] as List);
+        if (items.isEmpty) {
+          throw Exception('uploadMedia: empty items');
+        }
+
+        final first = items.first as Map<String, dynamic>;
+        final id = (first['id'] as num).toInt();
+        print('uploadMedia: ok id=$id');
+
+        return id;
+      } catch (e) {
+        print("error in _uploadMedia:");
+        print(e);
+        rethrow; // بذار بالا همون DioException یا Exception واقعی رو ببینه
+      }
     }
+
 
     // =============== 1) upload media(s) if provided ===============
     int? imageMediaId;
-    if (featuredFile != null) {
-      imageMediaId = await _uploadMedia(featuredFile, title: 'featured');
+    if (model.featuredFile != null) {
+      imageMediaId = await _uploadMedia(model.featuredFile!, title: 'featured');
     }
 
     List<int> galleryMediaIds = [];
-    if (galleryFiles.isNotEmpty) {
-      for (final f in galleryFiles) {
+    if (model.galleryFiles.isNotEmpty) {
+      for (final f in model.galleryFiles) {
         final id = await _uploadMedia(f);
         galleryMediaIds.add(id);
       }
     }
 
-    // =============== 2) build payload ===============
-    final Map<String, dynamic> payload = {
-      'type': type,
-      'name': name,
-    };
-
-    if (status != null) payload['status'] = status;
-    if (sku != null && sku.isNotEmpty) payload['sku'] = sku;
-    if (regularPrice != null) payload['regular_price'] = regularPrice;
-    if (salePrice != null) payload['sale_price'] = salePrice;
-    if (description != null) payload['description'] = description;
-    if (shortDescription != null) payload['short_description'] = shortDescription;
-
-    if (manageStock != null) payload['manage_stock'] = manageStock;
-    if (stockQuantity != null) payload['stock_quantity'] = stockQuantity;
-    if (inStock != null) payload['in_stock'] = inStock;
-
-    if (imageMediaId != null) payload['image_media_id'] = imageMediaId;
-    if (featuredImageUrl != null) payload['image_url'] = featuredImageUrl;
-
-    if (galleryMediaIds.isNotEmpty) payload['gallery_media_ids'] = galleryMediaIds;
-    if (categoryIds != null && categoryIds!.isNotEmpty) {
-      payload['category_ids'] = categoryIds;
-    }
-    if (attributes != null && attributes!.isNotEmpty) {
-      payload['attributes'] = attributes;
-    }
-    if (type == 'variable' && variations != null && variations!.isNotEmpty) {
-      payload['variations'] = variations;
-    }
+    // =============== 2) build payload from model ===============
+    final payload = model.toJson(
+      imageMediaId: imageMediaId,
+      galleryMediaIds: galleryMediaIds,
+    );
 
     print('submitProduct: payload => $payload');
 
-    // =============== 3) call create_item endpoint ===============
+    // =============== 3) call /shop-yar/products ===============
     final res = await _dio.post(
       "${StaticValues.webService}/wp-json/shop-yar/products",
       data: payload,
@@ -146,6 +121,7 @@ class AddProductsGetDataApiProvider {
     print('submitProduct: response => ${res.data}');
     return res;
   }
+
 
 }
 

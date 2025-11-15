@@ -8,16 +8,17 @@ import '../../../../core/resources/order_data_state.dart';
 import '../../../../core/usecases/use_case.dart';
 import '../../../feature_log_in/domain/entities/login_entity.dart';
 import '../../../feature_products/domain/entities/product_entity.dart';
+import '../../data/models/product_submit_model.dart';
 import '../entities/add_order_product_entity.dart';
 import '../repository/add_product_repository.dart';
 
-class SubmitProductUseCase implements UseCase<AddProductDataState, InfParams>{
+class SubmitProductUseCase implements UseCase<AddProductDataState, ProductSubmitModel>{
   final AddProductRepository _productRepository;
   SubmitProductUseCase(this._productRepository);
 
   @override
-  Future<AddProductDataState> call(InfParams productsParams) {
-    return _productRepository.submitProduct();
+  Future<AddProductDataState> call(ProductSubmitModel model) {
+    return _productRepository.submitProduct(model);
   }
 
 }

@@ -51,7 +51,11 @@ class RemoveSelectedAttributeEvent extends AddProductEvent{
 }
 
 class SubmitProductBlocEvent extends AddProductEvent{
-  SubmitProductBlocEvent();
+  ProductSubmitModel model;
+  SubmitProductBlocEvent(this.model);
+}
+class ResetSubmitProductStatusEvent extends AddProductEvent{
+  ResetSubmitProductStatusEvent();
 }
 
 
