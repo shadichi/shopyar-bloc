@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shopyar/core/resources/data_state.dart';
 import 'package:shopyar/core/widgets/alert_dialog.dart';
 import 'package:shopyar/core/widgets/progress-bar.dart';
+import 'package:shopyar/features/feature_add_edit_product/data/models/variation_model.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,6 +67,11 @@ class _AddProductProductFormScreenState
   String productStatValue = '';
   String productCountValue = '';
    BuiltAttributePayload attributesValue = BuiltAttributePayload(attributes: [], variations: []);
+  /* VariationUiModel variationValue = VariationUiModel(
+     attributes: {},
+     displayAttributes: {},
+   );*/
+   List<VariationUiModel> variationValue = [];
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +98,8 @@ class _AddProductProductFormScreenState
       (value) => productStatValue = value,
       (value) => productCountValue = value,
     ];
+    final Function(List<VariationUiModel>) variationModelChooser =
+        (value) => variationValue = value;
 
     final Function(BuiltAttributePayload) attributeChooser =
         (value) => attributesValue = value;
@@ -191,7 +199,9 @@ class _AddProductProductFormScreenState
                           addProductBillAddOnTextChange,
                           categoryChooser,
                           brandChooser,
-                          attributeChooser),
+                          attributeChooser,
+                          variationModelChooser
+                      ),
                     ),
                   ),
                 ),
@@ -324,6 +334,7 @@ class _AddProductProductFormScreenState
     Function(List<int>) categoryChooser,
     Function(List<int>) brandChooser,
     Function(BuiltAttributePayload) attributeChooser,
+    Function(List<VariationUiModel>) variationUiModel,
   ) {
     switch (activeStep) {
       case 0:
@@ -346,7 +357,9 @@ class _AddProductProductFormScreenState
             addProductBillAddOnTextChange,
             categoryChooser,
             brandChooser,
-            attributeChooser);
+            attributeChooser,
+          variationUiModel
+        );
 
       default:
         return const SizedBox.shrink();
@@ -377,6 +390,30 @@ class _AddProductProductFormScreenState
                   false)) {
                 print(attributesValue.attributes);
                 print(attributesValue.variations);
+                final List<Map<String, dynamic>> variationJsonList = variationValue.map((v) {
+                  return {
+                    "attributes": v.attributes, // همین { "pa_color": "red", ... }
+
+                    if (v.regularPrice != null && v.regularPrice!.isNotEmpty)
+                      "regular_price": v.regularPrice,
+
+                    if (v.salePrice != null && v.salePrice!.isNotEmpty)
+                      "sale_price": v.salePrice,
+
+                    "manage_stock": v.manageStock,
+
+                    if (v.manageStock && v.stockQuantity != null && v.stockQuantity!.isNotEmpty)
+                      "stock_quantity": int.tryParse(v.stockQuantity!) ?? 0,
+
+                    "in_stock": v.inStock,
+
+                    if (v.imageMediaId != null) "image_media_id": v.imageMediaId,
+                  };
+                }).toList();
+
+                print('variationJsonList');
+                print(variationJsonList);
+                // print(variationValue.regularPrice);
               /*  context
                     .read<AddProductBloc>()
                     .add(SubmitProductBlocEvent(ProductSubmitModel(

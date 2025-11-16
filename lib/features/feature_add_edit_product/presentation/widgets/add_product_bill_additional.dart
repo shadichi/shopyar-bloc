@@ -11,6 +11,7 @@ import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/presentation/bloc/add_product_bloc.dart';
 
 import '../../data/models/add_order_data_model.dart';
+import '../../data/models/variation_model.dart';
 import '../screens/product_form_screen.dart' hide ProductStatus;
 
 class AddProductBillAdditional extends StatefulWidget {
@@ -20,9 +21,10 @@ class AddProductBillAdditional extends StatefulWidget {
   final Function(List<int>) catOnTextChange;
   final Function(List<int>) brandOnTextChange;
   final Function(BuiltAttributePayload) attributeChooser;
+  final Function(List<VariationUiModel>) variationUiModel;
 
   AddProductBillAdditional(this.formKey,
-      this.addProductDataModel, this.onTextChange, this.catOnTextChange, this.brandOnTextChange, this.attributeChooser);
+      this.addProductDataModel, this.onTextChange, this.catOnTextChange, this.brandOnTextChange, this.attributeChooser, this.variationUiModel);
 
   @override
   State<AddProductBillAdditional> createState() =>
@@ -140,6 +142,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
             AttributeSection(
               key1: '',
               attributeChooser: widget.attributeChooser,
+              variationUiModel: widget.variationUiModel,
             ),
             AppMultiSelect<Category>(
               items: widget.addProductDataModel.categories,
@@ -296,11 +299,13 @@ class AttributeSection extends StatefulWidget {
   final String key1;
   /// خروجی نهایی: attributes + variations
   final Function(BuiltAttributePayload) attributeChooser;
+  final Function(List<VariationUiModel>) variationUiModel;
 
   const AttributeSection({
     super.key,
     required this.key1,
     required this.attributeChooser,
+    required this.variationUiModel,
   });
 
   @override
@@ -323,6 +328,12 @@ class _AttributeSectionState extends State<AttributeSection> {
     return m.name;
   }
 
+  void _notifyVariationUi() {
+    // بهتره یک کپی غیرقابل‌تغییر بفرستی
+    widget.variationUiModel(List<VariationUiModel>.unmodifiable(_variationUi));
+  }
+
+
   String slugByName(Attribute attr, String name) {
     final m = attr.terms.firstWhere(
           (b) => b.name == name,
@@ -342,6 +353,7 @@ class _AttributeSectionState extends State<AttributeSection> {
     if (basePayload.variations.isEmpty) {
       _variationUi = [];
       widget.attributeChooser(basePayload);
+      _notifyVariationUi(); // لیست خالی
       return;
     }
 
@@ -391,11 +403,16 @@ class _AttributeSectionState extends State<AttributeSection> {
           manageStock: old?.manageStock ?? false,
           stockQuantity: old?.stockQuantity,
           inStock: old?.inStock ?? true,
+          imageFile: old?.imageFile,      // اگر داری
+          imageMediaId: old?.imageMediaId,
         ),
       );
     }
 
     _variationUi = newUi;
+
+    // ⬅️ همیشه بعد از سینک، لیست کامل رو بفرست بالا
+    _notifyVariationUi();
 
     if (!_advancedMode) {
       widget.attributeChooser(basePayload);
@@ -663,7 +680,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                _buildVariationsEditor(context),
+                _buildVariationsEditor(context, widget.variationUiModel),
               ],
             ],
           ),
@@ -672,7 +689,7 @@ class _AttributeSectionState extends State<AttributeSection> {
     );
   }
 
-  Widget _buildVariationsEditor(BuildContext context) {
+  Widget _buildVariationsEditor(BuildContext context, Function(List<VariationUiModel>) variationModel) {
     if (_variationUi.isEmpty) {
       return Text(
         'ابتدا مقدارهایی برای ویژگی‌ها انتخاب کنید تا ورییشن‌ها ساخته شوند.',
@@ -717,7 +734,11 @@ class _AttributeSectionState extends State<AttributeSection> {
                         keyboardType: TextInputType.number,
                         initialValue: v.regularPrice,
                         onChanged: (val) {
-                          setState(() => _variationUi[index].regularPrice = val);
+                          setState(() {
+                            _variationUi[index].regularPrice = val;
+                            variationModel([_variationUi[index]]);
+                          });
+                          _notifyVariationUi();
                         },
                       ),
                     ),
@@ -732,6 +753,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                         initialValue: v.salePrice,
                         onChanged: (val) {
                           setState(() => _variationUi[index].salePrice = val);
+                          _notifyVariationUi();
                         },
                       ),
                     ),
@@ -746,6 +768,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                         setState(() {
                           _variationUi[index].manageStock = val ?? false;
                         });
+                        _notifyVariationUi();
                       },
                     ),
                     const Text('مدیریت موجودی'),
@@ -763,6 +786,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                             setState(
                                   () => _variationUi[index].stockQuantity = val,
                             );
+                            _notifyVariationUi();
                           },
                         ),
                       ),
@@ -776,6 +800,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                         setState(
                               () => _variationUi[index].inStock = val ?? true,
                         );
+                        _notifyVariationUi();
                       },
                     ),
                     const Text('موجود است'),
@@ -789,12 +814,10 @@ class _AttributeSectionState extends State<AttributeSection> {
                     if (picked == null) return;
                     final file = File(picked.path);
 
-                    // اینجا یا همون‌جا uploadMedia بزنی و imageMediaId بگیری
-                    // یا فقط file رو نگه داری و موقع submit همه رو با هم آپلود کنی
-
                     setState(() {
                       _variationUi[index].imageFile = file;
                     });
+                    _notifyVariationUi();
                   },
                   icon: const Icon(Icons.image_outlined),
                   label: const Text('انتخاب تصویر'),
@@ -1164,31 +1187,6 @@ class BuiltAttributePayload {
   BuiltAttributePayload({
     required this.attributes,
     required this.variations,
-  });
-}
-class VariationUiModel {
-  final Map<String, String> attributes;
-  final Map<String, String> displayAttributes;
-
-  String? regularPrice;
-  String? salePrice;
-  bool manageStock;
-  String? stockQuantity;
-  bool inStock;
-
-  File? imageFile;      // برای انتخاب از گالری
-  int? imageMediaId;    // آیدی که از آپلود می‌گیری
-
-  VariationUiModel({
-    required this.attributes,
-    required this.displayAttributes,
-    this.regularPrice,
-    this.salePrice,
-    this.manageStock = false,
-    this.stockQuantity,
-    this.inStock = true,
-    this.imageFile,
-    this.imageMediaId,
   });
 }
 
