@@ -229,5 +229,18 @@ class AddProductBloc extends Bloc<AddProductEvent, AddProductState> {
       ));
     });
 
+    // add_product_bloc.dart (یا جایی که on<>ها هست)
+    on<ClearProductFormEvent>((event, emit) {
+      emit(state.copyWith(
+
+        newSelectedAttributes: [],
+        newAvailableAttributes: [],
+        newSelectedTerms: {},
+        newProductType: ProductType.simple,
+        newSubmitProductStatus: SubmitProductInitial(),
+      ));
+    });
+
+
   }
 }

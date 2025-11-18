@@ -22,9 +22,10 @@ class AddProductBillAdditional extends StatefulWidget {
   final Function(List<int>) brandOnTextChange;
   final Function(BuiltAttributePayload) attributeChooser;
   final Function(List<VariationUiModel>) variationUiModel;
+  final Function(int) countOnTextChange;
 
   AddProductBillAdditional(this.formKey,
-      this.addProductDataModel, this.onTextChange, this.catOnTextChange, this.brandOnTextChange, this.attributeChooser, this.variationUiModel);
+      this.addProductDataModel, this.onTextChange, this.catOnTextChange, this.brandOnTextChange, this.attributeChooser, this.variationUiModel, this.countOnTextChange);
 
   @override
   State<AddProductBillAdditional> createState() =>
@@ -40,11 +41,21 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
         .add(AddAttributeEvent(widget.addProductDataModel.attributes));
   }
 
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+
+
   List<String> productTypeList = ["ساده", "متغیر"];
 
   List<String> productStatusList = ["منتشر شده", "پیش نویس", "در انتظار بازبینی"];
 
   String customerLNBill = 'dd';
+
+   ProductType pt = ProductType.simple;
 
 
   TextEditingController controller = TextEditingController();
@@ -119,6 +130,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
     return mainContent;
   }
 
+
   Widget _buildSection() {
     switch (activeStep) {
       case 0:
@@ -131,7 +143,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               getLabel: (c) => c,
               onChanged: (c) {
                 print('type picked: $c');
-                ProductType pt = c == productTypeList[0] ? ProductType.simple : ProductType.variable;
+                 pt = c == productTypeList[0] ? ProductType.simple : ProductType.variable;
                 context
                     .read<AddProductBloc>()
                     .add(SetTypeOfProductEvent(pt));
@@ -185,15 +197,16 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
             SizedBox(
               height: AppConfig.calHeight(context, 0.5),
             ),
+            pt == ProductType.simple ?
             textField(
               controller,
               'موجودی',
               context,
               onChanged: (String value) {
                 print('brand picked: $value');
-                widget.onTextChange[2](value.toString());
+                widget.countOnTextChange(int.parse(value));
               },
-            ),
+            ):SizedBox.shrink()
             // checkBoxs()
           ],
         );
@@ -278,21 +291,6 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
               : null,
         ));
   }
-
-/*  Widget _CustomElevatedButton(String label, void Function() onPress,
-      {Color color = Colors.black}) {
-    return ElevatedButton(
-      onPressed: onPress,
-      child: Text(
-        label,
-        style: TextStyle(
-            color: color, fontSize: AppConfig.calFontSize(context, 2.5)),
-      ),
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(AppConfig.white),
-      ),
-    );
-  }*/
 }
 
 class AttributeSection extends StatefulWidget {
@@ -313,11 +311,11 @@ class AttributeSection extends StatefulWidget {
 }
 
 class _AttributeSectionState extends State<AttributeSection> {
-  // حالت ساده / پیشرفته
-  bool _advancedMode = false;
+
 
   // اطلاعات UI برای هر ورییشن (قیمت، موجودی، ...)
   List<VariationUiModel> _variationUi = [];
+
 
   // === Helpers (بالای فایل، بعد از importها) ===
   String nameBySlug(Attribute attr, String slug) {
@@ -349,6 +347,10 @@ class _AttributeSectionState extends State<AttributeSection> {
       state.selectedAttributes,
       state.selectedTerms,
     );
+
+    print("basePayload");
+    print(basePayload.attributes);
+
 
     if (basePayload.variations.isEmpty) {
       _variationUi = [];
@@ -413,11 +415,6 @@ class _AttributeSectionState extends State<AttributeSection> {
 
     // ⬅️ همیشه بعد از سینک، لیست کامل رو بفرست بالا
     _notifyVariationUi();
-
-    if (!_advancedMode) {
-      widget.attributeChooser(basePayload);
-      return;
-    }
 
     // حالت فول: merge با extra fields
     final List<Map<String, dynamic>> enrichedVariations = [];
@@ -491,24 +488,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'پیشرفته',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      Switch(
-                        value: _advancedMode,
-                        onChanged: (val) {
-                          setState(() {
-                            _advancedMode = val;
-                          });
-                          // وقتی حالت عوض شد، دوباره payload رو بفرست بالا
-                          _rebuildAndNotify(state);
-                        },
-                      ),
-                    ],
-                  ),
+
                 ],
               ),
               const SizedBox(height: 12),
@@ -565,7 +545,7 @@ class _AttributeSectionState extends State<AttributeSection> {
 
                       // ستِ انتخاب‌شده‌ها از state (بر اساس slug)
                       final chosen =
-                          state.selectedTerms[attr.name] ?? <String>{};
+                          state.selectedTerms[attr.taxonomy] ?? <String>{};
 
                       // باقی‌مانده‌ها برای افزودن
                       final remainingSlugs = allSlugs
@@ -596,13 +576,9 @@ class _AttributeSectionState extends State<AttributeSection> {
                                   context
                                       .read<AddProductBloc>()
                                       .add(RemoveSelectedAttributeEvent(attr));
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    _rebuildAndNotify(
-                                      context.read<AddProductBloc>().state,
-                                    );
-                                  });
+                                  // بقیه‌اش لازم نیست؛ BlocConsumer.listener خودش کارو می‌کنه
                                 },
+
                               ),
                             ],
                           ),
@@ -624,7 +600,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                                   label: Text(name),
                                   onDeleted: () {
                                     context.read<AddProductBloc>().add(
-                                      ToggleTermEvent(attr.name, slug, false),
+                                      ToggleTermEvent(attr.taxonomy, slug, false),
                                     );
                                   },
 
@@ -655,7 +631,7 @@ class _AttributeSectionState extends State<AttributeSection> {
                                   label: Text(name),
                                   onPressed: () {
                                     context.read<AddProductBloc>().add(
-                                      ToggleTermEvent(attr.name, slug, true),
+                                      ToggleTermEvent(attr.taxonomy, slug, true),
                                     );
                                     // دیگه اینجا کاری نکن؛ listener خودش بعد از آپدیت صدا می‌خوره
                                   },
@@ -670,18 +646,18 @@ class _AttributeSectionState extends State<AttributeSection> {
                 ),
 
               // ➒ اگر حالت پیشرفته روشن است و variation داریم، UI ورییشن‌ها
-              if (_advancedMode) ...[
+
                 const Divider(height: 24),
                 Text(
-                  'تنظیمات ورییشن‌ها',
+                  'تنظیمات ویژگی‌های متغیر',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                _buildVariationsEditor(context, widget.variationUiModel),
-              ],
+                _buildVariationsEditor(context),
+
             ],
           ),
         );
@@ -689,10 +665,10 @@ class _AttributeSectionState extends State<AttributeSection> {
     );
   }
 
-  Widget _buildVariationsEditor(BuildContext context, Function(List<VariationUiModel>) variationModel) {
+  Widget _buildVariationsEditor(BuildContext context) {
     if (_variationUi.isEmpty) {
       return Text(
-        'ابتدا مقدارهایی برای ویژگی‌ها انتخاب کنید تا ورییشن‌ها ساخته شوند.',
+        'ابتدا مقدارهایی برای ویژگی‌ها انتخاب کنید تا متغیرها ساخته شوند.',
         style: Theme.of(context).textTheme.bodySmall,
       );
     }
@@ -727,27 +703,46 @@ class _AttributeSectionState extends State<AttributeSection> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'قیمت',
+                        decoration: InputDecoration(
                           isDense: true,
+                          filled: true,
+                        hintText: 'قیمت',
+                        //  fillColor: const Color(0xffededed),
+                          contentPadding: EdgeInsets.symmetric(vertical: AppConfig.calHeight(context, 0.5), horizontal: 8),
+                          enabledBorder:  OutlineInputBorder(
+                            borderSide: BorderSide(width: 0.5, color: Theme.of(context).colorScheme.primary,),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1),
+                          ),
                         ),
+
                         keyboardType: TextInputType.number,
                         initialValue: v.regularPrice,
                         onChanged: (val) {
                           setState(() {
                             _variationUi[index].regularPrice = val;
-                            variationModel([_variationUi[index]]);
                           });
                           _notifyVariationUi();
                         },
+
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'قیمت تخفیفی',
+                        decoration: InputDecoration(
                           isDense: true,
+                          filled: true,
+                          hintText: 'قیمت  تخفیفی',
+                          //  fillColor: const Color(0xffededed),
+                          contentPadding: EdgeInsets.symmetric(vertical: AppConfig.calHeight(context, 0.5), horizontal: 8),
+                          enabledBorder:  OutlineInputBorder(
+                            borderSide: BorderSide(width: 0.5, color: Theme.of(context).colorScheme.primary,),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1),
+                          ),
                         ),
                         keyboardType: TextInputType.number,
                         initialValue: v.salePrice,
@@ -760,39 +755,70 @@ class _AttributeSectionState extends State<AttributeSection> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: v.manageStock,
-                      onChanged: (val) {
-                        setState(() {
-                          _variationUi[index].manageStock = val ?? false;
-                        });
-                        _notifyVariationUi();
-                      },
-                    ),
-                    const Text('مدیریت موجودی'),
-                    const SizedBox(width: 8),
-                    if (v.manageStock)
-                      Expanded(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: 'تعداد موجودی',
-                            isDense: true,
-                          ),
-                          keyboardType: TextInputType.number,
-                          initialValue: v.stockQuantity,
+            Row(
+              children: [
+                // ستون اول: چک‌باکس + متن (نصف عرض کارد)
+                Expanded(
+                  child: Container(
+
+
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: v.manageStock,
                           onChanged: (val) {
-                            setState(
-                                  () => _variationUi[index].stockQuantity = val,
-                            );
+                            setState(() {
+                              _variationUi[index].manageStock = val ?? false;
+                            });
                             _notifyVariationUi();
                           },
                         ),
-                      ),
-                  ],
+ Text('مدیریت موجودی',style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.5)),),
+                      ],
+                    ),
+                  ),
                 ),
-                Row(
+
+                // فاصله بین ستون چپ و راست
+                if (v.manageStock) const SizedBox(width: 8),
+
+                // ستون دوم: تکست فیلد (نصف عرض کارد، هم‌تراز با TextFieldهای بالا)
+                if (v.manageStock)
+                  Expanded(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        hintText: 'تعداد موجودی',
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: AppConfig.calHeight(context, 0.5),
+                          horizontal: 8,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            width: 0.5,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            width: 1,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      initialValue: v.stockQuantity,
+                      onChanged: (val) {
+                        setState(() => _variationUi[index].stockQuantity = val);
+                        _notifyVariationUi();
+                      },
+                    ),
+                  ),
+              ],
+            ),
+
+            Row(
                   children: [
                     Checkbox(
                       value: v.inStock,
@@ -803,12 +829,13 @@ class _AttributeSectionState extends State<AttributeSection> {
                         _notifyVariationUi();
                       },
                     ),
-                    const Text('موجود است'),
+                     Text('موجود است',style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.5))),
                     const Spacer(),
 
                   ],
                 ),
-                TextButton.icon(
+                _variationUi[index].imageFile == null
+                    ? TextButton.icon(
                   onPressed: () async {
                     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
                     if (picked == null) return;
@@ -821,7 +848,53 @@ class _AttributeSectionState extends State<AttributeSection> {
                   },
                   icon: const Icon(Icons.image_outlined),
                   label: const Text('انتخاب تصویر'),
+                )
+                    : Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.file(_variationUi[index].imageFile!, fit: BoxFit.cover),
+                      ),
+                    ),
+
+                    TextButton.icon(
+                      onPressed: () async {
+                        final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if (picked == null) return;
+                        final file = File(picked.path);
+
+                        setState(() {
+                          _variationUi[index].imageFile = file;
+                        });
+                        _notifyVariationUi();
+                      },
+                      icon: const Icon(Icons.image_outlined),
+                      label: const Text('تغییر تصویر'),
+                    ),
+
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _variationUi[index].imageFile = null;
+                        });
+                        _notifyVariationUi();
+                      },
+                      icon: const Icon(Icons.delete_forever_rounded),
+                      label: const Text('حذف تصویر', ),
+                    ),
+                  ],
                 ),
+
 
               ],
             ),
@@ -831,8 +904,6 @@ class _AttributeSectionState extends State<AttributeSection> {
     );
   }
 }
-
-
 class _EmptyHint extends StatelessWidget {
   final double width;
   final String text;
@@ -1123,10 +1194,15 @@ BuiltAttributePayload buildSelectedAttributesPayload(
   final List<Attribute> activeAttrs = [];
 
   for (final attr in selectedAttributes) {
-    final chosenSlugs = selectedTerms[attr.name] ?? <String>{};
+    final chosenSlugs = selectedTerms[attr.taxonomy] ?? <String>{};
+
+    print("attributesssssssssssssssss");
+    print(attributes);
+
 
     if (chosenSlugs.isNotEmpty) {
       activeAttrs.add(attr);
+
 
       attributes.add({
         "name": attr.taxonomy,              // مثل "pa_color"
@@ -1162,7 +1238,7 @@ BuiltAttributePayload buildSelectedAttributesPayload(
     }
 
     final attr = activeAttrs[index];
-    final chosenSlugs = selectedTerms[attr.name]!.toList(); // مطمئنیم خالی نیست چون فعال است
+    final chosenSlugs = selectedTerms[attr.taxonomy]!.toList(); // مطمئنیم خالی نیست چون فعال است
 
     for (final slug in chosenSlugs) {
       current[attr.taxonomy] = slug;        // مثلا current["pa_color"] = "red"

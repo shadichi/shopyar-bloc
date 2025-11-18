@@ -20,6 +20,7 @@ class AddProductsGetDataApiProvider {
     print(response.data);
     return response;
   }
+
   Future<dynamic> submitProduct(ProductSubmitModel model) async {
     print('submitProduct: start');
 
@@ -33,7 +34,6 @@ class AddProductsGetDataApiProvider {
         final mediaType = MediaType.parse(mime);
 
         final formData = FormData.fromMap({
-          // طبق PHP: $_FILES['file']
           'file': await MultipartFile.fromFile(
             path,
             filename: fileName,
@@ -47,7 +47,7 @@ class AddProductsGetDataApiProvider {
           data: formData,
           options: Options(
             headers: {
-              'Authorization': StaticValues.passWord,   // همون توکن پلاگین
+              'Authorization': StaticValues.passWord,
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
             },
@@ -57,8 +57,6 @@ class AddProductsGetDataApiProvider {
         print('uploadMedia: status=${res.statusCode}');
         print('uploadMedia: data=${res.data}');
 
-        // ساختار پاسخ handle_upload تو PHP:
-        // ['success'=>true,'items'=>[ ['index'=>0,'id'=>123,'url'=>'...'], ... ]]
         final data = res.data as Map<String, dynamic>;
         if (data['success'] != true) {
           throw Exception('uploadMedia: success=false | $data');
@@ -77,15 +75,17 @@ class AddProductsGetDataApiProvider {
       } catch (e) {
         print("error in _uploadMedia:");
         print(e);
-        rethrow; // بذار بالا همون DioException یا Exception واقعی رو ببینه
+        rethrow;
       }
     }
 
-
-    // =============== 1) upload media(s) if provided ===============
+    // =============== 1) upload main media(s) if provided ===============
     int? imageMediaId;
     if (model.featuredFile != null) {
-      imageMediaId = await _uploadMedia(model.featuredFile!, title: 'featured');
+      imageMediaId = await _uploadMedia(
+        model.featuredFile!,
+        title: 'featured',
+      );
     }
 
     List<int> galleryMediaIds = [];
@@ -96,15 +96,48 @@ class AddProductsGetDataApiProvider {
       }
     }
 
+    // =============== 1.5) upload variation images if any ===============
+    List<Map<String, dynamic>>? finalVariations;
+
+    if (model.type == 'variable' &&
+        model.variations != null &&
+        model.variations!.isNotEmpty &&
+        model.variationImageFiles.isNotEmpty) {
+      // کپی deep از ورییشن‌ها تا روی original دست نبریم
+      finalVariations =
+          model.variations!.map((v) => Map<String, dynamic>.from(v)).toList();
+
+      // فرض: طول variationImageFiles با طول variations یکی است
+      // اگر نباشد می‌توانی از min استفاده کنی
+      final variationFiles = model.variationImageFiles;
+
+      for (int i = 0; i < finalVariations.length; i++) {
+        if (i >= variationFiles.length) break;
+
+        final file = variationFiles[i];
+        if (file == null) continue; // برای این ورییشن تصویر انتخاب نشده
+
+        // آپلود فایل و گذاشتن id در همون ورییشن
+        final imgId = await _uploadMedia(
+          file,
+          title: 'variation_$i',
+        );
+
+        finalVariations[i]['image_media_id'] = imgId;
+      }
+    }
+
     // =============== 2) build payload from model ===============
     final payload = model.toJson(
       imageMediaId: imageMediaId,
       galleryMediaIds: galleryMediaIds,
+      variationsOverride: finalVariations, // 👈 همین‌جاست
     );
 
     print('submitProduct: payload => $payload');
 
     // =============== 3) call /shop-yar/products ===============
+
     final res = await _dio.post(
       "${StaticValues.webService}/wp-json/shop-yar/products",
       data: payload,
@@ -112,7 +145,7 @@ class AddProductsGetDataApiProvider {
         headers: {
           'Authorization': StaticValues.passWord,
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
         },
       ),
     );
@@ -121,7 +154,4 @@ class AddProductsGetDataApiProvider {
     print('submitProduct: response => ${res.data}');
     return res;
   }
-
-
 }
-

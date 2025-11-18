@@ -256,7 +256,7 @@ class _AddProductBillState extends State<AddProductBill> {
                                           "پاک کردن همه", () {
                                         context
                                             .read<AddProductBloc>()
-                                            .add(PickGalleryRequestedEvent());
+                                            .add(ClearGalleryRequestedEvent());
                                       }),
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
@@ -321,19 +321,22 @@ class _AddProductBillState extends State<AddProductBill> {
               'قیمت',
               context,
               onChanged: widget.onTextChange[3],
-              isNec: true
+              isNec: true,
+                isDigit: true
             ),
             textField(
               widget.textEditing[4],
               'قیمت کمیسیون',
               context,
               onChanged: widget.onTextChange[4],
+                isDigit: true
             ),
             textField(
               widget.textEditing[5],
               'sku',
               context,
               onChanged: widget.onTextChange[5],
+                isDigit: true
 
             ),
           ],
@@ -391,7 +394,7 @@ class _AddProductBillState extends State<AddProductBill> {
       child: Text(
         label,
         style: TextStyle(
-            color: color, fontSize: AppConfig.calFontSize(context, 2.5)),
+            color: color, fontSize: AppConfig.calFontSize(context,3.5)),
       ),
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(AppConfig.white),

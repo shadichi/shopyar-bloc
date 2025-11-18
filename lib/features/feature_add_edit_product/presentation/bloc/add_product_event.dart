@@ -57,5 +57,8 @@ class SubmitProductBlocEvent extends AddProductEvent{
 class ResetSubmitProductStatusEvent extends AddProductEvent{
   ResetSubmitProductStatusEvent();
 }
+// add_product_event.dart
+class ClearProductFormEvent extends AddProductEvent {}
+
 
 

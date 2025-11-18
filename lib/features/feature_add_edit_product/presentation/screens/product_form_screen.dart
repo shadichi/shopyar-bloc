@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:shopyar/core/resources/data_state.dart';
 import 'package:shopyar/core/widgets/alert_dialog.dart';
 import 'package:shopyar/core/widgets/progress-bar.dart';
 import 'package:shopyar/features/feature_add_edit_product/data/models/variation_model.dart';
@@ -41,7 +38,15 @@ class _AddProductProductFormScreenState
   @override
   void initState() {
     super.initState();
+    context.read<AddProductBloc>().add(ClearProductFormEvent());
     context.read<AddProductBloc>().add(AddProductsDataLoadEvent());
+  }
+  @override
+  void dispose() {
+    // یک reference امن به bloc هم می‌تونی نگه داری
+    final bloc = context.read<AddProductBloc>();
+    bloc.add(ClearProductFormEvent());
+    super.dispose();
   }
 
   final TextEditingController productName = TextEditingController();
@@ -65,7 +70,7 @@ class _AddProductProductFormScreenState
   List<int> productCatValue = [];
   List<int> productBrandValue = [];
   String productStatValue = '';
-  String productCountValue = '';
+  int? productCountValue = 0;
    BuiltAttributePayload attributesValue = BuiltAttributePayload(attributes: [], variations: []);
   /* VariationUiModel variationValue = VariationUiModel(
      attributes: {},
@@ -96,7 +101,6 @@ class _AddProductProductFormScreenState
     final List<Function(String)> addProductBillAddOnTextChange = [
       (value) => productTypeValue = value,
       (value) => productStatValue = value,
-      (value) => productCountValue = value,
     ];
     final Function(List<VariationUiModel>) variationModelChooser =
         (value) => variationValue = value;
@@ -112,6 +116,10 @@ class _AddProductProductFormScreenState
 
     void onFeaturedImageChanged(File? f) {
       setState(() => imageFile = f);
+    }
+
+    void onProductCountValueChanged(int? f) {
+      setState(() => productCountValue = f);
     }
 
     void onGalleryChanged(List<File> files) {
@@ -200,7 +208,8 @@ class _AddProductProductFormScreenState
                           categoryChooser,
                           brandChooser,
                           attributeChooser,
-                          variationModelChooser
+                          variationModelChooser,
+                          onProductCountValueChanged
                       ),
                     ),
                   ),
@@ -335,6 +344,7 @@ class _AddProductProductFormScreenState
     Function(List<int>) brandChooser,
     Function(BuiltAttributePayload) attributeChooser,
     Function(List<VariationUiModel>) variationUiModel,
+    Function(int) countUiModel,
   ) {
     switch (activeStep) {
       case 0:
@@ -358,7 +368,9 @@ class _AddProductProductFormScreenState
             categoryChooser,
             brandChooser,
             attributeChooser,
-          variationUiModel
+          variationUiModel,
+            countUiModel
+
         );
 
       default:
@@ -379,7 +391,7 @@ class _AddProductProductFormScreenState
               }
             } else if (activeStep == 1) {
               if ((productTypeValue == ProductType.variable.name) &&
-                  attributesValue.attributes.isNotEmpty) {
+                  attributesValue.attributes.isEmpty) {
                 alertDialogScreen(
                     context,
                     "لطفا درصورت انتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ",
@@ -390,31 +402,44 @@ class _AddProductProductFormScreenState
                   false)) {
                 print(attributesValue.attributes);
                 print(attributesValue.variations);
+                Map<String, dynamic> test = {};
+// ساختن لیست ورییشن‌ها
                 final List<Map<String, dynamic>> variationJsonList = variationValue.map((v) {
                   return {
-                    "attributes": v.attributes, // همین { "pa_color": "red", ... }
-
+                    "attributes": v.attributes,
                     if (v.regularPrice != null && v.regularPrice!.isNotEmpty)
                       "regular_price": v.regularPrice,
-
                     if (v.salePrice != null && v.salePrice!.isNotEmpty)
                       "sale_price": v.salePrice,
-
                     "manage_stock": v.manageStock,
-
                     if (v.manageStock && v.stockQuantity != null && v.stockQuantity!.isNotEmpty)
                       "stock_quantity": int.tryParse(v.stockQuantity!) ?? 0,
-
                     "in_stock": v.inStock,
-
-                    if (v.imageMediaId != null) "image_media_id": v.imageMediaId,
+                    if (v.imageFile != null) "image_media_id": v.imageFile, // File
                   };
                 }).toList();
 
+
+                /// استخراج فایل‌های ورییشن
+                final List<File?> variationImageFiles = variationJsonList.map((item) {
+                  final val = item['image_media_id'];
+                  return val is File ? val : null;
+                }).toList();
+
+
+                /// پاک کردن هردا**
+                for (final item in variationJsonList) {
+                  if (item['image_media_id'] is File) {
+                    item.remove('image_media_id');
+                  }
+                }
+
+
+
                 print('variationJsonList');
-                print(variationJsonList);
+                print(attributesValue.attributes);
                 // print(variationValue.regularPrice);
-              /*  context
+                context
                     .read<AddProductBloc>()
                     .add(SubmitProductBlocEvent(ProductSubmitModel(
                       name: productNameValue,
@@ -423,27 +448,20 @@ class _AddProductProductFormScreenState
                       sku: skuValue,
                       regularPrice: priceValue,
                       salePrice: commissionPriceValue,
+                      manageStock: attributesValue.attributes.isNotEmpty?false:true,
                       description: explanationValue,
                       shortDescription: shortExplanationValue,
-                      stockQuantity: 1,
+                      stockQuantity: productCountValue,
                       featuredFile: imageFile,
                       galleryFiles: galleryImages,
                       categoryIds: productCatValue,
                       brandIds: productBrandValue,
-                      attributes: attributesValue,
-                      variations: attributesValue.isNotEmpty
-                          ? [
-                              {
-                                "attributes": attributesValue,
-                                "regular_price": priceValue,
-                                "sale_price": commissionPriceValue,
-                                "manage_stock": true,
-                                "stock_quantity": 5
-                              }
-                            ]
+                      attributes: attributesValue.attributes,
+                      variations: attributesValue.attributes.isNotEmpty
+                          ? variationJsonList
                           : [],
-                    )));*/
-
+                  variationImageFiles: variationImageFiles,
+                    )));
                 /*  print(productNameValue);
                 print(shortExplanationValue);
                 print(explanationValue);

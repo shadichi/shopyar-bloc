@@ -92,9 +92,7 @@ class Product extends StatelessWidget {
                               style: TextStyle(
                                   fontSize: width * 0.035,
                                //   fontWeight: FontWeight.bold,
-                                  color: productsLoadedStatus.price.toString().isEmpty
-                                      ? Colors.red
-                                      : Colors.white),
+                                  color:  Colors.white),
                               minFontSize: width * 0.01.toInt(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -122,23 +120,23 @@ class Product extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      child: AutoSizeText(
-                        productsLoadedStatus.stockQuantity.toString().isEmpty
-                            ? 'موجودی نامشخص'
-                            : '${productsLoadedStatus.stockQuantity.toString().stringToPersianDigits()} موجودی',
-                        style: TextStyle(
-                            fontSize: width * 0.03,
-                            color: productsLoadedStatus.stockQuantity
-                                    .toString()
-                                    .isEmpty
-                                ? Colors.red
-                                : Colors.white),
-                        minFontSize: width * 0.01.toInt(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                   !isChild? Container(
+                     child: AutoSizeText(
+                       productsLoadedStatus.stockQuantity.toString().isEmpty
+                           ? 'موجودی نامشخص'
+                           : '${productsLoadedStatus.stockQuantity.toString().stringToPersianDigits()} موجودی',
+                       style: TextStyle(
+                           fontSize: width * 0.03,
+                           color: productsLoadedStatus.stockQuantity
+                               .toString()
+                               .isEmpty
+                               ? Colors.red
+                               : Colors.white),
+                       minFontSize: width * 0.01.toInt(),
+                       maxLines: 1,
+                       overflow: TextOverflow.ellipsis,
+                     ),
+                   ):SizedBox.shrink()
                   ],
                 ),
               )
@@ -206,22 +204,41 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                                       maxLines: 1,
                                       minFontSize: 9,
                                       overflow: TextOverflow.ellipsis,
-                                    ))
+                                    )),
+
                               ],
                             ),
-                            Container(alignment: Alignment.centerRight,
-                            /*  color: Colors.yellow,*/
-                              width: AppConfig.calWidth(context, 88),
-                              height: AppConfig.calHeight(context, 5),
-                              child: AutoSizeText(
-                                product.name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: AppConfig.calFontSize(context, 2.9), color: Colors.white),
-                                maxLines: 1,
-                                minFontSize: 9,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                              children: [
+                                Container(alignment: Alignment.centerRight,
+                                /*  color: Colors.red,*/
+                                  width: AppConfig.calWidth(context, 43),
+                                  height: AppConfig.calHeight(context, 5),
+                                  child: AutoSizeText(
+                                    product.variable,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: AppConfig.calFontSize(context, 2.9), color: Colors.white),
+                                    maxLines: 1,
+                                    minFontSize: 9,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),Container(alignment: Alignment.centerRight,
+                                    /*  color: Colors.grey,*/
+                                    width: AppConfig.calWidth(context, 43),
+                                    height: AppConfig.calHeight(context, 3),
+                                    child: AutoSizeText(
+                                      product.stockQuantity.isNotEmpty? 'موجودی: ${product.stockQuantity.stringToPersianDigits()} ':"موجودی نامشخص",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: AppConfig.calFontSize(context, 3), color: product.stockQuantity.isNotEmpty? Colors.white:Colors.red),
+                                      maxLines: 1,
+                                      minFontSize: 9,
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                              ],
                             ),
                             Container(
                               width: AppConfig.calWidth(context, 83),

@@ -36,6 +36,11 @@ class ProductSubmitModel {
   /// [{"attributes":{"pa_color":"red"},"regular_price":"100000", ...}]
   final List<Map<String, dynamic>>? variations;
 
+  /// لیست موازی با variations برای فایل تصویر هر ورییشن
+  /// index 0 برای variations[0] ، index 1 برای variations[1] و ...
+  final List<File?> variationImageFiles;
+
+
   const ProductSubmitModel({
     // الزامی
     required this.name,
@@ -64,6 +69,8 @@ class ProductSubmitModel {
     this.brandIds,
     this.attributes,
     this.variations,
+    this.variationImageFiles = const [],
+
   });
 
   /// این متد فقط JSON بدنه‌ی محصول را می‌سازد
@@ -71,6 +78,7 @@ class ProductSubmitModel {
   Map<String, dynamic> toJson({
     int? imageMediaId,
     List<int>? galleryMediaIds,
+    List<Map<String, dynamic>>? variationsOverride,
   }) {
     final Map<String, dynamic> payload = {
       'type': type,
@@ -107,8 +115,12 @@ class ProductSubmitModel {
     if (attributes != null && attributes!.isNotEmpty) {
       payload['attributes'] = attributes;
     }
-    if (type == 'variable' && variations != null && variations!.isNotEmpty) {
-      payload['variations'] = variations;
+    // ورییشن‌ها
+    if (type == 'variable') {
+      final list = variationsOverride ?? variations;
+      if (list != null && list.isNotEmpty) {
+        payload['variations'] = list;
+      }
     }
 
     return payload;
