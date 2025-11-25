@@ -25,4 +25,6 @@ abstract class AddOrderRepository{
   Future<AddOrderProductsCard<AddOrderOrdersEntity>> getSelectedProducts(AddOrderGetSelectedProductsParams addOrderGetSelectedProductsParams);
 
   Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams);
+
+  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(List searchProducts);
 }

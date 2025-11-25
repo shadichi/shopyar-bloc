@@ -17,6 +17,7 @@ import '../../../feature_products/domain/entities/product_entity.dart';
 import '../../domain/entities/add_order_data_entity.dart';
 import '../../domain/entities/add_order_product_entity.dart';
 import '../../domain/use_cases/add_order_get_products_use_case.dart';
+import '../../domain/use_cases/add_order_searched_products_use_case.dart';
 import '../../domain/use_cases/add_order_set_order_use_case.dart';
 import '../../domain/use_cases/add_order_get_selected_products_use_case.dart';
 import 'add_order_card_product_status.dart';
@@ -31,8 +32,9 @@ part 'add_order_state.dart';
 class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
   final AddProductGetDataUseCase getProductsUseCase;
   final AddOrderSetOrderUseCase addOrderSetOrderUseCase;
+  final AddProductSearchedDataUseCase addProductSearchedDataUseCase;
 
-  AddOrderBloc(this.getProductsUseCase, this.addOrderSetOrderUseCase)
+  AddOrderBloc(this.getProductsUseCase, this.addOrderSetOrderUseCase, this.addProductSearchedDataUseCase)
       : super(
     AddOrderState(
       addOrderStatus: AddOrderProductsLoadingStatus(),
@@ -41,12 +43,13 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       count: const {},
       isFirstTime: const {},
       visibleProducts: const [],
+      isLoadingMore: false
     ),
   ) {
     // --- Load products
     on<LoadAddOrderProductsData>((event, emit) async {
       if (StaticValues.staticProducts.isEmpty) {
-        final dataState = await getProductsUseCase(InfParams('10', false, '', false));
+        final dataState = await getProductsUseCase(InfParams(event.productsParams.productCount, false, '', false));
 
         if (dataState is OrderDataSuccess) {
           StaticValues.staticProducts = dataState.data!.cast<ProductEntity>();
@@ -79,31 +82,53 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     EventTransformer<E> debounce<E>(Duration d) => (events, mapper) => events.debounce(d).switchMap(mapper);
     String _norm(String? s) => (s ?? '').toLowerCase().replaceAll('ي', 'ی').replaceAll('ك', 'ک').trim();
 
-    on<LoadOnChangedAddOrderProductsData>(
-          (event, emit) {
-        final q = _norm(event.query);
-        if (q.isEmpty) {
-          emit(state.copyWith(newVisibleProducts: StaticValues.staticProducts));
+    on<LoadOnChangedAddOrderProductsData>((event, emit) async {
+      final q = _norm(event.query);
+
+      if (q.isEmpty) {
+        emit(state.copyWith(newVisibleProducts: StaticValues.staticProducts));
+        return;
+      }
+
+      // اگر سرچ ID بود → از API جداگانه
+      if (_isIdSearch(q)) {
+        final ids = q.split(',').map((e) => int.tryParse(e.trim())).whereType<int>().toList();
+
+        // فراخوانی API مخصوص سرچ ID
+        final dataState = await addProductSearchedDataUseCase(ids);
+
+        print(dataState.data);
+
+        if (dataState is OrderDataSuccess) {
+          final items = dataState.data!.cast<ProductEntity>();
+          print('items');
+          print(items);
+
+          emit(state.copyWith(newVisibleProducts: items));
+          return;
+        } else {
+          emit(state.copyWith(newVisibleProducts: []));
           return;
         }
+      }
 
-        final results = StaticValues.staticProducts.where((p) {
-          final name = _norm(p.name);
-          final hitSelf = name.contains(q);
+      // --- حالت سرچ معمولی (متن) ---
+      final results = StaticValues.staticProducts.where((p) {
+        final name = _norm(p.name);
+        final hitSelf = name.contains(q);
 
-          final hitChild = (p.childes ?? const []).any((c) {
-            final cn = _norm(c.name);
-            final varName = _norm(c.variable);
-            return cn.contains(q) || varName.contains(q);
-          });
+        final hitChild = (p.childes ?? const []).any((c) {
+          final cn = _norm(c.name);
+          final varName = _norm(c.variable);
+          return cn.contains(q) || varName.contains(q);
+        });
 
-          return hitSelf || hitChild;
-        }).toList();
+        return hitSelf || hitChild;
+      }).toList();
 
-        emit(state.copyWith(newVisibleProducts: results));
-      },
-      transformer: debounce(const Duration(milliseconds: 250)),
-    );
+      emit(state.copyWith(newVisibleProducts: results));
+    });
+
 
     // --- Hydrate from order (EDIT)
     on<HydrateCartFromOrder>((event, emit) {
@@ -233,4 +258,8 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     ));
   }
 
+}
+bool _isIdSearch(String q) {
+  final numeric = RegExp(r'^[0-9,\s]+$');
+  return numeric.hasMatch(q);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
 import 'package:shopyar/features/feature_orders/presentation/widgets/order.dart';
+import '../../../../core/params/products_params.dart';
 import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../../feature_orders/domain/entities/orders_entity.dart';
@@ -86,6 +87,8 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
 
   bool _hydratedOnce = false;
   AddOrderProductsLoadedStatus? _lastLoaded;
+  bool _initialSearchDone = false;
+
 
   @override
   void initState() {
@@ -93,7 +96,35 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
     // clear cart
     context.read<AddOrderBloc>().add(ClearCart());
     // load product
-    context.read<AddOrderBloc>().add(LoadAddOrderProductsData());
+    context.read<AddOrderBloc>().add(LoadAddOrderProductsData(InfParams('10',false,'',false)));
+
+    // اگر در حالت ویرایش هستیم و سفارش داریم، یکبار لیست id ها را سرچ کن
+    if (!_initialSearchDone && widget.mode == AddOrderProductFormMode.edit && widget.ordersEntity != null) {
+      _initialSearchDone = true;
+
+      // استخراج id ها از lineItems (فرض می‌کنیم کلاس LineItem دارای فیلد productId هست)
+      final ids = (widget.ordersEntity!.lineItems ?? [])
+          .map((li) => li.productId)
+          .where((id) => id != null && id > 0)
+          .map((id) => id.toString())
+          .toSet() // حذف تکراری
+          .toList();
+
+      print("ids");
+      print(ids);
+
+      if (ids.isNotEmpty) {
+        final searchQuery = ids.join(','); // "1347,200,55"
+        // اگر دوست داری متن جستجو را در SearchBar هم نمایش دهی:
+        controller.text = searchQuery;
+
+        print("searchQuery");
+        print(searchQuery);
+
+        // Dispatch event برای جستجوی سریع بر اساس این ids
+        context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(searchQuery));
+      }
+    }
   }
 
   final TextEditingController controller = TextEditingController();
@@ -370,33 +401,55 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
               child: BlocBuilder<AddOrderBloc, AddOrderState>(
                 builder: (context, state) {
                   // فرض می‌کنیم state.addOrderCardProductStatus حاوی Map<int,int> cart است
+                  // جایگزین قسمت ساخت sortedProducts
                   Map<int, int> cart = {};
                   if (state.addOrderCardProductStatus is AddOrderCardProductLoaded) {
                     cart = (state.addOrderCardProductStatus as AddOrderCardProductLoaded).cart;
                   }
 
-                  final sortedProducts = List<ProductEntity>.from(products);
-                  sortedProducts.sort((a, b) {
-                    // بررسی اینکه آیا محصول یا هر یک از childهایش در cart هستند
-                    bool aSelected = (cart[a.id] ?? 0) > 0 ||
-                        (a.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
-                    bool bSelected = (cart[b.id] ?? 0) > 0 ||
-                        (b.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
+// 1) محصولات انتخاب‌شده — از لیست فعلی 'products' (که ممکن است visibleProducts یا search results باشد)
+                  final selected = <ProductEntity>[];
+                  final selectedIds = <int>{};
 
-                    // محصولات انتخاب‌شده اول بیایند (descending on selected bool)
-                    if (aSelected && !bSelected) return -1;
-                    if (!aSelected && bSelected) return 1;
+// بررسی هر محصول در 'products' و تشخیص انتخاب بودن خودش یا یکی از childها
+                  for (final p in products) {
+                    final bool selfSelected = (cart[p.id] ?? 0) > 0;
+                    final bool childSelected = (p.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
 
-                    // در صورت برابر بودن، مرتب‌سازی ثانویه (مثلاً بر اساس نام یا id)
-                    return (a.name ?? '').compareTo(b.name ?? '');
-                  });
+                    if (selfSelected || childSelected) {
+                      selected.add(p);
+                      selectedIds.add(p.id!.toInt());
+                    }
+                  }
+
+// 2) محصولات باقیمانده را از StaticValues.staticProducts اضافه کن (بدون تکرار)
+// همچنین اگر StaticValues.staticProducts شامل محصولاتی باشد که قبلاً در selected هستند، از اضافه‌شدن دوباره جلوگیری می‌کنیم
+                  final remaining = <ProductEntity>[];
+                  for (final sp in StaticValues.staticProducts) {
+                    if (!selectedIds.contains(sp.id)) {
+                      remaining.add(sp);
+                    }
+                  }
+
+// 3) نتیجه نهایی: ابتدا selected (محصولات در کارت)، بعد remaining (کل محصولات ثابت)
+                  final finalList = <ProductEntity>[...selected, ...remaining];
+
+// در صورت خواستن یک مرتب‌سازی ثانویه داخل selected یا remaining، می‌تونی اینجا اعمال کنی.
+// مثلا مرتب‌سازی remaining بر اساس نام:
+// remaining.sort((a,b) => (a.name ?? '').compareTo(b.name ?? ''));
 
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: sortedProducts.length,
+                    itemCount: finalList.length,
                     itemBuilder: (context, index) {
-                      final product = sortedProducts[index];
+                      final product = finalList[index];
+                      if (index == StaticValues.staticProducts.length) {
+                        return Container(
+                          height: AppConfig.calHeight(context, 21),
+                          child: _LoadMoreButton(),
+                        );
+                      }
                       return KeyedSubtree(
                         key: ValueKey(product.id),
                         child: AddOrderProduct(
@@ -408,6 +461,7 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
                       );
                     },
                   );
+
                 },
               ),
             ),
@@ -674,4 +728,57 @@ bool isValidEmail(String email) {
 
   if (email.isEmpty) return false;
   return regex.hasMatch(email);
+}
+class _LoadMoreButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AddOrderBloc>().state;
+    final isLoadingMore = state.isLoadingMore == true;
+
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: AppConfig.calWidth(context, 26),
+        right: AppConfig.calWidth(context, 3),
+        left: AppConfig.calWidth(context, 3),
+      ),
+      margin: EdgeInsets.only(
+        top: AppConfig.calWidth(context, 1.2),
+      ),
+      height: AppConfig.calHeight(context, 10),
+      child: ElevatedButton(
+        onPressed: isLoadingMore
+            ? () {
+          print('fgggggggggggggggggggg');
+        }
+            : () {
+          print('fgggggg');
+          final currentCount = StaticValues.staticProducts.length;
+          print(currentCount);
+          context.read<AddOrderBloc>().add(
+            LoadAddOrderProductsData(InfParams(
+                (currentCount + 10).toString(), false, '', true)),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppConfig.secondaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(width: 0.3, color: Colors.grey[300]!),
+          ),
+        ),
+        child: isLoadingMore
+            ? SizedBox(
+            child: ProgressBar(
+              size: 3,
+            ))
+            : Text(
+          "بارگیری بیشتر",
+          style: TextStyle(
+            fontSize: AppConfig.calFontSize(context, 3.4),
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
 }

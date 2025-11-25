@@ -90,4 +90,23 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
       return false;
     }
   }
+
+  @override
+  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(List searchProducts) async {
+    try {
+      Response response = await apiProvider.getSearchedProductsApi([1347,1346]);
+
+      if (response.statusCode == 200) {
+        List<ProductEntity> editOrderProductEntity =
+        productsFromJson(response.data);
+        return OrderDataSuccess(editOrderProductEntity);
+      } else {
+        return const OrderDataFailed("Something Went Wrong. try again...");
+      }
+    } catch (e) {
+      print(e.toString());
+      return const OrderDataFailed("please check your connection...");
+    }
+  }
+
 }

@@ -5,11 +5,16 @@ abstract class AddOrderEvent {}
 
 
 class LoadAddOrderProductsData extends AddOrderEvent{
-  LoadAddOrderProductsData();
+  final InfParams productsParams;
+  LoadAddOrderProductsData(this.productsParams);
 }
 class LoadOnChangedAddOrderProductsData extends AddOrderEvent{
   final String query;
   LoadOnChangedAddOrderProductsData(this.query);
+}
+class LoadSearchedProductsData extends AddOrderEvent{
+  final List query;
+  LoadSearchedProductsData(this.query);
 }
 
 class HydrateCartFromOrder extends AddOrderEvent {

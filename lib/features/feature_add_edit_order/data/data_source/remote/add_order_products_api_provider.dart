@@ -74,4 +74,31 @@ class AddOrderProductsApiProvider {
       return false;
     }
   }
+  Future<dynamic> getSearchedProductsApi(List searchProducts) async {
+    try {
+      var response = await _dio.get(
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=437',
+        options: Options(headers: {'Authorization': StaticValues.passWord}),
+      );
+
+      if (response.statusCode == 200) {
+        print('responseeeeee');
+        print(response);
+        return response;
+      } else {
+        return [];
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        print("محصولی در GetSearchedProducts یافت نشد");
+        print(e.toString());
+        return Response(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 200,
+            data: []
+        );
+      }
+      return [];
+    }
+  }
 }
