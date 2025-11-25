@@ -16,7 +16,7 @@ class AddOrderProductsApiProvider {
 
   Future<dynamic> getOrderProducts(InfParams productsParams) async {
     var response = await _dio.get(
-        "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=10",
+        "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=-1",
         options: Options(headers: {'Authorization': StaticValues.passWord}));
     return response;
   }

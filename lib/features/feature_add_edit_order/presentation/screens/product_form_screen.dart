@@ -365,27 +365,53 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
                     .add(LoadOnChangedAddOrderProductsData(q)),
               ),
             ),
+            // جایگزین Expanded(...) فعلی
             Expanded(
-              child: ListView.builder(
-                shrinkWrap: true, // ← Add this
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return KeyedSubtree(
-                    key: ValueKey(product.id),
-                    child: AddOrderProduct(
-                      isEditMode,
-                      product,
-                      ordersEntity,
-                      // ⚠️ این کال‌بک دیگه state محلی lineItem رو دستکاری نمی‌کنه
-                      // چون ثبت سفارش مستقیم از state مشتق میشه
-                      (p0) {},
-                    ),
+              child: BlocBuilder<AddOrderBloc, AddOrderState>(
+                builder: (context, state) {
+                  // فرض می‌کنیم state.addOrderCardProductStatus حاوی Map<int,int> cart است
+                  Map<int, int> cart = {};
+                  if (state.addOrderCardProductStatus is AddOrderCardProductLoaded) {
+                    cart = (state.addOrderCardProductStatus as AddOrderCardProductLoaded).cart;
+                  }
+
+                  final sortedProducts = List<ProductEntity>.from(products);
+                  sortedProducts.sort((a, b) {
+                    // بررسی اینکه آیا محصول یا هر یک از childهایش در cart هستند
+                    bool aSelected = (cart[a.id] ?? 0) > 0 ||
+                        (a.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
+                    bool bSelected = (cart[b.id] ?? 0) > 0 ||
+                        (b.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
+
+                    // محصولات انتخاب‌شده اول بیایند (descending on selected bool)
+                    if (aSelected && !bSelected) return -1;
+                    if (!aSelected && bSelected) return 1;
+
+                    // در صورت برابر بودن، مرتب‌سازی ثانویه (مثلاً بر اساس نام یا id)
+                    return (a.name ?? '').compareTo(b.name ?? '');
+                  });
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: sortedProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = sortedProducts[index];
+                      return KeyedSubtree(
+                        key: ValueKey(product.id),
+                        child: AddOrderProduct(
+                          isEditMode,
+                          product,
+                          ordersEntity,
+                              (p0) {},
+                        ),
+                      );
+                    },
                   );
                 },
               ),
             ),
+
           ],
         );
 
