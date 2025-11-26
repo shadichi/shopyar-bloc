@@ -444,12 +444,12 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
                     itemCount: finalList.length,
                     itemBuilder: (context, index) {
                       final product = finalList[index];
-                      if (index == StaticValues.staticProducts.length) {
+                      /*if (index == StaticValues.staticProducts.length) {
                         return Container(
                           height: AppConfig.calHeight(context, 21),
                           child: _LoadMoreButton(),
                         );
-                      }
+                      }*/
                       return KeyedSubtree(
                         key: ValueKey(product.id),
                         child: AddOrderProduct(
