@@ -18,6 +18,8 @@ class ProductsApiProvider{
         '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}&search=${productsParams.search}',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
+      print(        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}&search=${productsParams.search}',
+      );
 
       if (response.statusCode == 200) {
         return response;

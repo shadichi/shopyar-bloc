@@ -95,6 +95,8 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
     super.initState();
     // clear cart
     context.read<AddOrderBloc>().add(ClearCart());
+
+
     // load product
     context.read<AddOrderBloc>().add(LoadAddOrderProductsData(InfParams('10',false,'',false)));
 
@@ -125,6 +127,9 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
         context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(searchQuery));
       }
     }
+    context
+        .read<AddOrderBloc>()
+        .add(LoadOnChangedAddOrderProductsData(""));// فقط برای انه که لیست اپدیت بشه nothing elseeeeeeee
   }
 
   final TextEditingController controller = TextEditingController();
@@ -360,7 +365,7 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
       case 1:
         return Column(
           children: [
-            Container(
+          /*  Container(
               height: AppConfig.calHeight(context, 6),
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.02,
@@ -395,7 +400,7 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
                     .read<AddOrderBloc>()
                     .add(LoadOnChangedAddOrderProductsData(q)),
               ),
-            ),
+            ),*/
             // جایگزین Expanded(...) فعلی
             Expanded(
               child: BlocBuilder<AddOrderBloc, AddOrderState>(
@@ -438,18 +443,34 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
 // مثلا مرتب‌سازی remaining بر اساس نام:
 // remaining.sort((a,b) => (a.name ?? '').compareTo(b.name ?? ''));
 
+                  print('finalList.length');
+                  print(finalList.length);
+
                   return ListView.builder(
-                    shrinkWrap: true,
+                    // داخل Expanded نیازی به shrinkWrap نیست
+                    // shrinkWrap: true,
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: finalList.length,
                     itemBuilder: (context, index) {
                       final product = finalList[index];
-                      /*if (index == StaticValues.staticProducts.length) {
-                        return Container(
-                          height: AppConfig.calHeight(context, 21),
-                          child: _LoadMoreButton(),
+
+                      // آیتم آخر: دکمه با ارتفاع مشخص و padding کوچک
+                      if (index == finalList.length - 1) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppConfig.calWidth(context, 3),
+                            vertical: AppConfig.calWidth(context, 1.5), // کم کن
+                          ),
+                          child: Center(
+                            child: SizedBox(
+                              height: AppConfig.calHeight(context, 5), // ارتفاع ثابت دکمه (مثلاً 5)
+                              width: double.infinity, // یا محدودش کن اگر نمی‌خوای full-width باشه
+                              child: _LoadMoreButton(finalList.length), // داخلش باید فقط خودِ ElevatedButton باشه
+                            ),
+                          ),
                         );
-                      }*/
+                      }
+
                       return KeyedSubtree(
                         key: ValueKey(product.id),
                         child: AddOrderProduct(
@@ -730,53 +751,41 @@ bool isValidEmail(String email) {
   return regex.hasMatch(email);
 }
 class _LoadMoreButton extends StatelessWidget {
+  int listCount;
+  _LoadMoreButton(this.listCount);
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AddOrderBloc>().state;
     final isLoadingMore = state.isLoadingMore == true;
 
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: AppConfig.calWidth(context, 26),
-        right: AppConfig.calWidth(context, 3),
-        left: AppConfig.calWidth(context, 3),
-      ),
-      margin: EdgeInsets.only(
-        top: AppConfig.calWidth(context, 1.2),
-      ),
-      height: AppConfig.calHeight(context, 10),
-      child: ElevatedButton(
-        onPressed: isLoadingMore
-            ? () {
-          print('fgggggggggggggggggggg');
-        }
-            : () {
-          print('fgggggg');
-          final currentCount = StaticValues.staticProducts.length;
-          print(currentCount);
-          context.read<AddOrderBloc>().add(
-            LoadAddOrderProductsData(InfParams(
-                (currentCount + 10).toString(), false, '', true)),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppConfig.secondaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: BorderSide(width: 0.3, color: Colors.grey[300]!),
+    return ElevatedButton(
+      onPressed: isLoadingMore
+          ? null
+          : () {
+        final currentCount = StaticValues.staticProducts.length;
+        context.read<AddOrderBloc>().add(
+          LoadAddOrderProductsData(
+            InfParams((currentCount + 10).toString(), false, '', true),
           ),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppConfig.secondaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(width: 0.3, color: Colors.grey[300]!),
         ),
-        child: isLoadingMore
-            ? SizedBox(
-            child: ProgressBar(
-              size: 3,
-            ))
-            : Text(
-          "بارگیری بیشتر",
-          style: TextStyle(
-            fontSize: AppConfig.calFontSize(context, 3.4),
-            color: Colors.white,
-          ),
+      ),
+      child: isLoadingMore
+          ? SizedBox(
+        height: AppConfig.calHeight(context, 4),
+        child: ProgressBar(size: 3),
+      )
+          : Text(
+        "بارگیری بیشتر",
+        style: TextStyle(
+          fontSize: AppConfig.calFontSize(context, 3.4),
+          color: Colors.white,
         ),
       ),
     );

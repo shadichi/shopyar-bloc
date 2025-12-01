@@ -16,12 +16,6 @@ class _HomeScreenPieChartState extends State<HomeScreenPieChart> {
 
   @override
   Widget build(BuildContext context) {
-    print('widget.items[0]');
-    print(widget.items[0]);
-    print(widget.items[1]);
-    print(widget.items[2]);
-    print(widget.items[3]);
-    print(widget.items[4]);
     // تعریف لیبل و رنگ هر وضعیت
     final labels = <String>[
       'تکمیل شده',

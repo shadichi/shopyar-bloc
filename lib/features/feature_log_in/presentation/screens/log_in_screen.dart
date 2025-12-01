@@ -271,7 +271,7 @@ Widget versionText(context, version) {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'ورژن ${"1.0.2".toString().stringToPersianDigits()}',
+          'ورژن ${"1.0.3".toString().stringToPersianDigits()}',
           style: TextStyle(
             color: AppConfig.progressBarColor,
             fontSize: AppConfig.calWidth(context, 3.4),

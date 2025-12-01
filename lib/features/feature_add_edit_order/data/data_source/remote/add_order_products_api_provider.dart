@@ -15,8 +15,10 @@ class AddOrderProductsApiProvider {
   final Dio _dio = Dio();
 
   Future<dynamic> getOrderProducts(InfParams productsParams) async {
+    print("productsParams.productCount in getOrderProducts:");
+    print(productsParams.productCount);
     var response = await _dio.get(
-        "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=-1",
+        "${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&per_page=${productsParams.productCount}",
         options: Options(headers: {'Authorization': StaticValues.passWord}));
     return response;
   }
@@ -75,12 +77,16 @@ class AddOrderProductsApiProvider {
     }
   }
   Future<dynamic> getSearchedProductsApi(List searchProducts) async {
+    print('searchProducts');
+    String result = searchProducts.join(',');
+    print(result);
     try {
       var response = await _dio.get(
-        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=437',
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${result}',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
 
+print( '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${result}');
       if (response.statusCode == 200) {
         print('responseeeeee');
         print(response);
@@ -89,7 +95,7 @@ class AddOrderProductsApiProvider {
         return [];
       }
     } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
+
         print("محصولی در GetSearchedProducts یافت نشد");
         print(e.toString());
         return Response(
@@ -97,7 +103,7 @@ class AddOrderProductsApiProvider {
             statusCode: 200,
             data: []
         );
-      }
+
       return [];
     }
   }

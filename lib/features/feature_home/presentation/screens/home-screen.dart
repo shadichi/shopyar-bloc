@@ -83,10 +83,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushReplacementNamed(context, LogInScreen.routeName);
       }
       if (state.homeStatus is HomeLoadedStatus) {
-        print('StaticValues.versionNo');
-        print(StaticValues.versionNo);
         widget.onReady?.call();
-        if(StaticValues.versionNo!="1.0.2"){
+        if(StaticValues.versionNo!="1.0.3"){
           alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
 
         }

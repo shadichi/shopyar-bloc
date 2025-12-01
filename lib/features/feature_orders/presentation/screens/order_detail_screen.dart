@@ -304,9 +304,9 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         Container(
                           alignment: Alignment.centerRight,
-                          //      color: Colors.green,
+                            //    color: Colors.green,
                           width: width * 0.4,
-                          height: height * 0.22,
+                          height: height * 0.24,
                           child: Column(
                             spacing:  AppConfig.calHeight(context, 0.7),
                             crossAxisAlignment: CrossAxisAlignment.start,

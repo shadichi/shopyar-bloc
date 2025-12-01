@@ -22,6 +22,7 @@ class StaticValues{
   ///order, product
   static List<OrdersEntity> staticOrders = [];
   static List<ProductEntity> staticProducts = [];
+  static List<ProductEntity> staticAddOrderProducts = [];
   static List<ProductEntity> searchedProducts = [];
   static List<AddOrderProductEntity> staticCardProducts = [];
 }

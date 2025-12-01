@@ -25,30 +25,34 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<LoadProductsData>((event, emit) async {
       final isInitial = StaticValues.staticProducts.isEmpty &&
           !event.productsParams.isLoadMore;
+      print(StaticValues.staticProducts);
 
       if (StaticValues.staticProducts.isEmpty ||
           event.productsParams.isSearch ||
           event.productsParams.isLoadMore) {
-        print('1');
 
         if (event.productsParams.isSearch || event.productsParams.isRefresh) {
           StaticValues.staticProducts.clear();
           emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
         }
-
         if (event.productsParams.isLoadMore) {
           emit(state.copyWith(newIsLoadingMore: true));
-        } else if (isInitial) {
+        }
+        if (isInitial) {
           emit(state.copyWith(newProductsStatus: ProductsLoadingStatus()));
         }
 
         try {
           String perPage = '10';
+          print("7");
           if (event.productsParams.productCount.isNotEmpty) {
             perPage = event.productsParams.productCount;
           }
           final dataState = await getProductsUseCase(event.productsParams);
+          print("dataState in product screen");
+          print(dataState);
           if (dataState is OrderDataSuccess) {
+
             final fetched = dataState.data!.cast<ProductEntity>();
 
             if (event.productsParams.isLoadMore &&
@@ -101,6 +105,9 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       } else {
         emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
       */
+      }else if(StaticValues.staticProducts.isNotEmpty){
+        emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
+
       }
     });
 

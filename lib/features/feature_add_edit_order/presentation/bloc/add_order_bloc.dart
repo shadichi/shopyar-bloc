@@ -48,8 +48,18 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
   ) {
     // --- Load products
     on<LoadAddOrderProductsData>((event, emit) async {
-      if (StaticValues.staticProducts.isEmpty) {
+      print('event.productsParams.isLoadMore');
+      print(event.productsParams.isLoadMore);
+      if (event.productsParams.isLoadMore) {
+        emit(state.copyWith(newIsLoadingMore: true));
+      }
+      if (StaticValues.staticProducts.isEmpty || event.productsParams.isLoadMore) {
         final dataState = await getProductsUseCase(InfParams(event.productsParams.productCount, false, '', false));
+
+        print("dataState");
+        print(dataState);
+        print(dataState.data);
+
 
         if (dataState is OrderDataSuccess) {
           StaticValues.staticProducts = dataState.data!.cast<ProductEntity>();
@@ -75,6 +85,9 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
             newVisibleProducts: StaticValues.staticProducts,
           ),
         );
+      }
+      if (event.productsParams.isLoadMore) {
+        emit(state.copyWith(newIsLoadingMore: false));
       }
     });
 

@@ -94,7 +94,7 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   @override
   Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(List searchProducts) async {
     try {
-      Response response = await apiProvider.getSearchedProductsApi([1347,1346]);
+      Response response = await apiProvider.getSearchedProductsApi(searchProducts);
 
       if (response.statusCode == 200) {
         List<ProductEntity> editOrderProductEntity =

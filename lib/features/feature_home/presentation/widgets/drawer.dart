@@ -213,7 +213,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             Padding(
               padding:  EdgeInsets.symmetric(vertical: width*0.02),
               child: Text(
-                'ورژن ${"1.0.2".toString().stringToPersianDigits()}',
+                'ورژن ${"1.0.3".toString().stringToPersianDigits()}',
                 style: TextStyle(
                   color: AppConfig.progressBarColor,
                   fontSize: AppConfig.calWidth(context, 3.2),
