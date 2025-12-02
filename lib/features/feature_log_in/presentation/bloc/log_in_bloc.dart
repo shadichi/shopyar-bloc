@@ -45,12 +45,16 @@ class LogInBloc extends Bloc<LogInEvent, LogInState> {
             StaticValues.webService =
                 event.userDataParams.webService.toString();
             StaticValues.passWord = event.userDataParams.key.toString();
+            if(
+            StaticValues.shippingMethods.isEmpty ||
+                StaticValues.paymentMethods.isEmpty){
+              emit(
+                  state.copyWith(newlogInStatus: LoginEmptyFieldErrorState('Empty fields found')));
+            }
 
-            if (StaticValues.shopName != '' &&
+           else if (StaticValues.shopName != '' &&
                 StaticValues.status.isNotEmpty &&
-                StaticValues.shopName.isNotEmpty &&
-                StaticValues.shippingMethods.isNotEmpty &&
-                StaticValues.paymentMethods.isNotEmpty) {
+                StaticValues.shopName.isNotEmpty) {
               try {
                 await setStringUseCase(event.userDataParams.key.toString(),
                     event.userDataParams.webService);

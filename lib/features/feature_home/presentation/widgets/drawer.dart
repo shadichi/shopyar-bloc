@@ -8,10 +8,7 @@ import 'package:shopyar/features/feature_home/presentation/screens/setting.dart'
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shopyar/features/feature_orders/presentation/screens/enter_inf_data.dart';
 import '../../../../core/config/app-colors.dart';
-import '../../../../core/params/whole_user_data_params.dart';
-import '../../../feature_log_in/presentation/bloc/log_in_bloc.dart';
 import '../../../feature_orders/data/models/store_info.dart';
-import '../../../feature_orders/presentation/widgets/show_post_label.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
@@ -24,7 +21,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   String _version = "";
   StoreInfo storeInfo =  StoreInfo(storeName: '', storeAddress: '', phoneNumber: '', instagram: '', postalCode: '', website: '', storeIcon: '',storeSenderName: '',storeNote: '');
-
 
   final List<String> icons = [
     'assets/images/icons/setting.svg',
@@ -213,7 +209,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             Padding(
               padding:  EdgeInsets.symmetric(vertical: width*0.02),
               child: Text(
-                'ورژن ${"1.0.3".toString().stringToPersianDigits()}',
+                'ورژن ${StaticValues.packageInfoVersionNo.toString().stringToPersianDigits()}',
                 style: TextStyle(
                   color: AppConfig.progressBarColor,
                   fontSize: AppConfig.calWidth(context, 3.2),

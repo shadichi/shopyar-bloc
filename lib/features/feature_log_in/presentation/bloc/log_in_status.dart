@@ -48,6 +48,15 @@ class LoginErrorState extends LogInStatus {
   // TODO: implement props
   List<Object?> get props => [error];
 }
+class LoginEmptyFieldErrorState extends LogInStatus {
+  final String error;
+
+  LoginEmptyFieldErrorState(this.error);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [error];
+}
 class SharedPErrorState extends LogInStatus {
   final String error;
 

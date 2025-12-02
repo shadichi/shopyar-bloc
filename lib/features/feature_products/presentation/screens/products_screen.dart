@@ -35,8 +35,10 @@ class _ProductsScreenState extends State<ProductsScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-    BlocProvider.of<ProductsBloc>(context)
-        .add(LoadProductsData(InfParams('10', false, '', false)));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      BlocProvider.of<ProductsBloc>(context)
+          .add(LoadProductsData(InfParams('10', false, '', false)));    });
   }
 
   Future<void> _onRefresh() {

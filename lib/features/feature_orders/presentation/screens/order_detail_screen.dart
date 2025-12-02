@@ -153,6 +153,11 @@ class OrderDetailScreen extends StatelessWidget {
                           controller: _scrollController,
                             itemCount: ordersData.lineItems!.length,
                             itemBuilder: (context, index) {
+                              final imageMap = ordersData.lineItems![index].image;
+
+                              final imageUrl = (imageMap != null && imageMap["full"] != null)
+                                  ? imageMap["full"].toString()
+                                  : "";
                               return Container(
                                 width: width * 0.5,
                                 height: height * 0.1,
@@ -168,11 +173,13 @@ class OrderDetailScreen extends StatelessWidget {
                                       width: width * 0.2,
                                       height: height * 0.2,
                                       padding: EdgeInsets.all(width * 0.013),
-                                      child: ordersData.lineItems![index].image!["full"]
-                                          .toString().isNotEmpty
-                                          ? Image.network(ordersData.lineItems![index].image!["full"]
-                                          .toString())
-                                          : Image.asset("assets/images/index.png"),
+                                      child: imageUrl.isNotEmpty
+                                          ? Image.network(
+                                        imageUrl,
+                                        errorBuilder: (context, error, stackTrace) =>
+                                        const SizedBox.shrink(),
+                                      )
+                                          : const SizedBox.shrink(),
                                     ),
 
                                     Column(

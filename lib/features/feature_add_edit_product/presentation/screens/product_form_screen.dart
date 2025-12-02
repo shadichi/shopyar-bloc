@@ -35,17 +35,19 @@ class _AddProductProductFormScreenState
   final GlobalKey<FormState> _addProductBillformKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _addProductBillAddformKey = GlobalKey<FormState>();
 
+  late final AddProductBloc _addProductBloc;
+
   @override
   void initState() {
     super.initState();
-    context.read<AddProductBloc>().add(ClearProductFormEvent());
-    context.read<AddProductBloc>().add(AddProductsDataLoadEvent());
+    _addProductBloc = context.read<AddProductBloc>(); // safe here
+    _addProductBloc.add(ClearProductFormEvent());
+    _addProductBloc.add(AddProductsDataLoadEvent());
   }
   @override
   void dispose() {
-    // یک reference امن به bloc هم می‌تونی نگه داری
-    final bloc = context.read<AddProductBloc>();
-    bloc.add(ClearProductFormEvent());
+    // از context استفاده نکن — از فیلد ذخیره شده استفاده کن
+    _addProductBloc.add(ClearProductFormEvent());
     super.dispose();
   }
 
@@ -397,6 +399,7 @@ class _AddProductProductFormScreenState
                     "لطفا درصورت انتخاب محصول متغیر، مقادیر ویژگی متغیر را هم انتخاب کنید. ",
                     1,
                     true);
+                return;
               }
               if ((_addProductBillAddformKey.currentState?.validate() ??
                   false)) {

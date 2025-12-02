@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:shopyar/core/utils/static_values.dart';
 import 'package:shopyar/features/feature_home/presentation/bloc/home_status.dart';
@@ -28,7 +27,6 @@ class HomeScreen extends StatefulWidget {
   final void Function(bool)? onDrawerStatusChange;
   final VoidCallback? onReady;
 
-
   const HomeScreen({Key? key, this.onDrawerStatusChange,this.onReady,}) : super(key: key);
 
   @override
@@ -40,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-   // _startPollingReady();
+    // _startPollingReady();
     BlocProvider.of<HomeBloc>(context).add(LoadDataEvent());
   }
 
@@ -78,18 +76,21 @@ class _HomeScreenState extends State<HomeScreen> {
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
 
     return BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) {
-      if (state.homeStatus is HomeAccountExitStatus) {
-        Navigator.pushReplacementNamed(context, LogInScreen.routeName);
-      }
-      if (state.homeStatus is HomeLoadedStatus) {
-        widget.onReady?.call();
-        if(StaticValues.versionNo!="1.0.3"){
-          alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
+        listener: (context, state) async {
+          if (state.homeStatus is HomeAccountExitStatus) {
+            Navigator.pushReplacementNamed(context, LogInScreen.routeName);
+          }
+          if (state.homeStatus is HomeLoadedStatus) {
 
-        }
-      }
-    }, builder: (context, state) {
+            widget.onReady?.call();
+            print('packageInfo.version');
+            print(StaticValues.packageInfoVersionNo);
+            if(StaticValues.versionNo!=StaticValues.packageInfoVersionNo){
+              alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
+
+            }
+          }
+        }, builder: (context, state) {
       if (state.homeStatus is HomeLoading) {
         return Center(child: ProgressBar());
       }
@@ -159,53 +160,53 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       StaticValues
-                                      .staticHomeDataEntity!.statusCounts!.wcCompleted ==
-                                  0 &&
-                              StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcOnHold ==
-                                  0 &&
-                              StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcPending ==
-                                  0 &&
-                              StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcProcessing ==
-                                  0 &&
-                              StaticValues.staticHomeDataEntity!.statusCounts!
-                                      .wcCancelled ==
-                                  0
+                          .staticHomeDataEntity!.statusCounts!.wcCompleted ==
+                          0 &&
+                          StaticValues.staticHomeDataEntity!.statusCounts!
+                              .wcOnHold ==
+                              0 &&
+                          StaticValues.staticHomeDataEntity!.statusCounts!
+                              .wcPending ==
+                              0 &&
+                          StaticValues.staticHomeDataEntity!.statusCounts!
+                              .wcProcessing ==
+                              0 &&
+                          StaticValues.staticHomeDataEntity!.statusCounts!
+                              .wcCancelled ==
+                              0
                           ? Center(
-                              child: Container(
-                                height: AppConfig.calHeight(context, 30),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
-                                  style: TextStyle(
-                                      fontSize:
-                                          AppConfig.calFontSize(context, 3),
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            )
+                        child: Container(
+                          height: AppConfig.calHeight(context, 30),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
+                            style: TextStyle(
+                                fontSize:
+                                AppConfig.calFontSize(context, 3),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      )
                           : Padding(
-                              padding: EdgeInsets.only(
-                                  top: AppConfig.calHeight(context, 5),
-                                  bottom: AppConfig.calHeight(context, 1.2)),
-                              child: HomeScreenPieChart(
-                                items: [
-                                  StaticValues.staticHomeDataEntity!
-                                      .statusCounts!.wcCompleted,
-                                  StaticValues.staticHomeDataEntity!
-                                      .statusCounts!.wcOnHold,
-                                  StaticValues.staticHomeDataEntity!
-                                      .statusCounts!.wcPending,
-                                  StaticValues.staticHomeDataEntity!
-                                      .statusCounts!.wcProcessing,
-                                  StaticValues.staticHomeDataEntity!
-                                      .statusCounts!.wcCancelled
-                                ],
-                              ),
-                            ),
+                        padding: EdgeInsets.only(
+                            top: AppConfig.calHeight(context, 5),
+                            bottom: AppConfig.calHeight(context, 1.2)),
+                        child: HomeScreenPieChart(
+                          items: [
+                            StaticValues.staticHomeDataEntity!
+                                .statusCounts!.wcCompleted,
+                            StaticValues.staticHomeDataEntity!
+                                .statusCounts!.wcOnHold,
+                            StaticValues.staticHomeDataEntity!
+                                .statusCounts!.wcPending,
+                            StaticValues.staticHomeDataEntity!
+                                .statusCounts!.wcProcessing,
+                            StaticValues.staticHomeDataEntity!
+                                .statusCounts!.wcCancelled
+                          ],
+                        ),
+                      ),
                       SizedBox(
                         height: AppConfig.calHeight(context, 2.5),
                       ),
@@ -228,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: EdgeInsets.only(
                             right: AppConfig.calWidth(context, 6)),
                         decoration: BoxDecoration(
-                            //    color: Colors.red,
+                          //    color: Colors.red,
                             borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(width * 0.07),
                                 topRight: Radius.circular(width * 0.07))),
@@ -245,15 +246,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       } else if (state.homeStatus is HomeErrorStatus) {
-        return Center(
-            child: Text(
-          'خطا در بارگیری اطلاعات صفحه اصلی!',
-          style: TextStyle(
-              color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
-        ));
+        return ShowErrorWidget(context);;
       } else if (state.homeStatus is HomeLoadedStatus) {
         final HomeLoadedStatus ordersLoadedStatus =
-            state.homeStatus as HomeLoadedStatus;
+        state.homeStatus as HomeLoadedStatus;
         return Scaffold(
           body: SizedBox(
             height: height,
@@ -284,10 +280,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-      return Container(
-        color: AppConfig.backgroundColor,
-        child: Text('خطا در بارگیری اطلاعات!'),
-      );
+      return ShowErrorWidget(context);
     });
   }
+}
+Widget ShowErrorWidget(BuildContext context){
+  return  Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Icon(Icons.warning,color: AppConfig.firstLinearColor),
+      SizedBox(height: AppConfig.calHeight(context, 2),),
+      Text(
+        'خطا در بارگیری اطلاعات!',
+        style: TextStyle(
+            color: Colors.white, fontSize: AppConfig.calFontSize(context, 4)),
+      ),
+    ],
+  );
 }

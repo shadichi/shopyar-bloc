@@ -28,6 +28,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             homeStatus: HomeLoading(), homeDataStatus: HomeDataLoading())) {
 
     on<LoadDataEvent>((event, emit) async {
+
       if (StaticValues.webService.isEmpty ||
           StaticValues.passWord.isEmpty ||
           StaticValues.shopName.isEmpty ||

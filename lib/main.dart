@@ -10,6 +10,7 @@ import 'package:shopyar/features/feature_orders/presentation/screens/orders_scre
 import 'package:shopyar/features/feature_products/presentation/bloc/products_bloc.dart';
 import 'package:shopyar/features/feature_start/presentation/bloc/start_bloc.dart';
 import 'package:shopyar/features/feature_start/presentation/screens/start_screen.dart';
+import 'core/utils/static_values.dart';
 import 'features/feature_add_edit_order/presentation/screens/product_form_screen.dart';
 import 'features/feature_add_edit_order/presentation/bloc/add_order_bloc.dart';
 import 'features/feature_home/presentation/bloc/home_bloc.dart';
@@ -22,10 +23,13 @@ import 'features/feature_orders/data/models/store_info.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'locator.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final packageInfo = await PackageInfo.fromPlatform();
+  StaticValues.packageInfoVersionNo = packageInfo.version;
   await Hive.initFlutter();
 
   Hive.registerAdapter(StoreInfoAdapter()); // ثبت مدل

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopyar/core/config/app-colors.dart';
+import 'package:shopyar/core/utils/static_values.dart';
 import 'package:shopyar/core/widgets/alert_dialog.dart';
 import 'package:shopyar/extension/persian_digits.dart';
 import 'package:shopyar/features/feature_log_in/presentation/bloc/log_in_bloc.dart';
@@ -12,6 +13,7 @@ import '../bloc/log_in_status.dart';
 import '../widgets/cusrom_clippath_login.dart';
 import 'package:shimmer/shimmer.dart';
 import '../widgets/log_in_text_form_widget.dart';
+
 
 class LogInScreen extends StatefulWidget {
   static const routeName = '/login_widget';
@@ -34,6 +36,7 @@ class _LogInScreenState extends State<LogInScreen> {
     super.initState();
     _webServiceController = TextEditingController();
     _tokenController = TextEditingController();
+
   }
 
   @override
@@ -74,6 +77,12 @@ class _LogInScreenState extends State<LogInScreen> {
               showSnack(
                 context,
                 "خطا: آدرس وب‌سرویس یا توکن نادرست است!",
+              );
+            }
+            if (status is LoginEmptyFieldErrorState) {
+              showSnack(
+                context,
+                "خطا: در این سایت شیوه های پرداخت یا حمل و نقل وجود ندارد!",
               );
             } else if (status is EmptyTextFieldsStatus) {
               showSnack(
@@ -122,7 +131,7 @@ class _LogInScreenState extends State<LogInScreen> {
                   SizedBox(height: AppConfig.calHeight(context, 4)),
                   helpButton(context),
                   SizedBox(height: AppConfig.calHeight(context, 4)),
-                  versionText(context, _version),
+                  versionText(context),
                 ],
               ),
             ),
@@ -263,7 +272,7 @@ Widget helpButton(context) {
   );
 }
 
-Widget versionText(context, version) {
+Widget versionText(context) {
   return SizedBox(
     width: AppConfig.calWidth(context, 25),
     height: AppConfig.calHeight(context, 5),
@@ -271,7 +280,7 @@ Widget versionText(context, version) {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'ورژن ${"1.0.3".toString().stringToPersianDigits()}',
+          'ورژن ${StaticValues.packageInfoVersionNo.stringToPersianDigits()}',
           style: TextStyle(
             color: AppConfig.progressBarColor,
             fontSize: AppConfig.calWidth(context, 3.4),
