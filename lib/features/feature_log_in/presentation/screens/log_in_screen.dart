@@ -11,7 +11,6 @@ import '../../../../core/widgets/progress-bar.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../bloc/log_in_status.dart';
 import '../widgets/cusrom_clippath_login.dart';
-import 'package:shimmer/shimmer.dart';
 import '../widgets/log_in_text_form_widget.dart';
 
 
@@ -68,6 +67,7 @@ class _LogInScreenState extends State<LogInScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: AppConfig.white,
         resizeToAvoidBottomInset: false,
         body: BlocListener<LogInBloc, LogInState>(
           listener: (context, state) {
@@ -110,29 +110,45 @@ class _LogInScreenState extends State<LogInScreen> {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, // 👈 با اسکرول کیبورد بسته میشه
 
               // padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  header(context),
-                  SizedBox(height: AppConfig.calHeight(context, 4)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: loginForm(
-                      context,
-                      _formKey,
-                      _webServiceController,
-                      _tokenController,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height, // یا هر ارتفاع دلخواه
+                ),
+                child: Stack(
+                  children: [
+                
+                    header(context),
+                  //  SizedBox(height: AppConfig.calHeight(context, 4)),
+                    Positioned(
+                      top: 250,
+                      left: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: loginForm(
+                          context,
+                          _formKey,
+                          _webServiceController,
+                          _tokenController,
+                            _submit
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: AppConfig.calHeight(context, 2)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: loginButton(context, () => _submit(context)),
-                  ),
-                  SizedBox(height: AppConfig.calHeight(context, 4)),
-                  helpButton(context),
-                  SizedBox(height: AppConfig.calHeight(context, 4)),
-                  versionText(context),
-                ],
+                    SizedBox(height: AppConfig.calHeight(context, 2)),
+                   /* Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: loginButton(context, () => _submit(context)),
+                    ),*/
+                    SizedBox(height: AppConfig.calHeight(context, 4)),
+                    Positioned(child: helpButton(context), bottom: 40,
+                      left: 0,
+                      right: 0,),
+                    SizedBox(height: AppConfig.calHeight(context, 4)),
+                    Positioned(child: versionText(context), bottom: 20,
+                      left: 0,
+                      right: 0,),
+                  ],
+                ),
               ),
             ),
           ),
@@ -146,18 +162,27 @@ Widget header(context) {
   return ClipPath(
     clipper: CustomClipPathSignUp(),
     child: Container(
-      alignment: Alignment.center,
-      height: AppConfig.calHeight(context, 30),
+      padding: EdgeInsets.only(top: AppConfig.calHeight(context, 12)),
+      alignment: Alignment.topCenter,
+      height: AppConfig.calHeight(context, 80),
       color: AppConfig.secondaryColor,
-      child: Shimmer.fromColors(
-        baseColor: Colors.white,
-        highlightColor: Colors.grey,
-        child: Text(
+      child: ListTile(
+        title: Text(
           'ورود به اپلیکیشن شاپ‌یار',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: AppConfig.calFontSize(context, 5),
             fontWeight: FontWeight.bold,
+            color: AppConfig.white
+          ),
+        ),
+        subtitle: Text(
+          'جهت ورود به اپلیکیشن، آدرس وب سرویس و توکن دریافتی از افزونه را وارد کنید.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: AppConfig.calFontSize(context, 3.8),
+            fontWeight: FontWeight.bold,
+              color: AppConfig.borderColor
           ),
         ),
       ),
@@ -165,34 +190,48 @@ Widget header(context) {
   );
 }
 
-Widget loginForm(context, formKey, webServiceController, tokenController) {
+Widget loginForm(context, formKey, webServiceController, tokenController, _submit) {
   final gap = SizedBox(height: AppConfig.calHeight(context, 2));
   final labelStyle = TextStyle(
-    fontSize: AppConfig.calFontSize(context, 4),
+    fontSize: AppConfig.calFontSize(context, 5),
     fontWeight: FontWeight.bold,
-    color: Colors.white,
+    color: AppConfig.backgroundColor,
   );
 
   return Form(
     key: formKey,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('آدرس وب‌سرویس', style: labelStyle),
-        gap,
-        LogInTextFormWidget(webServiceController),
-        SizedBox(height: AppConfig.calHeight(context, 2)),
-        Text('توکن', style: labelStyle),
-        gap,
-        LogInTextFormWidget(tokenController),
-      ],
+    child: Card(
+      elevation: 10,
+      child: Container(
+        height: AppConfig.calHeight(context, 50),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(AppConfig.calBorderRadiusSize(context))),
+          color: AppConfig.white,
+        ),
+        padding: EdgeInsets.all(AppConfig.calHeight(context, 0.8)),
+      
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: AppConfig.calHeight(context, 1)),
+            Text('فرم ورود به اپلیکیشن', style: labelStyle),
+            gap,
+            LogInTextFormWidget(webServiceController, "آدرس وب سرویس"),
+          //  SizedBox(height: AppConfig.calHeight(context, 2)),
+            //Text('توکن', style: labelStyle),
+            gap,
+            LogInTextFormWidget(tokenController, "توکن"),
+            loginButton(context, () => _submit(context))
+          ],
+        ),
+      ),
     ),
   );
 }
 
 Widget loginButton(context, onPressed) {
-  final buttonWidth = AppConfig.calWidth(context, 80);
-  final buttonHeight = AppConfig.calHeight(context, 8);
+  final buttonWidth = AppConfig.calWidth(context, 70);
+  final buttonHeight = AppConfig.calHeight(context, 6);
 
   return SizedBox(
     width: buttonWidth,
@@ -256,14 +295,14 @@ Widget helpButton(context) {
           Text(
             'راهنمایی',
             style: TextStyle(
-              color: AppConfig.progressBarColor,
+              color: AppConfig.backgroundColor,
               fontSize: AppConfig.calWidth(context, 4),
             ),
           ),
           SizedBox(width: AppConfig.calWidth(context, 2)),
           Icon(
             Icons.help,
-            color: AppConfig.progressBarColor,
+            color: AppConfig.backgroundColor,
             size: AppConfig.calWidth(context, 4.3),
           ),
         ],
@@ -280,9 +319,9 @@ Widget versionText(context) {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'ورژن ${StaticValues.packageInfoVersionNo.stringToPersianDigits()}',
+          'نسخه ${StaticValues.packageInfoVersionNo.stringToPersianDigits()}',
           style: TextStyle(
-            color: AppConfig.progressBarColor,
+            color: AppConfig.backgroundColor,
             fontSize: AppConfig.calWidth(context, 3.4),
           ),
         ),

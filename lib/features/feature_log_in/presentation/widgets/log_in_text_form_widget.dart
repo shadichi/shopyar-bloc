@@ -3,15 +3,19 @@ import 'package:shopyar/core/config/app-colors.dart';
 
 class LogInTextFormWidget extends StatelessWidget {
   TextEditingController textEditingController;
-  LogInTextFormWidget(this.textEditingController);
+  String hintText;
+  LogInTextFormWidget(this.textEditingController, this.hintText);
 
   @override
   Widget build(BuildContext context) {
-    return  SizedBox(
+    return  Container(
+      alignment: Alignment.center,
+    //  color: Colors.red,
       height: AppConfig.calHeight(context, 13),
+      width: AppConfig.calWidth(context, 70),
       child: TextFormField(
         controller: textEditingController,
-        textInputAction: TextInputAction.next, // یا done برای آخری
+        textInputAction: TextInputAction.next,
         scrollPadding: const EdgeInsets.only(bottom: 100),
         style:  TextStyle(
           color: AppConfig.backgroundColor,
@@ -22,24 +26,41 @@ class LogInTextFormWidget extends StatelessWidget {
         textAlignVertical: TextAlignVertical.center,
         //keyboardType: TextInputType.number,
         decoration: InputDecoration(
-          filled: true,
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10, vertical: 20),
-          fillColor: Colors.grey[300],
+          filled: false, // دیگه بک‌گراند نداره
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           counterText: "",
-          enabledBorder: OutlineInputBorder(
-              borderSide:  BorderSide(
-                  width: 2, color: Colors.transparent),
-              borderRadius: BorderRadius.circular(10)),
-          errorBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                  width: 1, color: Colors.transparent),
-              borderRadius: BorderRadius.circular(10)),
-          focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(
-                  width: 1, color: AppConfig.progressBarColor),
-              borderRadius: BorderRadius.circular(10)),
+          hintText: hintText,
+          hintStyle: TextStyle(color: AppConfig.backgroundColor),
+
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              width: 2,
+              color: Colors.grey,
+            ),
+          ),
+
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              width: 2,
+              color: AppConfig.progressBarColor,
+            ),
+          ),
+
+          errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              width: 1,
+              color: Colors.red,
+            ),
+          ),
+
+          focusedErrorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              width: 1,
+              color: Colors.red,
+            ),
+          ),
         ),
+
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'این فیلد اجباری است';
