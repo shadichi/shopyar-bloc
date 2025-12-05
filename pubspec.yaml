@@ -68,15 +68,3 @@ flutter:
     - family: Vazir
       fonts:
         - asset: assets/fonts/Vazir.ttf
-
-    - family: Bnazanin
-      fonts:
-         - asset: assets/fonts/B-NAZANIN.ttf
-
-    - family: Byekan
-      fonts:
-         - asset: assets/fonts/Yekan.ttf
-
-    - family: NotoSansArabic
-      fonts:
-        - asset: assets/fonts/NotoSansArabic-Medium.ttf
