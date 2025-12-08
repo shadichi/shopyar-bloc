@@ -40,7 +40,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
     if (stored != null) {
       storeInfo = stored;
     } else {
-      // اگر انتظار داشتی حتما داده باشه، اینجا می‌تونی مقدار پیش‌فرض یا لاگ بذاری
       storeInfo = StoreInfo(
           storeName: '',
           storeAddress: '',
@@ -124,7 +123,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     height: height*0.2,
                     child: Builder(
                       builder: (context) {
-                        // اگر خالی بود → بزار روی shopyar-icon.svg
                         if (storeInfo.storeIcon.isEmpty) {
                           return SvgPicture.asset(
                             'assets/images/icons/shopyar-icon.svg',
@@ -142,7 +140,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                           }
                         }
 
-                        // اگر فایل از حافظه لوکال باشه
                         if (iconPath.toLowerCase().endsWith('.svg')) {
                           return SvgPicture.file(File(iconPath), fit: BoxFit.contain);
                         } else {

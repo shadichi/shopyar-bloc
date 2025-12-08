@@ -23,13 +23,11 @@ import 'features/feature_orders/data/models/store_info.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'locator.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final packageInfo = await PackageInfo.fromPlatform();
-  StaticValues.packageInfoVersionNo = packageInfo.version;
+  StaticValues.packageInfoVersionNo = '1.0.3';
   await Hive.initFlutter();
 
   Hive.registerAdapter(StoreInfoAdapter()); // ثبت مدل
