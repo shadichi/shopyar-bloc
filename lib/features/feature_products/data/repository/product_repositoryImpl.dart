@@ -42,7 +42,10 @@ class ProductRepositoryImpl extends ProductRepository{
       if (response.statusCode == 200) {
         print('response.statusCode');
         print(response.statusCode);
+        print(response.data);
         List<ProductEntity> productEntity = productsFromJson(response.data);
+        print("productEntity");
+        print(productEntity);
 
         return OrderDataSuccess(productEntity);
       }else{

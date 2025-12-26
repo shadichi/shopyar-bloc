@@ -51,19 +51,19 @@ class Product extends StatelessWidget {
                 ),
                 //   clipBehavior: Clip.antiAlias,  // برای کلیپ شدن کانتینر
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      AppConfig.calBorderRadiusSize(context)),
-                  child: (productsLoadedStatus.image != null &&
-                          productsLoadedStatus.image!.isNotEmpty)
-                      ? Image.network(
-                          productsLoadedStatus.image!,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/index.png',
-                          fit: BoxFit.cover,
-                        ),
+                  borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)),
+                  child: Image.network(
+                    productsLoadedStatus.image!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Image.asset('assets/images/index.png', fit: BoxFit.cover),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(child: CircularProgressIndicator()); // اختیاری
+                    },
+                  ),
                 ),
+
               ),
               Container(
 
@@ -278,3 +278,23 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
     );
   }
 }
+Widget _buildProductImage(String? imageUrl) {
+  // اگر null یا خالی باشه → asset
+  if (imageUrl == null || imageUrl.isEmpty) {
+    return Image.asset('assets/images/index.png', fit: BoxFit.cover);
+  }
+
+  // اگر عدد باشه → asset
+  if (int.tryParse(imageUrl) != null) {
+    return Image.asset('assets/images/index.png', fit: BoxFit.cover);
+  }
+
+  // اگر URL معتبر باشه → network
+  return Image.network(
+    imageUrl,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) =>
+        Image.asset('assets/images/index.png', fit: BoxFit.cover), // fallback
+  );
+}
+

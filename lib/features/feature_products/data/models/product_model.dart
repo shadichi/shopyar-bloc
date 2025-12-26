@@ -44,23 +44,25 @@ class ProductModel extends ProductEntity{
     totalSales: totalSales,
     childes: childes,
   );
-
+  int? _parseInt(dynamic value) => value == null || value == "" ? null : int.tryParse(value.toString());
+  bool? _parseBool(dynamic value) => value == null ? null : (value is bool ? value : value.toString().toLowerCase() == 'true');
+  String? _parseString(dynamic value) => value?.toString();
 
   ProductModel.fromJson(dynamic json) {
-    id= json["id"];
-    name= json["name"];
-    sku= json["sku"];
-    regularPrice= json["regular_price"];
-    salePrice= json["sale_price"];
-    price=json["price"];
-    manageStock= json["manage_stock"];
-    stockQuantity= json["stock_quantity"];
-    inStock= json["in_stock"];
-    dateOnSaleFrom= json["date_on_sale_from"];
-    dateOnSaleTo= json["date_on_sale_to"];
-    lowStock= json["low_stock"];
-    image= json["image"];
-    totalSales= json["total_sales"];
+    id= _parseInt(json["id"]);
+    name= _parseString(json["name"]);
+    sku= _parseString(json["sku"]);
+    regularPrice= _parseString(json["regular_price"]);
+    salePrice= _parseString(json["sale_price"]);
+    price=_parseString(json["price"]);
+    manageStock= _parseBool(json["manage_stock"]);
+    stockQuantity= _parseString(json["stock_quantity"]);
+    inStock= _parseBool(json["in_stock"]);
+    dateOnSaleFrom= _parseString(json["date_on_sale_from"]);
+    dateOnSaleTo= _parseString(json["date_on_sale_to"]);
+    lowStock= _parseString(json["low_stock"]);
+    image= _parseString(json["image"]);
+    totalSales= _parseInt(json["total_sales"]);
     childes= List<Childe>.from(json["variations"].map((x) => Childe.fromJson(x)));
   }
    int? id;

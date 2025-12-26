@@ -50,24 +50,33 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           }
           final dataState = await getProductsUseCase(event.productsParams);
           print("dataState in product screen");
-          print(dataState);
+         // print(dataState);
           if (dataState is OrderDataSuccess) {
-
+            print("1");
             final fetched = dataState.data!.cast<ProductEntity>();
-
+            print("2");
             if (event.productsParams.isLoadMore &&
                 StaticValues.staticProducts.isNotEmpty) {
+              print("3");
               StaticValues.staticProducts = fetched;
+              print("4");
             } else {
+              print("5");
               StaticValues.staticProducts = fetched;
             }
+            print("6");
             emit(state.copyWith(newProductsStatus: ProductsLoadedStatus()));
           } else {
+            print("7");
             emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
           }
         } catch (e) {
+          print("8");
           emit(state.copyWith(newProductsStatus: ProductsErrorStatus()));
+          print("error in get product:");
+          print(e);
         } finally {
+          print("9");
           // 👇 حتماً خاموش کن تا دکمه از لودینگ خارج شه
           if (event.productsParams.isLoadMore) {
             emit(state.copyWith(newIsLoadingMore: false));
