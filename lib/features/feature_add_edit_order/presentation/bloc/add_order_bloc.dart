@@ -23,7 +23,8 @@ import '../../domain/use_cases/add_order_get_selected_products_use_case.dart';
 import 'add_order_card_product_status.dart';
 import 'add_order_set_order_status.dart';
 import 'add_order_status.dart';
-import 'package:stream_transform/stream_transform.dart';
+import 'package:collection/collection.dart';
+
 
 part 'add_order_event.dart';
 
@@ -34,6 +35,7 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
   final AddOrderSetOrderUseCase addOrderSetOrderUseCase;
   final AddProductSearchedDataUseCase addProductSearchedDataUseCase;
 
+
   AddOrderBloc(this.getProductsUseCase, this.addOrderSetOrderUseCase, this.addProductSearchedDataUseCase)
       : super(
     AddOrderState(
@@ -43,9 +45,12 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       count: const {},
       isFirstTime: const {},
       visibleProducts: const [],
-      isLoadingMore: false
+      isLoadingMore: false, isSearching:false, isRemoteResult: false
     ),
   ) {
+
+    int _searchToken = 0;
+
     // --- Load products
     on<LoadAddOrderProductsData>((event, emit) async {
       print('event.productsParams.isLoadMore');
@@ -92,56 +97,33 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     });
 
     // --- Debounced search
-    EventTransformer<E> debounce<E>(Duration d) => (events, mapper) => events.debounce(d).switchMap(mapper);
     String _norm(String? s) => (s ?? '').toLowerCase().replaceAll('ي', 'ی').replaceAll('ك', 'ک').trim();
 
-    on<LoadOnChangedAddOrderProductsData>((event, emit) async {
-      final q = _norm(event.query);
+    /// ===== Helpers =====
 
-      if (q.isEmpty) {
-        emit(state.copyWith(newVisibleProducts: StaticValues.staticProducts));
-        return;
-      }
+    bool _isIdSearch(String q) =>
+        RegExp(r'^(\d+)(,\d+)*$').hasMatch(q);
 
-      // اگر سرچ ID بود → از API جداگانه
-      if (_isIdSearch(q)) {
-        final ids = q.split(',').map((e) => int.tryParse(e.trim())).whereType<int>().toList();
+    List<ProductEntity> _localSearch(String q) {
+      print("localsearchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+      return StaticValues.staticProducts.where((p) {
+        final hitSelf = _norm(p.name).contains(q);
 
-        // فراخوانی API مخصوص سرچ ID
-        final dataState = await addProductSearchedDataUseCase(ids);
+        final hitChild = (p.childes ?? []).any((c) =>
+        _norm(c.name).contains(q) ||
+            _norm(c.variable).contains(q));
 
-        print(dataState.data);
-
-        if (dataState is OrderDataSuccess) {
-          final items = dataState.data!.cast<ProductEntity>();
-          print('items');
-          print(items);
-
-          emit(state.copyWith(newVisibleProducts: items));
-          return;
-        } else {
-          emit(state.copyWith(newVisibleProducts: []));
-          return;
-        }
-      }
-
-      // --- حالت سرچ معمولی (متن) ---
-      final results = StaticValues.staticProducts.where((p) {
-        final name = _norm(p.name);
-        final hitSelf = name.contains(q);
-
-        final hitChild = (p.childes ?? const []).any((c) {
-          final cn = _norm(c.name);
-          final varName = _norm(c.variable);
-          return cn.contains(q) || varName.contains(q);
-        });
+        print(hitChild);
+        print(hitSelf);
 
         return hitSelf || hitChild;
       }).toList();
+    }
 
-      emit(state.copyWith(newVisibleProducts: results));
-    });
-
+    Future<List<ProductEntity>> _fakeApiSearch() async {
+      await Future.delayed(const Duration(milliseconds: 600));
+      return [];
+    }
 
     // --- Hydrate from order (EDIT)
     on<HydrateCartFromOrder>((event, emit) {
@@ -157,7 +139,6 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       }
       _emitCart(emit, cart);
     });
-
 
     // --- Clear cart
     on<ClearCart>((event, emit) {
@@ -181,7 +162,6 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
       emit(state.copyWith(newAddOrderStatus: AddOrderProductsLoadingStatus()));
       _emitCart(emit, mutable);
     });
-
 
     // --- Decrease product (-1 / remove)
     on<DecreaseProductCount>((event, emit) {
@@ -242,6 +222,82 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
         ),
       );
     });
+    Future<void> _onSearchChanged(
+        LoadOnChangedAddOrderProductsData event,
+        Emitter<AddOrderState> emit,
+        ) async {
+      final int token = ++_searchToken;
+
+      // debounce
+      await Future.delayed(const Duration(milliseconds: 350));
+      if (token != _searchToken || emit.isDone) return;
+
+      final q = _norm(event.query);
+
+      final cart = (state.addOrderCardProductStatus is AddOrderCardProductLoaded)
+          ? (state.addOrderCardProductStatus as AddOrderCardProductLoaded).cart
+          : <int,int>{};
+
+      // سرچ خالی
+      if (q.isEmpty) {
+        // 1️⃣ محصولات انتخاب شده (cart)
+        final selectedProducts = cart.keys.map((id) {
+          return state.apiSearchedProducts
+              .firstWhereOrNull((p) => p.id == id) ??
+              StaticValues.staticProducts.firstWhereOrNull((p) => p.id == id);
+        }).whereType<ProductEntity>().toList();
+
+        // 2️⃣ بقیه محصولات استاتیک که انتخاب نشده‌اند
+        final remainingProducts = StaticValues.staticProducts
+            .where((p) => !selectedProducts.any((c) => c.id == p.id))
+            .toList();
+
+        final merged = [...selectedProducts, ...remainingProducts];
+
+        emit(state.copyWith(
+          newVisibleProducts: merged,
+          newIsSearching: false,
+          newIsRemoteResult: false,
+        ));
+        return;
+      }
+
+      // سرچ لوکال
+      final localResults = _localSearch(q);
+
+      // سرچ API
+      emit(state.copyWith(newIsSearching: true));
+
+      final dataState = await addProductSearchedDataUseCase(q);
+      if (emit.isDone) return;
+
+      final apiResults = (dataState is OrderDataSuccess && dataState.data != null)
+          ? dataState.data!.cast<ProductEntity>()
+          : <ProductEntity>[];
+
+      // merge لوکال + API بدون تکرار
+      final combined = [
+        ...localResults,
+        ...apiResults.where(
+                (apiProd) => !localResults.any((localProd) => localProd.id == apiProd.id))
+      ];
+
+      emit(state.copyWith(
+        newVisibleProducts: combined,
+        newApiSearchedProducts: apiResults,
+        newIsSearching: false,
+        newIsRemoteResult: true,
+      ));
+    }
+
+
+
+    on<LoadOnChangedAddOrderProductsData>(_onSearchChanged);
+
+    @override
+    Future<void> close() {
+      return super.close();
+    }
   }
   Map<int,int> _readCartSafe(AddOrderState s) {
     // اولویت با state.count
@@ -271,8 +327,4 @@ class AddOrderBloc extends Bloc<AddOrderEvent, AddOrderState> {
     ));
   }
 
-}
-bool _isIdSearch(String q) {
-  final numeric = RegExp(r'^[0-9,\s]+$');
-  return numeric.hasMatch(q);
 }

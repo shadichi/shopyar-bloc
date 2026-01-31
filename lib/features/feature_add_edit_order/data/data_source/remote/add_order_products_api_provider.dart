@@ -76,17 +76,15 @@ class AddOrderProductsApiProvider {
       return false;
     }
   }
-  Future<dynamic> getSearchedProductsApi(List searchProducts) async {
-    print('searchProducts');
-    String result = searchProducts.join(',');
-    print(result);
+  Future<dynamic> getSearchedProductsApi(String searchWord) async {
+
     try {
       var response = await _dio.get(
-        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${result}',
+        '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${searchWord}',
         options: Options(headers: {'Authorization': StaticValues.passWord}),
       );
 
-print( '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${result}');
+print( '${StaticValues.webService}/wp-json/shop-yar/products?cat=allPr&search=${searchWord}');
       if (response.statusCode == 200) {
         print('responseeeeee');
         print(response);

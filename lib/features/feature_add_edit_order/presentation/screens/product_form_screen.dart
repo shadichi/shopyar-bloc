@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:shopyar/features/feature_orders/presentation/screens/orders_screen.dart';
-import 'package:shopyar/features/feature_orders/presentation/widgets/order.dart';
+import 'package:collection/collection.dart'; // اول اضافه کن
 import '../../../../core/params/products_params.dart';
 import '../../../../core/params/setOrderPArams.dart';
 import '../../../../core/widgets/snackBar.dart';
@@ -34,13 +33,14 @@ class AddOrderProductFormScreen extends StatefulWidget {
   final AddOrderProductFormMode mode;
   final OrdersEntity? ordersEntity;
 
+
   const AddOrderProductFormScreen._({required this.mode, this.ordersEntity});
 
   factory AddOrderProductFormScreen.create() =>
       AddOrderProductFormScreen._(mode: AddOrderProductFormMode.create);
 
   factory AddOrderProductFormScreen.edit(
-          {required OrdersEntity ordersEntity}) =>
+      {required OrdersEntity ordersEntity}) =>
       AddOrderProductFormScreen._(
           mode: AddOrderProductFormMode.edit, ordersEntity: ordersEntity);
 
@@ -71,17 +71,21 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
   String shipPriceBill = '';
   List<ShippingLine> shippingLine = [];
 
+  String _searchQuery = '';
+
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   List<LineItem> _cartToLineItems(Map<int, int> cart) {
     return cart.entries
-        .map((e) => LineItem(
-              id: 0,
-              productId: e.key,
-              name: "",
-              quantity: e.value,
-              total: '0',
-            ))
+        .map((e) =>
+        LineItem(
+          id: 0,
+          productId: e.key,
+          name: "",
+          quantity: e.value,
+          total: '0',
+        ))
         .toList();
   }
 
@@ -98,10 +102,12 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
 
 
     // load product
-    context.read<AddOrderBloc>().add(LoadAddOrderProductsData(InfParams('10',false,'',false)));
+    context.read<AddOrderBloc>().add(
+        LoadAddOrderProductsData(InfParams('10', false, '', false)));
 
     // اگر در حالت ویرایش هستیم و سفارش داریم، یکبار لیست id ها را سرچ کن
-    if (!_initialSearchDone && widget.mode == AddOrderProductFormMode.edit && widget.ordersEntity != null) {
+    if (!_initialSearchDone && widget.mode == AddOrderProductFormMode.edit &&
+        widget.ordersEntity != null) {
       _initialSearchDone = true;
 
       // استخراج id ها از lineItems (فرض می‌کنیم کلاس LineItem دارای فیلد productId هست)
@@ -116,20 +122,14 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
       print(ids);
 
       if (ids.isNotEmpty) {
-        final searchQuery = ids.join(','); // "1347,200,55"
-        // اگر دوست داری متن جستجو را در SearchBar هم نمایش دهی:
-        controller.text = searchQuery;
-
-        print("searchQuery");
-        print(searchQuery);
-
-        // Dispatch event برای جستجوی سریع بر اساس این ids
-        context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(searchQuery));
+        context.read<AddOrderBloc>().add(
+            LoadOnChangedAddOrderProductsData('')); // خالی باشه، فقط hydrate کن
       }
     }
     context
         .read<AddOrderBloc>()
-        .add(LoadOnChangedAddOrderProductsData(""));// فقط برای انه که لیست اپدیت بشه nothing elseeeeeeee
+        .add(LoadOnChangedAddOrderProductsData(
+        "")); // فقط برای انه که لیست اپدیت بشه nothing elseeeeeeee
   }
 
   final TextEditingController controller = TextEditingController();
@@ -156,10 +156,25 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
     return const [];
   }
 
+  final ScrollController _billingController = ScrollController();
+
+
+  @override
+  void dispose() {
+    _billingController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     final List<TextEditingController> textEditing = [
       step1CustomerFNBill,
@@ -173,17 +188,17 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
     ];
 
     final List<Function(String)> onTextChange = [
-      (value) => customerLNBill = value,
-      (value) => customerFNBill = value,
-      (value) => cityBill = value,
-      (value) => provinceBill = value,
-      (value) => addressBill = value,
-      (value) => postalCodeBill = value,
-      (value) => emailBill = value,
-      (value) => phoneBill = value,
-      (value) => shipmentBill = value,
-      (value) => paymentBill = value,
-      (value) => shipPriceBill = value,
+          (value) => customerLNBill = value,
+          (value) => customerFNBill = value,
+          (value) => cityBill = value,
+          (value) => provinceBill = value,
+          (value) => addressBill = value,
+          (value) => postalCodeBill = value,
+          (value) => emailBill = value,
+          (value) => phoneBill = value,
+          (value) => shipmentBill = value,
+          (value) => paymentBill = value,
+          (value) => shipPriceBill = value,
     ];
 
     paymentMethod = StaticValues.paymentMethods
@@ -217,15 +232,15 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
           );
           if (isSuccess!) {
             context.read<OrdersBloc>().add(
-                  LoadOrdersData(
-                    false,
-                    '',
-                    false,
-                    (10).toString(),
-                    '',
-                    isChangeStatus: true,
-                  ),
-                );
+              LoadOrdersData(
+                false,
+                '',
+                false,
+                (10).toString(),
+                '',
+                isChangeStatus: true,
+              ),
+            );
             if (widget.mode == AddOrderProductFormMode.edit) {
               Navigator.pop(context);
               Navigator.pop(context);
@@ -243,7 +258,8 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
         final isSubmitting = state.addOrderStatus is AddOrderLoadingStatus;
         final isLoadError = state.addOrderStatus is AddOrderProductsErrorStatus;
         final isLoadingProducts =
-            state.addOrderStatus is AddOrderProductsLoadingStatus;
+        state.addOrderStatus is AddOrderProductsLoadingStatus;
+
 
         if (state.addOrderStatus is AddOrderProductsLoadedStatus) {
           _lastLoaded = state.addOrderStatus as AddOrderProductsLoadedStatus;
@@ -287,12 +303,13 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
                     // color: Colors.green,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 400),
-                      transitionBuilder: (child, animation) => SlideTransition(
-                        position: Tween<Offset>(
+                      transitionBuilder: (child, animation) =>
+                          SlideTransition(
+                            position: Tween<Offset>(
                                 begin: const Offset(1, 0), end: Offset.zero)
-                            .animate(animation),
-                        child: child,
-                      ),
+                                .animate(animation),
+                            child: child,
+                          ),
                       child: Padding(
                         key: ValueKey<int>(activeStep),
                         //width: 500,
@@ -343,13 +360,11 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
     );
   }
 
-  Widget _buildSection(
-    List<Function(String)> onTextChange,
-    List<TextEditingController> textEditing,
-    AddOrderProductFormMode isEditMode,
-    OrdersEntity? ordersEntity,
-    List<ProductEntity> products,
-  ) {
+  Widget _buildSection(List<Function(String)> onTextChange,
+      List<TextEditingController> textEditing,
+      AddOrderProductFormMode isEditMode,
+      OrdersEntity? ordersEntity,
+      List<ProductEntity> products,) {
     switch (activeStep) {
       case 0:
         return AddOrderBill(
@@ -365,128 +380,119 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
       case 1:
         return Column(
           children: [
-          /*  Container(
-              height: AppConfig.calHeight(context, 6),
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.02,
-                vertical: MediaQuery.of(context).size.width * 0.01,
-              ),
-              child: SearchBar(
-                backgroundColor:
-                    WidgetStateProperty.all(AppConfig.secondaryColor),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        AppConfig.calBorderRadiusSize(context)),
-                  ),
-                ),
-                leading: Icon(Icons.search,
-                    color: Colors.white, size: AppConfig.calWidth(context, 5)),
-                hintText: 'جستجو',
-                textStyle: WidgetStateProperty.all(
-                  TextStyle(
-                      color: Colors.white,
-                      fontSize: AppConfig.calFontSize(context, 3)),
-                ),
-                hintStyle: WidgetStateProperty.all(
-                  TextStyle(
-                      fontSize: AppConfig.calFontSize(context, 3),
-                      color: Colors.white60),
-                ),
-                onChanged: (q) => context
-                    .read<AddOrderBloc>()
-                    .add(LoadOnChangedAddOrderProductsData(q)),
-                onSubmitted: (q) => context
-                    .read<AddOrderBloc>()
-                    .add(LoadOnChangedAddOrderProductsData(q)),
-              ),
-            ),*/
-            // جایگزین Expanded(...) فعلی
-            Expanded(
-              child: BlocBuilder<AddOrderBloc, AddOrderState>(
-                builder: (context, state) {
-                  // فرض می‌کنیم state.addOrderCardProductStatus حاوی Map<int,int> cart است
-                  // جایگزین قسمت ساخت sortedProducts
-                  Map<int, int> cart = {};
-                  if (state.addOrderCardProductStatus is AddOrderCardProductLoaded) {
-                    cart = (state.addOrderCardProductStatus as AddOrderCardProductLoaded).cart;
-                  }
 
-// 1) محصولات انتخاب‌شده — از لیست فعلی 'products' (که ممکن است visibleProducts یا search results باشد)
-                  final selected = <ProductEntity>[];
-                  final selectedIds = <int>{};
+            // 🔍 SearchBar (بیرون از لیست)
+            Container(
+              width: AppConfig.calWidth(context, 90),
 
-// بررسی هر محصول در 'products' و تشخیص انتخاب بودن خودش یا یکی از childها
-                  for (final p in products) {
-                    final bool selfSelected = (cart[p.id] ?? 0) > 0;
-                    final bool childSelected = (p.childes?.any((c) => (cart[c.id] ?? 0) > 0) ?? false);
-
-                    if (selfSelected || childSelected) {
-                      selected.add(p);
-                      selectedIds.add(p.id!.toInt());
-                    }
-                  }
-
-// 2) محصولات باقیمانده را از StaticValues.staticProducts اضافه کن (بدون تکرار)
-// همچنین اگر StaticValues.staticProducts شامل محصولاتی باشد که قبلاً در selected هستند، از اضافه‌شدن دوباره جلوگیری می‌کنیم
-                  final remaining = <ProductEntity>[];
-                  for (final sp in StaticValues.staticProducts) {
-                    if (!selectedIds.contains(sp.id)) {
-                      remaining.add(sp);
-                    }
-                  }
-
-// 3) نتیجه نهایی: ابتدا selected (محصولات در کارت)، بعد remaining (کل محصولات ثابت)
-                  final finalList = <ProductEntity>[...selected, ...remaining];
-
-// در صورت خواستن یک مرتب‌سازی ثانویه داخل selected یا remaining، می‌تونی اینجا اعمال کنی.
-// مثلا مرتب‌سازی remaining بر اساس نام:
-// remaining.sort((a,b) => (a.name ?? '').compareTo(b.name ?? ''));
-
-                  print('finalList.length');
-                  print(finalList.length);
-
-                  return ListView.builder(
-                    // داخل Expanded نیازی به shrinkWrap نیست
-                    // shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: finalList.length,
-                    itemBuilder: (context, index) {
-                      final product = finalList[index];
-
-                      // آیتم آخر: دکمه با ارتفاع مشخص و padding کوچک
-                      if (index == finalList.length - 1) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppConfig.calWidth(context, 3),
-                            vertical: AppConfig.calWidth(context, 1.5), // کم کن
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: AppConfig.calWidth(context, 60),
+                    height: AppConfig.calWidth(context, 9),
+                    child: SearchBar(
+                      controller: controller,
+                      backgroundColor:
+                      MaterialStateProperty.all(AppConfig.secondaryColor),
+                      leading: Icon(Icons.search,
+                        size: AppConfig.calWidth(context, 6),
+                        color: Colors.white,),
+                      hintText: 'جستجو',
+                      textStyle: MaterialStateProperty.all(
+                        TextStyle(
+                            color: Colors.white,
+                            fontSize: AppConfig.calFontSize(context, 4.3)),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppConfig.calBorderRadiusSize(context),
                           ),
-                          child: Center(
-                            child: SizedBox(
-                              height: AppConfig.calHeight(context, 5), // ارتفاع ثابت دکمه (مثلاً 5)
-                              width: double.infinity, // یا محدودش کن اگر نمی‌خوای full-width باشه
-                              child: _LoadMoreButton(finalList.length), // داخلش باید فقط خودِ ElevatedButton باشه
-                            ),
-                          ),
-                        );
-                      }
-
-                      return KeyedSubtree(
-                        key: ValueKey(product.id),
-                        child: AddOrderProduct(
-                          isEditMode,
-                          product,
-                          ordersEntity,
-                              (p0) {},
                         ),
-                      );
-                    },
-                  );
-
-                },
+                      ),
+                      hintStyle: MaterialStateProperty.all(
+                        TextStyle(
+                            fontSize: AppConfig.calFontSize(context, 4.3),
+                            color: Colors.white60),
+                      ),
+                      onSubmitted: (value) {
+                        context
+                            .read<AddOrderBloc>()
+                            .add(LoadOnChangedAddOrderProductsData(value));
+                      },
+                    ),
+                  ),
+                  Container(width: AppConfig.calWidth(context, 27),
+                      height: AppConfig.calWidth(context, 9),
+                      child: ElevatedButton(onPressed: () {
+                        controller.clear();
+                        context.read<AddOrderBloc>().add(LoadOnChangedAddOrderProductsData(''));
+                      },
+                          child: Text(
+                            "پاک کردن", style: TextStyle(fontSize:AppConfig.calFontSize(context, 3),color: Colors.white),)))
+                ],
               ),
             ),
 
+            const SizedBox(height: 8),
+
+            // 🧾 لیست محصولات
+            Expanded(
+              child: BlocBuilder<AddOrderBloc, AddOrderState>(
+                builder: (context, state) {
+                  if (state.isSearching) {
+                    return Center(child: ProgressBar());
+                  }
+
+                  if (state.visibleProducts.isEmpty && state.isRemoteResult) {
+                    return Center(child: Text('محصولی یافت نشد !',style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.5), color: Colors.white),));
+                  }
+
+                  final cart = (state.addOrderCardProductStatus
+                  is AddOrderCardProductLoaded)
+                      ? (state.addOrderCardProductStatus as AddOrderCardProductLoaded).cart
+                      : <int, int>{};
+
+                  final selected = <ProductEntity>[];
+                  final selectedIds = <int>{};
+
+                  for (final id in cart.keys) {
+                    ProductEntity? p = state.visibleProducts
+                        .firstWhereOrNull((prod) => prod.id == id) ??
+                        state.apiSearchedProducts
+                            .firstWhereOrNull((prod) => prod.id == id) ??
+                        StaticValues.staticProducts
+                            .firstWhereOrNull((prod) => prod.id == id);
+
+                    if (p != null) {
+                      selected.add(p);
+                      selectedIds.add(p.id!);
+                    }
+                  }
+
+                  final remaining =
+                  state.visibleProducts.where((p) => !selectedIds.contains(p.id)).toList();
+
+                  final finalList = [...selected, ...remaining];
+
+                  return ListView.builder(
+                    itemCount: finalList.length,
+                    itemBuilder: (context, index) {
+                      final product = finalList[index];
+                      return AddOrderProduct(
+                        isEditMode,
+                        product,
+                        ordersEntity,
+                            (_) {},
+                      );
+                    },
+                  );
+                },
+              )
+
+
+            )
           ],
         );
 
@@ -503,10 +509,10 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
         onPressed: () {
           if (activeStep == 0) {
             final payIdx = paymentMethod?.indexWhere((m) =>
-                    (m.methodTitle ?? '').trim() == paymentBill.trim()) ??
+            (m.methodTitle ?? '').trim() == paymentBill.trim()) ??
                 -1;
             final shipIdx = shipmentMethod?.indexWhere((m) =>
-                    (m.methodTitle ?? '').trim() == shipmentBill.trim()) ??
+            (m.methodTitle ?? '').trim() == shipmentBill.trim()) ??
                 -1;
             if (emailBill.isNotEmpty) {
               if (!isValidEmail(emailBill)) {
@@ -526,7 +532,9 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
           }
 
           if (activeStep == 1) {
-            final st = context.read<AddOrderBloc>().state;
+            final st = context
+                .read<AddOrderBloc>()
+                .state;
             final derived = _deriveLineItemsFromState(st);
 
             if (derived.isEmpty) {
@@ -536,11 +544,11 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
             }
 
             final selectedPay = (paymentMethod ?? []).firstWhere(
-              (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
+                  (m) => (m.methodTitle ?? '').trim() == paymentBill.trim(),
               orElse: () => paymentMethod!.first,
             );
             final selectedShip = (shipmentMethod ?? []).firstWhere(
-              (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
+                  (m) => (m.methodTitle ?? '').trim() == shipmentBill.trim(),
               orElse: () => shipmentMethod!.first,
             );
 
@@ -578,9 +586,9 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
             );
 
             final int orderIdForEdit =
-                (widget.mode == AddOrderProductFormMode.edit)
-                    ? (widget.ordersEntity?.id ?? 0)
-                    : 0;
+            (widget.mode == AddOrderProductFormMode.edit)
+                ? (widget.ordersEntity?.id ?? 0)
+                : 0;
 
             final order = AddOrderOrdersEntity(
               id: orderIdForEdit,
@@ -750,12 +758,17 @@ bool isValidEmail(String email) {
   if (email.isEmpty) return false;
   return regex.hasMatch(email);
 }
+
 class _LoadMoreButton extends StatelessWidget {
   int listCount;
+
   _LoadMoreButton(this.listCount);
+
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AddOrderBloc>().state;
+    final state = context
+        .watch<AddOrderBloc>()
+        .state;
     final isLoadingMore = state.isLoadingMore == true;
 
     return ElevatedButton(

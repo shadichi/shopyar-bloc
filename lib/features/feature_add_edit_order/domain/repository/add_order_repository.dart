@@ -26,5 +26,5 @@ abstract class AddOrderRepository{
 
   Future<bool> AddOrderSetOrder(SetOrderParams setOrderParams);
 
-  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(List searchProducts);
+  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(String searchProducts);
 }

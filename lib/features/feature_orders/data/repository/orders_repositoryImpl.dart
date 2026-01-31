@@ -29,13 +29,15 @@ class OrdersRepositoryImpl extends OrdersRepository {
       //Response response = await apiProvider.GetOrders(ordersParams);
       if (response.statusCode == 200) {
         List<OrdersEntity> ordersEntity = ordersFromJson(response.data);
-        print("yeeees");
+        print("orders yes");
+        print(ordersEntity);
 
         return OrderDataSuccess(ordersEntity);
       } else {
         return const OrderDataFailed("Something Went Wrong. try again...");
       }
     } catch (e) {
+      print("e.toString()");
       print(e.toString());
       return const OrderDataFailed("please check your connection...");
     }

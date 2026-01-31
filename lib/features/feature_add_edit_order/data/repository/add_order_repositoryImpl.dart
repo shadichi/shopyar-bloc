@@ -92,7 +92,7 @@ class AddOrderRepositoryImpl extends AddOrderRepository {
   }
 
   @override
-  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(List searchProducts) async {
+  Future<OrderDataState<ProductEntity>> AddOrderSearchedProduct(String searchProducts) async {
     try {
       Response response = await apiProvider.getSearchedProductsApi(searchProducts);
 

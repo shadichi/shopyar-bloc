@@ -90,7 +90,7 @@ class VariationProduct extends StatelessWidget {
                                 width: width * 0.6,
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                    '${StaticValues.staticProducts![item].childes![childItem].price.toString()} ریال'),
+                                    '${StaticValues.staticProducts![item].childes![childItem].price.toString()} تومان'),
                               ),
                             ],
                           ),

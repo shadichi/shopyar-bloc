@@ -37,14 +37,29 @@ class BarChartSample4State extends State<Chart> {
   final double kZeroBarHeight = 0.08;
 
   double _niceStep(double maxY) {
-    if (maxY <= 5) return 1;
-    final exp = (math.log(maxY) / math.ln10).floor();
-    for (final base in [1, 2, 5]) {
-      final step = base * math.pow(10, exp - 1);
-      if (maxY / step <= 8) return step.toDouble();
+    if (maxY <= 0) return 1;
+
+    // می‌خوایم حدوداً 5 تیک روی محور داشته باشیم
+    const targetTicks = 5;
+
+    final rawStep = maxY / targetTicks;
+    final exp = math.pow(10, (math.log(rawStep) / math.ln10).floor());
+    final fraction = rawStep / exp;
+
+    double niceFraction;
+    if (fraction <= 1) {
+      niceFraction = 1;
+    } else if (fraction <= 2) {
+      niceFraction = 2;
+    } else if (fraction <= 5) {
+      niceFraction = 5;
+    } else {
+      niceFraction = 10;
     }
-    return math.pow(10, exp - 1).toDouble();
+
+    return niceFraction * exp;
   }
+
 
   final _faFmt = NumberFormat.decimalPattern('fa');
 
@@ -107,10 +122,20 @@ class BarChartSample4State extends State<Chart> {
     }
   }
 
+  String _formatAxisValue(num v) {
+    if (v >= 1000000) {
+      return '${_faFmt.format((v / 1000000).toStringAsFixed(1))}M';
+    } else if (v >= 1000) {
+      return '${_faFmt.format((v / 1000).toStringAsFixed(1))}K';
+    }
+    return _faFmt.format(v.toInt());
+  }
+
+
   void test() {
     final counts = StaticValues.staticHomeDataEntity!.weeklyCounts;
 
-     result = getWeeklyCountsList(counts!);
+    result = getWeeklyCountsList(counts!);
     print(result);
   }
 
@@ -215,14 +240,21 @@ class BarChartSample4State extends State<Chart> {
 
 
   Widget leftTitles(double value, TitleMeta meta) {
-    final text = _faFmt.format(value.toInt());
+    final text = _formatAxisValue(value);
 
     return SideTitleWidget(
-      child: Text(text, style:  TextStyle(fontSize: AppConfig.calFontSize(context, 4.2), color: Colors.white)),
       meta: meta,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: AppConfig.calFontSize(context, 4.2),
+          color: Colors.white,
+        ),
+      ),
     );
   }
-@override
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -239,9 +271,9 @@ class BarChartSample4State extends State<Chart> {
     final double fallbackMaxY = 5 + math.Random(daySeed).nextInt(8).toDouble(); // 5..12
 
     // محور Y و فاصله تیک‌ها
-    final double axisMaxY = allZero
-        ? fallbackMaxY
-        : (rawMax * 1.2).ceilToDouble(); // کمی حاشیه بالای بیشینه واقعی
+    final step = _niceStep(rawMax);
+    final axisMaxY = ((rawMax / step).ceil()) * step;
+    // کمی حاشیه بالای بیشینه واقعی
 
     final double interval = allZero
         ? (fallbackMaxY / 5).ceilToDouble().clamp(1, double.infinity)

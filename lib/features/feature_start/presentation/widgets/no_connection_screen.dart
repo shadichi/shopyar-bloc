@@ -22,7 +22,7 @@ class NoConnectionScreen extends StatelessWidget {
                         children: [
               Text(
                 "لطفا اتصال اینترنت خود را بررسی کنید!",
-                style: TextStyle(fontSize: width * 0.05, color: AppConfig.white),
+                style: TextStyle(fontSize: width * 0.03, color: AppConfig.white),
                 textAlign: TextAlign.center,
               ),
               IconButton(

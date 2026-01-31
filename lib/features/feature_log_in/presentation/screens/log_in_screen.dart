@@ -42,6 +42,9 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void _submit(BuildContext context) {
+
+    FocusManager.instance.primaryFocus?.unfocus();// close keyboard
+
     if (_webServiceController.text.trim().isEmpty ||
         _tokenController.text.trim().isEmpty) {
       showSnack(context, "خطا: لطفاً فیلدهای خالی را تکمیل کنید!");
@@ -75,6 +78,7 @@ class _LogInScreenState extends State<LogInScreen> {
               );
             }
             if (status is LoginEmptyFieldErrorState) {
+
               showSnack(
                 context,
                 "خطا: در این سایت شیوه های پرداخت یا حمل و نقل وجود ندارد!",

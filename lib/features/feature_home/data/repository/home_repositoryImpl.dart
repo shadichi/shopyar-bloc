@@ -62,9 +62,12 @@ class HomeRepositoryImpl extends HomeRepository{
       try {
         final response = await homeApiProvider.getHomeData(WholeUserDataParams(webService, passWord));
         if (response.statusCode == 200) {
+          print("response.dataaaaaaaaaaaaaaaaaaaaaaaaa");
+          print(response.data);
           HomeDataEntity homeDataEntity = HomeDataModel.fromJson(response.data);
           return DataSuccess(homeDataEntity);
         } else {
+          print("yeeeeeeees here");
           return DataFailed('error in getHomeUserData');
         }
       } catch (e, st) {

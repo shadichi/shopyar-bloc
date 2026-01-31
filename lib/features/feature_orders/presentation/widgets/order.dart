@@ -128,7 +128,7 @@ class Order extends StatelessWidget {
                               style: TextStyle(
                                   fontSize: width * 0.036, color: Colors.white),
                             ),
-                            Text( '${formatFaThousands(ordersLoadedStatus.total).toString().stringToPersianDigits()} ریال',
+                            Text( '${formatFaThousands(ordersLoadedStatus.total).toString().stringToPersianDigits()} تومان',
                                 style: TextStyle(
                                     fontSize: width * 0.045,
                                     color: Colors.white)),

@@ -28,9 +28,11 @@ class OrdersApiProvider{
           "Authorization":StaticValues.passWord
         })
     );
-    print(response.statusCode);
+    print("response.statusCodeثثثثثثثثثثث");
+    print(response);
     return response;
   }
+
   Future<dynamic> editStatus(OrdersEditStatus ordersEditStatus) async {
     Response? response;
     try {
@@ -57,6 +59,4 @@ class OrdersApiProvider{
       throw Exception("No response received.");
     }
   }
-
-
 }

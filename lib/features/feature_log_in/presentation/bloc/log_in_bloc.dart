@@ -37,6 +37,9 @@ class LogInBloc extends Bloc<LogInEvent, LogInState> {
               WholeUserDataParams(event.userDataParams.webService.toString(),
                   event.userDataParams.key));
 
+          print("response in login:");
+          print(response);
+
           if (response.isNotEmpty) {
             StaticValues.shopName = await response['name'];
             StaticValues.shippingMethods = await response['shipping_methods'];

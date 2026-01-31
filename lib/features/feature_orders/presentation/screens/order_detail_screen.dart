@@ -9,32 +9,54 @@ import '../../../../core/config/app-colors.dart';
 import 'package:intl/intl.dart';
 import '../widgets/order_options.dart';
 
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends StatefulWidget {
   static const routeName = "/orders_detail_screen";
   final OrdersEntity ordersLoadedStatus;
   final int item;
 
   OrderDetailScreen(this.ordersLoadedStatus, this.item);
 
+  @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
   String selectedStatus = '';
+
   String chosenProductUrl = '';
 
   String formatFaThousands(dynamic value) {
     final n = (value is num) ? value : num.tryParse(value.toString()) ?? 0;
     return NumberFormat.decimalPattern('fa').format(n);
   }
-  final ScrollController _scrollController = ScrollController();
+
+  final ScrollController _itemsController = ScrollController();
+
+  final ScrollController _billingController = ScrollController();
+
+  final ScrollController _paymentController = ScrollController();
+
+  @override
+  void dispose() {
+    _itemsController.dispose();
+    _billingController.dispose();
+    _paymentController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     // final args = ModalRoute.of(context)!.settings.arguments as orderData;
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    var ordersData = ordersLoadedStatus;
+    var ordersData = widget.ordersLoadedStatus;
     var dateCreated = JDate(ordersData.dateCreated!.year,
                 ordersData.dateCreated!.month, ordersData.dateCreated!.day)
             .echo('d F Y') ??
         "";
+
+    final bool singleItem = ordersData.lineItems!.length == 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,7 +67,7 @@ class OrderDetailScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.menu,color: AppConfig.white),
           onPressed: () {
-            OrderOptions(context, ordersData, item, ordersLoadedStatus);
+            OrderOptions(context, ordersData, widget.item, widget.ordersLoadedStatus);
           },
         ),
         actions: [
@@ -69,6 +91,7 @@ class OrderDetailScreen extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: Container(
                 margin: EdgeInsets.only( bottom: width * 0.048),
+
                 alignment: Alignment.center,
                 width: width * 0.7,
                 height: height * 0.085,
@@ -77,7 +100,7 @@ class OrderDetailScreen extends StatelessWidget {
                   color:AppConfig.secondaryColor,
                 ),
                 child: Text(
-                  "${formatFaThousands(ordersData.total).toString().stringToPersianDigits()} ریال",
+                  "${formatFaThousands(ordersData.total).toString().stringToPersianDigits()} تومان",
                   style: TextStyle(color: Colors.white, fontSize: AppConfig.calFontSize(context, 6)),
                 ),
               ),
@@ -139,18 +162,18 @@ class OrderDetailScreen extends StatelessWidget {
                       height: width * 0.02,
                     ),
                     Container(
-                      height: ordersData.lineItems!.length == 1
-                          ? height * 0.12
-                          : ordersData.lineItems!.length == 2
-                              ? height * 0.25
-                              : height * 0.38,
+                      constraints: BoxConstraints(
+                        maxHeight: height * 0.38,
+                      ),
                       child: Scrollbar(
                         thumbVisibility: true,
                         thickness: 4.0,
-                        controller: _scrollController,
+                        controller: _itemsController,
                         radius: Radius.circular(3.0),
                         child: ListView.builder(
-                          controller: _scrollController,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            controller: _itemsController,
                             itemCount: ordersData.lineItems!.length,
                             itemBuilder: (context, index) {
                               final imageMap = ordersData.lineItems![index].image;
@@ -172,13 +195,21 @@ class OrderDetailScreen extends StatelessWidget {
                                       ),
                                       width: width * 0.2,
                                       height: height * 0.2,
-                                      padding: EdgeInsets.all(width * 0.013),
+                                      padding: EdgeInsets.all(width * 0.011),
                                       child: imageUrl.isNotEmpty
-                                          ? Image.network(
-                                        imageUrl,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                        const SizedBox.shrink(),
+                                          ? Container(
+
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.network(
+                                            imageUrl,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                            const SizedBox.shrink(),
+                                          ),
+                                        ),
                                       )
+
                                           : const SizedBox.shrink(),
                                     ),
 
@@ -214,7 +245,7 @@ class OrderDetailScreen extends StatelessWidget {
                                                 child: AutoSizeText(
 
                                                   " قیمت: ${formatFaThousands(ordersData
-                                                      .lineItems![index].total).toString().stringToPersianDigits()} ریال",
+                                                      .lineItems![index].total).toString().stringToPersianDigits()} تومان",
                                                   textAlign: TextAlign.right,
                                                   style: TextStyle(
                                                       fontWeight: FontWeight.bold,color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4.1)),
@@ -267,84 +298,107 @@ class OrderDetailScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: AppConfig.calHeight(context, 2),
                       children: [
-                        Container(
-                          alignment: Alignment.centerRight,
-                         // color: Colors.red,
-                          width: width * 0.4,
-                          height: height * 0.22,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            spacing:  AppConfig.calHeight(context, 0.7),
-                            children: [
-                              Text(
-                                "مشخصات صورتحساب: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                        Expanded(
+                          child: Scrollbar(
+                            controller: _billingController,
+                            thumbVisibility: true,
+                            thickness: 4.0,
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              //   color: Colors.red,
+                              //width: width * 0.4,
+                            //  height: height * 0.22,
+                              child: SingleChildScrollView(
+                                controller: _billingController,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  spacing:  AppConfig.calHeight(context, 0.7),
+                                  children: [
+                                    Text(
+                                      "مشخصات صورتحساب: ",
+                                      style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                                    ),
+                                    AutoSizeText(
+                                      '${ordersData.shipping!.lastName} ${ordersData.shipping!.firstName}',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
+                                      maxLines: 1,
+                                      minFontSize: 9,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      ordersData.shipping!.phone.stringToPersianDigits(),
+                                      style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
+                                    ),
+                                    Text(
+                                      ordersData.shipping!.state,
+                                      style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
+                                    ),
+                                    AutoSizeText(
+                                      ordersData.shipping!.address1,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
+                                      maxLines: 3,
+                                      minFontSize: 9,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              AutoSizeText(
-                                '${ordersData.shipping!.lastName} ${ordersData.shipping!.firstName}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
-                                maxLines: 1,
-                                minFontSize: 9,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                ordersData.shipping!.phone.stringToPersianDigits(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
-                              ),
-                              Text(
-                                ordersData.shipping!.state,
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
-                              ),
-                              AutoSizeText(
-                                ordersData.shipping!.address1,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: AppConfig.calFontSize(context, 3.7),color: AppConfig.white),
-                                maxLines: 2,
-                                minFontSize: 9,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                        Container(
-                          alignment: Alignment.centerRight,
-                            //    color: Colors.green,
-                          width: width * 0.4,
-                          height: height * 0.24,
-                          child: Column(
-                            spacing:  AppConfig.calHeight(context, 0.7),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                "روش پرداخت: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                        Expanded(
+                          child: Scrollbar(
+                            thumbVisibility: true,
+                            thickness: 4.0,
+                            controller: _paymentController,
+
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                                //    color: Colors.green,
+                            //  width: width * 0.3,
+                            //  height: height * 0.22,
+                              child: SingleChildScrollView(
+                                controller: _paymentController,
+
+                                child: Column(
+                                  spacing:  AppConfig.calHeight(context, 0.7),
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      "روش پرداخت: ",
+                                      style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                                    ),
+                                    Text(
+                                      ordersData.paymentMethodTitle.toString(),
+                                      style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
+                                    ),
+                                    Text(
+                                      "روش حمل و نقل: ",
+                                      style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                                    ),
+                                    Text(
+                                      ordersData.shippingLines!.isEmpty?'':  ordersData.shippingLines![0].methodTitle
+                                          .toString(),
+                                      style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
+                                    ),
+                                    Text(
+                                      "هزینه حمل و نقل: ",
+                                      style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
+                                    ),
+                                    Text(
+                                      formatFaThousands(ordersData.shippingPrice.toString().stringToPersianDigits()),
+                                      style: TextStyle(color:AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                ordersData.paymentMethodTitle.toString(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
-                              ),
-                              Text(
-                                "روش حمل و نقل: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
-                              ),
-                              Text(
-                                ordersData.shippingLines!.isEmpty?'':  ordersData.shippingLines![0].methodTitle
-                                    .toString(),
-                                style: TextStyle(color: AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
-                              ),
-                              Text(
-                                "هزینه حمل و نقل: ",
-                                style: TextStyle(color: AppConfig.white70,fontSize: AppConfig.calFontSize(context, 4)),
-                              ),
-                              Text(
-                                formatFaThousands(ordersData.shippingPrice.toString().stringToPersianDigits()),
-                                style: TextStyle(color:AppConfig.white,fontSize: AppConfig.calFontSize(context, 3.7)),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],

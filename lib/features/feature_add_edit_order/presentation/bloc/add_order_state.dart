@@ -7,8 +7,11 @@ class AddOrderState extends Equatable {
   final Map<int, int> count;
   final Map<int, bool> isFirstTime;
   final bool isLoadingMore;
+  final bool isSearching;
+  final bool isRemoteResult;
+  final List<ProductEntity> apiSearchedProducts; // ✅ اضافه شد
 
-  // 👇 اضافه کن
+
   final List<ProductEntity> visibleProducts;
 
   const AddOrderState({
@@ -17,8 +20,12 @@ class AddOrderState extends Equatable {
     required this.addOrderSetOrderStatus,
     required this.count,
     required this.isFirstTime,
-    required this.visibleProducts, // 👈
-    required this.isLoadingMore, // 👈
+    required this.visibleProducts,
+    required this.isLoadingMore,
+    required this.isSearching,
+    required this.isRemoteResult,
+    this.apiSearchedProducts = const [], // default خالی
+
   });
 
   AddOrderState copyWith({
@@ -27,8 +34,12 @@ class AddOrderState extends Equatable {
     AddOrderSetOrderStatus? newAddOrderSetOrderStatus,
     Map<int, int>? newCount,
     Map<int, bool>? newIsFirstTime,
-    List<ProductEntity>? newVisibleProducts, // 👈
-    bool? newIsLoadingMore, // 👈
+    List<ProductEntity>? newVisibleProducts,
+    bool? newIsLoadingMore,
+    bool? newIsSearching,
+    bool? newIsRemoteResult,
+    List<ProductEntity>? newApiSearchedProducts, // ✅ اضافه شد
+
   }) {
     return AddOrderState(
       addOrderStatus: newAddOrderStatus ?? addOrderStatus,
@@ -38,8 +49,12 @@ class AddOrderState extends Equatable {
       newAddOrderSetOrderStatus ?? addOrderSetOrderStatus,
       count: newCount ?? count,
       isFirstTime: newIsFirstTime ?? isFirstTime,
-      visibleProducts: newVisibleProducts ?? visibleProducts, // 👈
-      isLoadingMore: newIsLoadingMore ?? isLoadingMore, // 👈
+      visibleProducts: newVisibleProducts ?? visibleProducts,
+      isLoadingMore: newIsLoadingMore ?? isLoadingMore,
+      isSearching: newIsSearching ?? isSearching,
+      isRemoteResult: newIsRemoteResult ?? isRemoteResult,
+      apiSearchedProducts: newApiSearchedProducts ?? apiSearchedProducts, // ✅
+
     );
   }
 
@@ -50,8 +65,12 @@ class AddOrderState extends Equatable {
     addOrderSetOrderStatus,
     count,
     isFirstTime,
-    visibleProducts, // 👈
-    isLoadingMore, // 👈
+    visibleProducts,
+    isLoadingMore,
+    isSearching,
+    isRemoteResult,
+    apiSearchedProducts, // ✅ اضافه شد
+
   ];
 }
 

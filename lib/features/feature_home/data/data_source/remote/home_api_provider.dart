@@ -25,6 +25,8 @@ class HomeApiProvider {
 
       print('response.data');
       print(response.data);
+      print(wholeUserDataParams.webService);
+      print(wholeUserDataParams.key);
 
       return response;
     } catch (e) {

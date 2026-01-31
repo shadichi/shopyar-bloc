@@ -11,6 +11,7 @@ import '../../../../core/widgets/progress-bar.dart';
 import '../../../../core/widgets/snackBar.dart';
 import '../../../feature_log_in/presentation/screens/log_in_screen.dart';
 import '../../../feature_orders/data/models/store_info.dart';
+import '../../data/models/home_data_model.dart';
 import '../widgets/chart.dart';
 import '../bloc/home_bloc.dart';
 import '../widgets/drawer.dart';
@@ -27,7 +28,11 @@ class HomeScreen extends StatefulWidget {
   final void Function(bool)? onDrawerStatusChange;
   final VoidCallback? onReady;
 
-  const HomeScreen({Key? key, this.onDrawerStatusChange,this.onReady,}) : super(key: key);
+  const HomeScreen({
+    Key? key,
+    this.onDrawerStatusChange,
+    this.onReady,
+  }) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -44,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Timer? _pollTimer;
 
-
   void _startPollingReady() {
     _pollTimer = Timer.periodic(const Duration(milliseconds: 250), (t) {
       if (StaticValues.webService.isNotEmpty) {
@@ -53,19 +57,29 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
+
   @override
   void dispose() {
     _pollTimer?.cancel();
     super.dispose();
   }
 
-
-
   Future<void> _onRefresh() {
     final c = Completer<void>();
     context.read<HomeBloc>().add(RefreshHomeData(c));
     return c.future;
   }
+
+  bool hasStatusData(StatusCounts? s) {
+    if (s == null) return false;
+    return s.wcCompleted > 0 ||
+        s.wcPending > 0 ||
+        s.wcProcessing > 0 ||
+        s.wcCancelled > 0 ||
+        s.wcFailed > 0 ||
+        s.wcRefunded > 0;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,26 +89,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final dteNow = Jalali.now();
     var jd = JDate(dteNow.year, dteNow.month, dteNow.day);
 
-    return BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) async {
-          if (state.homeStatus is HomeAccountExitStatus) {
-            Navigator.pushReplacementNamed(context, LogInScreen.routeName);
-          }
-          if (state.homeStatus is HomeLoadedStatus) {
-
-            widget.onReady?.call();
-            print('packageInfo.version');
-            print(StaticValues.packageInfoVersionNo);
-            if(StaticValues.versionNo!=StaticValues.packageInfoVersionNo){
-              alertDialogScreen(context, "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!",0,true);
-
-            }
-          }
-        }, builder: (context, state) {
+    return BlocConsumer<HomeBloc, HomeState>(listener: (context, state) async {
+      if (state.homeStatus is HomeAccountExitStatus) {
+        Navigator.pushReplacementNamed(context, LogInScreen.routeName);
+      }
+      if (state.homeStatus is HomeLoadedStatus) {
+        widget.onReady?.call();
+        print('packageInfo.version');
+        print(StaticValues.packageInfoVersionNo);
+        if (StaticValues.versionNo != StaticValues.packageInfoVersionNo) {
+          alertDialogScreen(context,
+              "لطفاً بروزرسانی جدید برنامه را از راست چین نصب کنید!", 0, true);
+        }
+      }
+    }, builder: (context, state) {
       if (state.homeStatus is HomeLoading) {
         return Center(child: ProgressBar());
       }
       if (state.homeStatus is HomeLoadedStatus) {
+        final status = StaticValues.staticHomeDataEntity?.statusCounts;
 
         return Scaffold(
           drawer: HomeDrawer(),
@@ -159,54 +172,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     spacing: height * 0.02,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      StaticValues
-                          .staticHomeDataEntity!.statusCounts!.wcCompleted ==
-                          0 &&
-                          StaticValues.staticHomeDataEntity!.statusCounts!
-                              .wcOnHold ==
-                              0 &&
-                          StaticValues.staticHomeDataEntity!.statusCounts!
-                              .wcPending ==
-                              0 &&
-                          StaticValues.staticHomeDataEntity!.statusCounts!
-                              .wcProcessing ==
-                              0 &&
-                          StaticValues.staticHomeDataEntity!.statusCounts!
-                              .wcCancelled ==
-                              0
-                          ? Center(
-                        child: Container(
-                          height: AppConfig.calHeight(context, 30),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
-                            style: TextStyle(
-                                fontSize:
-                                AppConfig.calFontSize(context, 3),
+                      if (!hasStatusData(status))
+                        Center(
+                          child: Container(
+                            height: AppConfig.calHeight(context, 30),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'هیچ داده‌ای برای نمایش چارت وجود ندارد!',
+                              style: TextStyle(
+                                fontSize: AppConfig.calFontSize(context, 3),
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: AppConfig.calHeight(context, 5),
+                              bottom: AppConfig.calHeight(context, 1.2)),
+                          child: HomeScreenPieChart(
+                            items: [
+                              status!.wcCompleted,
+                              status.wcPending,
+                              status!.wcProcessing,
+                              status!.wcCancelled,
+                              status!.wcRefunded,
+                            ],
+
                           ),
                         ),
-                      )
-                          : Padding(
-                        padding: EdgeInsets.only(
-                            top: AppConfig.calHeight(context, 5),
-                            bottom: AppConfig.calHeight(context, 1.2)),
-                        child: HomeScreenPieChart(
-                          items: [
-                            StaticValues.staticHomeDataEntity!
-                                .statusCounts!.wcCompleted,
-                            StaticValues.staticHomeDataEntity!
-                                .statusCounts!.wcOnHold,
-                            StaticValues.staticHomeDataEntity!
-                                .statusCounts!.wcPending,
-                            StaticValues.staticHomeDataEntity!
-                                .statusCounts!.wcProcessing,
-                            StaticValues.staticHomeDataEntity!
-                                .statusCounts!.wcCancelled
-                          ],
-                        ),
-                      ),
                       SizedBox(
                         height: AppConfig.calHeight(context, 2.5),
                       ),
@@ -246,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       } else if (state.homeStatus is HomeErrorStatus) {
-        return ShowErrorWidget(context);;
+        return ShowErrorWidget(context);
+        ;
       } else if (state.homeStatus is HomeLoadedStatus) {
         final HomeLoadedStatus ordersLoadedStatus =
         state.homeStatus as HomeLoadedStatus;
@@ -284,12 +281,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 }
-Widget ShowErrorWidget(BuildContext context){
-  return  Column(
+
+Widget ShowErrorWidget(BuildContext context) {
+  return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      Icon(Icons.warning,color: AppConfig.firstLinearColor),
-      SizedBox(height: AppConfig.calHeight(context, 2),),
+      Icon(Icons.warning, color: AppConfig.firstLinearColor),
+      SizedBox(
+        height: AppConfig.calHeight(context, 2),
+      ),
       Text(
         'خطا در بارگیری اطلاعات!',
         style: TextStyle(

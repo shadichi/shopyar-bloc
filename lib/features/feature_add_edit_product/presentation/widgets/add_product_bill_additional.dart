@@ -206,6 +206,7 @@ class _AddProductBillAdditionalState extends State<AddProductBillAdditional> {
                 print('brand picked: $value');
                 widget.countOnTextChange(int.parse(value));
               },
+              isDigit: true
             ):SizedBox.shrink()
             // checkBoxs()
           ],

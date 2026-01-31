@@ -61,11 +61,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
             event.status,
           ),
         );
-        if(StaticValues.staticProducts.isEmpty){
+      /*  if(StaticValues.staticProducts.isEmpty){
           final dataState = await getProductsUseCase(InfParams('100',false,'',false));
 
 
-        }
+        }*/
 
         if (dataState is OrderDataSuccess) {
           final fetched = dataState.data!.cast<OrdersEntity>();

@@ -52,16 +52,17 @@ class Product extends StatelessWidget {
                 //   clipBehavior: Clip.antiAlias,  // برای کلیپ شدن کانتینر
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppConfig.calBorderRadiusSize(context)),
-                  child: Image.network(
+                  child:  (productsLoadedStatus.image?.isNotEmpty == true)
+                      ? Image.network(
                     productsLoadedStatus.image!,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
+                    errorBuilder: (_, __, ___) =>
                         Image.asset('assets/images/index.png', fit: BoxFit.cover),
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(child: CircularProgressIndicator()); // اختیاری
-                    },
-                  ),
+                  )
+                      : Image.asset(
+                    'assets/images/index.png',
+                    fit: BoxFit.cover,
+                  )
                 ),
 
               ),
@@ -105,7 +106,7 @@ class Product extends StatelessWidget {
                             child: AutoSizeText(
                               productsLoadedStatus.price.toString().isEmpty
                                   ? 'قیمت نامشخص'
-                                  : '${formatFaThousands(productsLoadedStatus.price).toString().stringToPersianDigits()} ریال',
+                                  : '${formatFaThousands(productsLoadedStatus.price).toString().stringToPersianDigits()} تومان',
                               style: TextStyle(
                                   fontSize: width * 0.035,
                                   fontWeight:isChild? FontWeight.normal: FontWeight.bold,
@@ -197,7 +198,7 @@ padding: EdgeInsets.only(top: AppConfig.calHeight(context, 1.5),),
                                     width: AppConfig.calWidth(context, 43),
                                     height: AppConfig.calHeight(context, 3),
                                     child: AutoSizeText(
-                                      'قیمت: ${formatFaThousands(product.price).toString().stringToPersianDigits()} ریال',
+                                      'قیمت: ${formatFaThousands(product.price).toString().stringToPersianDigits()} تومان',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: AppConfig.calFontSize(context, 3), color: Colors.white),

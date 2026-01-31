@@ -82,11 +82,11 @@ class _MainWrapperState extends State<MainWrapper> {
                                   );
                                 },
                               ),
-
                               if (!ready)
                                 Positioned.fill(
                                   child: Row(
                                     children: [
+                                      // تب سمت چپ
                                       Expanded(
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
@@ -97,18 +97,27 @@ class _MainWrapperState extends State<MainWrapper> {
                                         ),
                                       ),
 
-                                      Expanded(child: IgnorePointer(child: Container())),
+                                      // تب وسط (Home) آزاد
+                                      Expanded(
+                                        child: IgnorePointer(
+                                          child: Container(),
+                                        ),
+                                      ),
 
+                                      // تب سمت راست
                                       Expanded(
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
-                                          onTap: () {},
+                                          onTap: () {
+                                            showSnack(context, 'لطفا صبر کنید!');
+                                          },
                                           child: const SizedBox.expand(),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
+
                             ],
                           );
                         },

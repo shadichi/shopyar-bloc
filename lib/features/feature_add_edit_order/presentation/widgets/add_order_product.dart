@@ -152,12 +152,21 @@ class _AddOrderProductState extends State<AddOrderProduct> {
   /// Builds the product image display
   Widget _buildProductImage(Size size, context) {
     return Container(
-      margin: EdgeInsets.only(left: AppConfig.calWidth(context, 6)),
-      width: size.width * 0.17,
+      //margin: EdgeInsets.only(left: AppConfig.calWidth(context, 6)),
+      width: size.width * 0.21,
       height: size.height * 0.07,
-      child: widget.product.image!.isNotEmpty
-          ? Image.network(widget.product.image.toString())
-          : Image.asset('assets/images/index.png'),
+      child:
+      (widget.product.image?.isNotEmpty == true)
+          ? Image.network(
+        widget.product.image!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) =>
+            Image.asset('assets/images/index.png', fit: BoxFit.cover),
+      )
+          : Image.asset(
+        'assets/images/index.png',
+        fit: BoxFit.cover,
+      )
     );
   }
 
@@ -199,8 +208,8 @@ class _AddOrderProductState extends State<AddOrderProduct> {
                   width: AppConfig.calWidth(context, 20),
                   child: AutoSizeText(
                     isChild
-                        ? '${widget.product.childes![index].price} ریال'
-                        : '${widget.product.price} ریال',
+                        ? '${widget.product.childes![index].price} تومان'
+                        : '${widget.product.price} تومان',
                     style: TextStyle(
                         fontSize: AppConfig.calWidth(context,4),
                         color: Colors.black,fontWeight: FontWeight.bold),

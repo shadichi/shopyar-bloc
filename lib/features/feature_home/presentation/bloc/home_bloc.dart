@@ -40,15 +40,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         final DataState dataState = await getHomeDataUseCase();
 
-        print('dataState.data');
+        print('getHomeDataUseCase');
         print(dataState.data);
 
         if (dataState is DataSuccess) {
 
-          StaticValues.staticHomeDataEntity = dataState.data;
+       StaticValues.staticHomeDataEntity = dataState.data;
 
           print('StaticValues.staticHomeDataEntity');
-          print(StaticValues.staticHomeDataEntity);
+          print(dataState.data);
+         /* print(StaticValues.staticHomeDataEntity!.dailyCancelled!.qty);
+          print(StaticValues.staticHomeDataEntity!.dailyCounts!);
+          print(StaticValues.staticHomeDataEntity!.dailySales!.qty);
+          print(StaticValues.staticHomeDataEntity!.monthlyCancelled!.qty);
+          print(StaticValues.staticHomeDataEntity!.monthlyCounts!);*/
+          print(StaticValues.staticHomeDataEntity!.statusCounts!.wcCancelled);
+          print(StaticValues.staticHomeDataEntity!.weeklyCounts!);
 
         }
 
@@ -73,6 +80,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           StaticValues.status = homeUserDataParams.response['status'] ?? {};
           StaticValues.versionNo = homeUserDataParams.response['version'] ?? "";
 
+          print("StaticValues.webService");
+          print(StaticValues.webService);
+          print(StaticValues.passWord);
+          print(StaticValues.shopName);
+          print(StaticValues.userName);
+          print(StaticValues.shippingMethods);
+          print(StaticValues.paymentMethods);
+          print(StaticValues.status);
+          print(StaticValues.staticHomeDataEntity);
+          print("StaticValues.staticHomeDataEntity");
+
 
           if (StaticValues.webService != '' &&
               StaticValues.passWord != '' &&
@@ -84,7 +102,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               StaticValues.staticHomeDataEntity != null) {
             emit(state.copyWith(newHomeStatus: HomeLoadedStatus()));
           } else {
-            print('در صفحه هوم اطلاعات اصلی بارگیری نشد');
+            print('صلی بارگیری نشد');
+            //print('در صفحه هوم اطلاعات اصلی بارگیری نشد');
             emit(state.copyWith(newHomeStatus: HomeErrorStatus()));
           }
         } else {

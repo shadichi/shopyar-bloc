@@ -10,12 +10,12 @@ import '../../../feature_products/domain/entities/product_entity.dart';
 import '../entities/add_order_product_entity.dart';
 import '../repository/add_order_repository.dart';
 
-class AddProductSearchedDataUseCase implements UseCase<OrderDataState<ProductEntity>, List>{
+class AddProductSearchedDataUseCase implements UseCase<OrderDataState<ProductEntity>, String>{
   final AddOrderRepository _productRepository;
   AddProductSearchedDataUseCase(this._productRepository);
 
   @override
-  Future<OrderDataState<ProductEntity>> call(List productsParams) {
+  Future<OrderDataState<ProductEntity>> call(String productsParams) {
     return _productRepository.AddOrderSearchedProduct(productsParams);
   }
 

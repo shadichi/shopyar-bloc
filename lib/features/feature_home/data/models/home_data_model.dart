@@ -14,7 +14,7 @@ class HomeDataModel extends HomeDataEntity {
     StatusCounts? statusCounts,
     int? dailyCounts,
     int? monthlyCounts,
-   Map<String, int>? weeklyCounts,
+    Map<String, int>? weeklyCounts,
   }) : super(
     dailySales: dailySales,
     monthlySales: monthlySales,
@@ -40,9 +40,9 @@ class HomeDataModel extends HomeDataEntity {
       monthlyCancelled: json["monthly_cancelled"] != null
           ? DailyCancelled.fromJson(json["monthly_cancelled"])
           : null,
-      statusCounts: json["status_counts"] != null
+      statusCounts: (json["status_counts"] is Map)?json["status_counts"] != null
           ? StatusCounts.fromJson(json["status_counts"])
-          : null,
+          : null : null,
       dailyCounts: json["daily_count"] ?? 0,  // Provide default value
       monthlyCounts: json["monthly_count"] ?? 0,  // Provide default value
       weeklyCounts: (json["count"] is Map)?json["count"] != null
@@ -75,42 +75,42 @@ class DailyCancelled {
 
 class StatusCounts {
   final int wcCompleted;
-  final int wcOnHold;
   final int wcPending;
   final int wcProcessing;
   final int wcCancelled;
-  final int wcCheckoutDraft;
-  final int trash;
+  final int wcFailed;
+  final int wcRefunded;
 
-  StatusCounts({
+  const StatusCounts({
     required this.wcCompleted,
-    required this.wcOnHold,
     required this.wcPending,
     required this.wcProcessing,
     required this.wcCancelled,
-    required this.wcCheckoutDraft,
-    required this.trash,
+    required this.wcFailed,
+    required this.wcRefunded,
   });
 
-  factory StatusCounts.fromJson(Map<String, dynamic> json) => StatusCounts(
-    wcCompleted:     _asInt(json['wc-completed'])     ?? 0,
-    wcOnHold:        _asInt(json['wc-on-hold'])       ?? 0,
-    wcPending:       _asInt(json['wc-pending'])       ?? 0,
-    wcProcessing:    _asInt(json['wc-processing'])    ?? 0,
-    wcCancelled:     _asInt(json['wc-cancelled'])     ?? 0,
-    wcCheckoutDraft: _asInt(json['auto-draft'])?? 0,
-    trash:           _asInt(json['trash'])            ?? 0,
-  );
+  factory StatusCounts.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return const StatusCounts(
+        wcCompleted: 0,
+        wcPending: 0,
+        wcProcessing: 0,
+        wcCancelled: 0,
+        wcFailed: 0,
+        wcRefunded: 0,
+      );
+    }
 
-  Map<String, dynamic> toJson() => {
-    'wc-completed': wcCompleted,
-    'wc-on-hold': wcOnHold,
-    'wc-pending': wcPending,
-    'wc-processing': wcProcessing,
-    'wc-cancelled': wcCancelled,
-    'auto-draft': wcCheckoutDraft,
-    'trash': trash,
-  };
+    return StatusCounts(
+      wcCompleted: _asInt(json['completed']) ?? 0,
+      wcPending: _asInt(json['pending']) ?? 0,
+      wcProcessing: _asInt(json['processing']) ?? 0,
+      wcCancelled: _asInt(json['cancelled']) ?? 0,
+      wcFailed: _asInt(json['failed']) ?? 0,
+      wcRefunded: _asInt(json['refunded']) ?? 0,
+    );
+  }
 }
 
 int? _asInt(dynamic v) {
@@ -132,4 +132,3 @@ List<int> _asIntList(dynamic v) {
   if (v is List) return v.map((e) => _asInt(e) ?? 0).toList();
   return const [];
 }
-
