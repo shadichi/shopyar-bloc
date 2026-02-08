@@ -277,56 +277,68 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
 
           mainContent = Padding(
             padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Stack(
               children: [
-                stepper(),
-                ListTile(
-                  title: Text(
-                    activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: AppConfig.calFontSize(context, 4.5)),
-                  ),
-                  subtitle: Text(
-                    activeStep == 0
-                        ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
-                        : 'لطفا محصولات را انتخاب فرمایید.',
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: AppConfig.calFontSize(context, 4.3)),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    // color: Colors.green,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 400),
-                      transitionBuilder: (child, animation) =>
-                          SlideTransition(
-                            position: Tween<Offset>(
-                                begin: const Offset(1, 0), end: Offset.zero)
-                                .animate(animation),
-                            child: child,
-                          ),
-                      child: Padding(
-                        key: ValueKey<int>(activeStep),
-                        //width: 500,
-                        padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                        child: _buildSection(onTextChange, textEditing,
-                            widget.mode, widget.ordersEntity, products),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    stepper(),
+                    ListTile(
+                      title: Text(
+                        activeStep == 0 ? 'مشخصات صورتحساب' : 'محصولات',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: AppConfig.calFontSize(context, 4.5)),
+                      ),
+                      subtitle: Text(
+                        activeStep == 0
+                            ? 'لطفا مشخصات صورتحساب را وارد فرمایید.'
+                            : 'لطفا محصولات را انتخاب فرمایید.',
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: AppConfig.calFontSize(context, 4.3)),
                       ),
                     ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    nextButton(loaded),
-                    previousButton(),
+                    Expanded(
+                      child: Container(
+                        // color: Colors.green,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          transitionBuilder: (child, animation) =>
+                              SlideTransition(
+                                position: Tween<Offset>(
+                                    begin: const Offset(1, 0), end: Offset.zero)
+                                    .animate(animation),
+                                child: child,
+                              ),
+                          child: Padding(
+                            key: ValueKey<int>(activeStep),
+                            //width: 500,
+                            padding: EdgeInsets.symmetric(horizontal: width * 0.01),
+                            child: _buildSection(onTextChange, textEditing,
+                                widget.mode, widget.ordersEntity, products),
+                          ),
+                        ),
+                      ),
+                    ),
+                  //  SizedBox(height: height * 0.023,),
+                    Container(
+                      alignment: Alignment.topCenter,
+height: height*0.16,
+                     // color: Colors.green,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          nextButton(loaded),
+                          previousButton(),
+                        ],
+                      ),
+                    ),
+
                   ],
                 ),
+
               ],
             ),
           );
@@ -380,8 +392,6 @@ class _AddOrderTest extends State<AddOrderProductFormScreen> {
       case 1:
         return Column(
           children: [
-
-            // 🔍 SearchBar (بیرون از لیست)
             Container(
               width: AppConfig.calWidth(context, 90),
 

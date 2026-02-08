@@ -128,8 +128,10 @@ class _AddOrderBillState extends State<AddOrderBill> {
     return Form(
       key: widget.formKey,
       child: Container(
+        alignment: Alignment.topCenter,
+        height: AppConfig.calHeight(context, 100),
         padding: EdgeInsets.all(8),
-        // color: Colors.green,
+      //   color: Colors.green,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

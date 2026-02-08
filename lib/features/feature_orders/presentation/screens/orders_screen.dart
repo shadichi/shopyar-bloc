@@ -370,11 +370,11 @@ class _LoadMoreButton extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        bottom: AppConfig.calWidth(context, 26),
+        bottom: AppConfig.calWidth(context, 32.5),
         right: AppConfig.calWidth(context, 3),
         left: AppConfig.calWidth(context, 3),
       ),
-      height: AppConfig.calHeight(context, 20),
+      height: AppConfig.calHeight(context, 25),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConfig.secondaryColor,

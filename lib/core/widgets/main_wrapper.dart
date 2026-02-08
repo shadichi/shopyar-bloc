@@ -47,7 +47,7 @@ class _MainWrapperState extends State<MainWrapper> {
             children: pageViewWidget,
           ),
           Positioned(
-            top: height * 0.87, // ← همون اندازه‌ی خودت
+            bottom: height * 0.07, // ← همون اندازه‌ی خودت
             left: 0,
             right: 0,
             child: ValueListenableBuilder<bool>(

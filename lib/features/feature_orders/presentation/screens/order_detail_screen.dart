@@ -90,7 +90,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               height: height,
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: EdgeInsets.only( bottom: width * 0.048),
+                margin: EdgeInsets.only( bottom: width * 0.17),
 
                 alignment: Alignment.center,
                 width: width * 0.7,

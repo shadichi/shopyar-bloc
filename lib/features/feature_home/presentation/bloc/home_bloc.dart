@@ -54,7 +54,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           print(StaticValues.staticHomeDataEntity!.dailySales!.qty);
           print(StaticValues.staticHomeDataEntity!.monthlyCancelled!.qty);
           print(StaticValues.staticHomeDataEntity!.monthlyCounts!);*/
-          print(StaticValues.staticHomeDataEntity!.statusCounts!.wcCancelled);
+
           print(StaticValues.staticHomeDataEntity!.weeklyCounts!);
 
         }

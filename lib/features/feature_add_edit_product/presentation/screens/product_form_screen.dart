@@ -217,12 +217,16 @@ class _AddProductProductFormScreenState
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  nextButton(),
-                  previousButton(),
-                ],
+              Container(
+                alignment: Alignment.topCenter,
+                height: height*0.16,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    nextButton(),
+                    previousButton(),
+                  ],
+                ),
               ),
             ],
           );

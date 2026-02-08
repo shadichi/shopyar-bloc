@@ -69,17 +69,19 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<HomeBloc>().add(RefreshHomeData(c));
     return c.future;
   }
-
   bool hasStatusData(StatusCounts? s) {
-    if (s == null) return false;
-    return s.wcCompleted > 0 ||
-        s.wcPending > 0 ||
-        s.wcProcessing > 0 ||
-        s.wcCancelled > 0 ||
-        s.wcFailed > 0 ||
-        s.wcRefunded > 0;
-  }
+    if (s == null || s.counts.isEmpty) return false;
 
+    const keys = [
+      'wc-completed',
+      'wc-on-hold',
+      'wc-pending',
+      'wc-processing',
+      'wc-cancelled',
+    ];
+
+    return keys.any((k) => (s.counts[k] ?? 0) > 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,11 +196,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               bottom: AppConfig.calHeight(context, 1.2)),
                           child: HomeScreenPieChart(
                             items: [
-                              status!.wcCompleted,
-                              status.wcPending,
-                              status!.wcProcessing,
-                              status!.wcCancelled,
-                              status!.wcRefunded,
+                              status!.counts['wc-completed'] ?? 0,
+                              status!.counts['wc-on-hold'] ?? 0,
+                              status!.counts['wc-pending'] ?? 0,
+                              status!.counts['wc-processing'] ?? 0,
+                              status!.counts['wc-cancelled'] ?? 0,
                             ],
 
                           ),
